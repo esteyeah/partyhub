@@ -114,21 +114,18 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
     id: 'eleven',
     name: 'Compose ton 11',
     emoji: '⚽',
-    tagline: 'Budget, contraintes & tactique',
-    description: 'Compose ton 11 type sous contrainte (budget, nationalité, club…). La meilleure note l’emporte.',
+    tagline: 'Draft poste par poste, duels & surprises',
+    description:
+      'À chaque poste, choisis un joueur parmi ceux proposés sans dépasser ton budget. Même choix qu’un autre ? Duel sur une question foot : le perdant hérite d’un joueur surprise…',
     gradient: 'from-emerald-500 to-teal-600',
     settings: [
+      { key: 'choices', label: 'Choix / poste', type: 'number', min: 3, max: 5, default: 4 },
       {
-        key: 'challenge',
-        label: 'Défi',
+        key: 'budget',
+        label: 'Budget',
         type: 'select',
-        options: [
-          { value: 'budget', label: '💸 Budget serré (250 M€)' },
-          { value: 'bleus', label: '🇫🇷 100% Bleus' },
-          { value: 'galacticos', label: '🤍 Passés par le Real' },
-          { value: 'europe', label: '🌍 Tour d’Europe' },
-        ],
-        default: 'budget',
+        options: [150, 200, 250, 300, 400, 500].map((v) => ({ value: String(v), label: `${v} M€` })),
+        default: '300',
       },
       {
         key: 'formation',
@@ -141,7 +138,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
         ],
         default: '4-3-3',
       },
-      { key: 'time', label: 'Temps', type: 'select', options: timeOptions([60, 90, 120, 180, 240]), default: '120' },
+      { key: 'time', label: 'Temps / poste', type: 'select', options: timeOptions([15, 20, 30]), default: '20' },
     ],
   },
 };

@@ -1,8 +1,29 @@
-import { ELEVEN_CHALLENGES, FOOTBALLERS, type ElevenChallenge, type FootballerFull } from '@content/footballers';
-import type { ElevenSlot, ElevenTeamResult, ElevenView, FootPos, GameAction } from '@shared/types';
+import { FLOPS, FOOTBALLERS } from '@content/footballers';
+import { QUIZ_QUESTIONS, type QuizQuestion } from '@content/quiz';
+import type { ElevenOutcome, ElevenSlot, ElevenTeam, ElevenTeamResult, ElevenView, FootPos, Footballer, GameAction } from '@shared/types';
 import { GameModule } from '../GameModule';
+import { shuffle } from '../../utils/random';
 
-type Settings = { challenge: string; formation: string; time: string };
+/**
+ * « Compose ton 11 » en draft :
+ *  1. pick    — pour chaque poste, 3 à 5 footballeurs sont proposés (prix dégressifs).
+ *               Chacun choisit en secret, dans la limite de son budget.
+ *  2. reveal  — les choix sont dévoilés.
+ *  3. duel    — si plusieurs joueurs ont choisi le même footballeur : question foot,
+ *               le plus rapide à bien répondre l'emporte (tirage au sort si personne ne trouve).
+ *  4. resolve — attribution. Les perdants d'un duel reçoivent un joueur surprise gratuit :
+ *               85 % un joueur du dimanche, 15 % une star qui n'était pas proposée.
+ *  … poste suivant, puis notes finales.
+ */
+
+type Settings = { choices: number; budget: string; formation: string; time: string };
+
+const REVEAL_MS = 3500;
+const DUEL_MS = 12000;
+const RESOLVE_MS = 5500;
+const FINAL_MS = 30000;
+const STAR_CHANCE = 0.15;
+const STAR_RATING = 88;
 
 const FORMATIONS: Record<string, [number, number, number]> = {
   '4-3-3': [4, 3, 3],
@@ -17,166 +38,319 @@ const LABELS: Record<FootPos, Record<number, string[]>> = {
   ATT: { 2: ['BU', 'BU'], 3: ['AG', 'BU', 'AD'] },
 };
 
+/** Postes dans l'ordre du draft : gardien → défense → milieu → attaque */
 export function buildSlots(formation: string): ElevenSlot[] {
   const [d, m, a] = FORMATIONS[formation] ?? FORMATIONS['4-3-3'];
-  const rows: [FootPos, number, number][] = [['ATT', a, 16], ['MID', m, 42], ['DEF', d, 68], ['GK', 1, 88]];
+  const rows: [FootPos, number, number][] = [['GK', 1, 88], ['DEF', d, 68], ['MID', m, 42], ['ATT', a, 16]];
   const slots: ElevenSlot[] = [];
-  // Ordre GK → DEF → MID → ATT pour l'index des slots
-  for (const [pos, n, y] of [...rows].reverse()) {
+  for (const [pos, n, y] of rows) {
     for (let i = 0; i < n; i++) {
-      const x = ((i + 1) / (n + 1)) * 100;
-      // Légère courbe : les latéraux/ailiers sont un peu plus hauts
       const curve = n >= 4 && (i === 0 || i === n - 1) ? -4 : 0;
-      slots.push({ pos, label: LABELS[pos][n]?.[i] ?? pos, x, y: y + curve });
+      slots.push({ pos, label: LABELS[pos][n]?.[i] ?? pos, x: ((i + 1) / (n + 1)) * 100, y: y + curve });
     }
   }
   return slots;
 }
 
-interface Team {
-  picks: (string | null)[];
-  submitted: boolean;
+const strip = ({ clubs: _c, ...f }: Footballer & { clubs?: string[] }): Footballer => f;
+
+interface Duel {
+  footballer: Footballer;
+  players: string[];
+  answers: Map<string, { choice: number; ms: number }>;
+  winner: string | null;
+  byChance: boolean;
 }
 
 export class ElevenGame extends GameModule<Settings> {
-  private challenge!: ElevenChallenge;
   private slots: ElevenSlot[] = [];
-  private pool: FootballerFull[] = [];
-  private byId = new Map<string, FootballerFull>();
-  private teams = new Map<string, Team>();
-  private phase: 'build' | 'reveal' = 'build';
+  private slotIndex = -1;
+  private phase: ElevenView['phase'] = 'pick';
   private endsAt: number | null = null;
   private durationMs = 0;
+  private phaseStartedAt = 0;
+  private budget = 300;
+
+  private teams = new Map<string, ElevenTeam>();
+  private owned = new Set<string>();
+  private offers: Footballer[] = [];
+  private choices = new Map<string, string>();
+  private autoPicked = new Set<string>();
+  private broke = new Set<string>();
+  private revealed: Record<string, string | null> | null = null;
+
+  private duels: Duel[] = [];
+  private duelQuestion: { question: string; choices: string[]; answer: number } | null = null;
+  private usedQuestions = new Set<string>();
+  private outcomes: ElevenOutcome[] | null = null;
   private results: ElevenTeamResult[] | null = null;
+  private flopSeq = 0;
 
   start() {
-    this.challenge = ELEVEN_CHALLENGES[this.settings.challenge] ?? ELEVEN_CHALLENGES.budget;
+    this.budget = Number(this.settings.budget) || 300;
     this.slots = buildSlots(this.settings.formation);
-    this.pool = FOOTBALLERS.filter((p) => !this.challenge.pool || this.challenge.pool(p)).sort((a, b) => b.rating - a.rating);
-    this.byId = new Map(this.pool.map((p) => [p.id, p]));
-    this.durationMs = Number(this.settings.time) * 1000;
-    this.endsAt = this.now() + this.durationMs;
-    this.setTimer(this.durationMs, () => this.reveal());
-    this.ctx.sync();
+    this.nextSlot();
   }
 
-  private team(playerId: string): Team {
+  /* ---------------- Utilitaires ---------------- */
+
+  private team(playerId: string): ElevenTeam {
     let t = this.teams.get(playerId);
     if (!t) {
-      t = { picks: this.slots.map(() => null), submitted: false };
+      t = { picks: this.slots.map(() => null), spent: 0 };
       this.teams.set(playerId, t);
     }
     return t;
   }
 
-  private spent(picks: (string | null)[]): number {
-    return picks.reduce((sum, id) => sum + (id ? this.byId.get(id)?.price ?? 0 : 0), 0);
+  private remaining(playerId: string) {
+    return this.budget - this.team(playerId).spent;
   }
 
-  onAction(playerId: string, action: GameAction) {
-    if (this.phase !== 'build') return;
-    const team = this.team(playerId);
+  /** Joueurs qui participent au poste en cours */
+  private participants(): string[] {
+    return this.ctx.players().filter((p) => p.connected || this.teams.has(p.id)).map((p) => p.id);
+  }
 
-    if (action.type === 'pick') {
-      const slot = this.slots[action.slot];
-      const fb = this.byId.get(action.footballerId);
-      if (!slot || !fb || team.submitted) return;
-      if (fb.pos !== slot.pos) return;
-      if (team.picks.some((id, i) => id === fb.id && i !== action.slot)) return;
-      const next = [...team.picks];
-      next[action.slot] = fb.id;
-      if (this.spent(next) > this.challenge.budget) return;
-      team.picks = next;
-    } else if (action.type === 'clear') {
-      if (team.submitted || !this.slots[action.slot]) return;
-      team.picks[action.slot] = null;
-    } else if (action.type === 'submit') {
-      team.submitted = !!action.value;
-      const active = this.ctx.players().filter((p) => p.connected);
-      if (active.length && active.every((p) => this.teams.get(p.id)?.submitted)) {
-        this.clearTimers();
-        this.setTimer(800, () => this.reveal());
-      }
-    } else {
-      return;
-    }
+  private setPhase(phase: ElevenView['phase'], ms: number, next: () => void) {
+    this.clearTimers();
+    this.phase = phase;
+    this.phaseStartedAt = this.now();
+    this.durationMs = ms;
+    this.endsAt = this.now() + ms;
+    this.setTimer(ms, next);
     this.ctx.sync();
   }
 
-  private evaluate(playerId: string, team: Team): ElevenTeamResult {
-    const players = team.picks.map((id) => (id ? this.byId.get(id) ?? null : null));
-    const chosen = players.filter((p): p is FootballerFull => !!p);
-    const complete = chosen.length === this.slots.length;
-    // Un poste vide compte pour 0 : il faut absolument compléter son équipe !
-    const average = chosen.reduce((s, p) => s + p.rating, 0) / this.slots.length;
-    const bonuses = this.challenge.bonuses.map((b) => ({ label: b.label, value: b.value, ok: complete && b.test(chosen) }));
-    const note = Math.round((average + bonuses.reduce((s, b) => s + (b.ok ? b.value : 0), 0)) * 10) / 10;
-    return {
-      playerId,
-      picks: team.picks,
-      spent: this.spent(team.picks),
-      average: Math.round(average * 10) / 10,
-      note,
-      bonuses,
-      points: Math.round(note * 10),
-      complete,
-      best: false,
-    };
+  /** Propositions variées : on découpe les candidats par niveau et on en tire un par tranche. */
+  private makeOffers(pos: FootPos): Footballer[] {
+    const n = Math.max(3, Math.min(5, Number(this.settings.choices) || 4));
+    const candidates = FOOTBALLERS.filter((p) => p.pos === pos && !this.owned.has(p.id)).sort((a, b) => b.rating - a.rating);
+    if (candidates.length <= n) return candidates.map(strip).sort((a, b) => b.price - a.price);
+    const picked: Footballer[] = [];
+    for (let i = 0; i < n; i++) {
+      const from = Math.floor((i * candidates.length) / n);
+      const to = Math.floor(((i + 1) * candidates.length) / n);
+      const bucket = candidates.slice(from, Math.max(to, from + 1));
+      picked.push(strip(bucket[Math.floor(Math.random() * bucket.length)]));
+    }
+    return picked.sort((a, b) => b.price - a.price || b.rating - a.rating);
   }
 
-  private reveal() {
-    if (this.phase !== 'build') return;
-    this.clearTimers();
-    this.phase = 'reveal';
-    const results = this.ctx
-      .players()
-      .filter((p) => p.connected || this.teams.has(p.id))
-      .map((p) => this.evaluate(p.id, this.team(p.id)))
-      .sort((a, b) => b.note - a.note);
+  private surprise(pos: FootPos): { footballer: Footballer; star: boolean } {
+    if (Math.random() < STAR_CHANCE) {
+      const offered = new Set(this.offers.map((o) => o.id));
+      const stars = FOOTBALLERS.filter((p) => p.pos === pos && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
+      if (stars.length) return { footballer: strip(stars[Math.floor(Math.random() * stars.length)]), star: true };
+    }
+    const flops = FLOPS[pos];
+    const f = flops[Math.floor(Math.random() * flops.length)];
+    return { footballer: { ...f, id: `${f.id}-${++this.flopSeq}` }, star: false };
+  }
+
+  private pickDuelQuestion() {
+    let pool = QUIZ_QUESTIONS.filter((q) => q.theme === 'foot' && !this.usedQuestions.has(q.question));
+    if (!pool.length) {
+      this.usedQuestions.clear();
+      pool = QUIZ_QUESTIONS.filter((q) => q.theme === 'foot');
+    }
+    const q: QuizQuestion = pool[Math.floor(Math.random() * pool.length)];
+    this.usedQuestions.add(q.question);
+    const order = shuffle([0, 1, 2, 3]);
+    return { question: q.question, choices: order.map((i) => q.choices[i]), answer: order.indexOf(q.answer) };
+  }
+
+  /* ---------------- Déroulé ---------------- */
+
+  private nextSlot() {
+    this.slotIndex++;
+    if (this.slotIndex >= this.slots.length) return this.final();
+    for (const id of this.participants()) this.team(id);
+    this.offers = this.makeOffers(this.slots[this.slotIndex].pos);
+    this.choices.clear();
+    this.autoPicked.clear();
+    this.broke.clear();
+    this.revealed = null;
+    this.duels = [];
+    this.duelQuestion = null;
+    this.outcomes = null;
+    this.setPhase('pick', Number(this.settings.time) * 1000, () => this.closePicks());
+  }
+
+  private closePicks() {
+    if (this.phase !== 'pick') return;
+    // Pas de choix à temps : on prend le moins cher abordable, sinon remplaçant gratuit
+    for (const id of this.participants()) {
+      if (this.choices.has(id)) continue;
+      const cheapest = this.offers.filter((o) => o.price <= this.remaining(id)).sort((a, b) => a.price - b.price)[0];
+      if (cheapest) {
+        this.choices.set(id, cheapest.id);
+        this.autoPicked.add(id);
+      } else this.broke.add(id);
+    }
+    this.revealed = Object.fromEntries(this.participants().map((id) => [id, this.choices.get(id) ?? null]));
+
+    const groups = new Map<string, string[]>();
+    for (const [pid, fid] of this.choices) groups.set(fid, [...(groups.get(fid) ?? []), pid]);
+    const contested = [...groups].filter(([, ids]) => ids.length > 1);
+    this.duels = contested.map(([fid, ids]) => ({
+      footballer: this.offers.find((o) => o.id === fid)!,
+      players: ids,
+      answers: new Map(),
+      winner: null,
+      byChance: false,
+    }));
+    this.setPhase('reveal', REVEAL_MS, () => (this.duels.length ? this.startDuels() : this.resolve()));
+  }
+
+  private startDuels() {
+    this.duelQuestion = this.pickDuelQuestion();
+    this.setPhase('duel', DUEL_MS, () => this.resolveDuels());
+  }
+
+  private resolveDuels() {
+    if (this.phase !== 'duel' || !this.duelQuestion) return;
+    for (const d of this.duels) {
+      const right = [...d.answers].filter(([, a]) => a.choice === this.duelQuestion!.answer).sort((a, b) => a[1].ms - b[1].ms);
+      if (right.length) d.winner = right[0][0];
+      else {
+        d.winner = d.players[Math.floor(Math.random() * d.players.length)];
+        d.byChance = true;
+      }
+    }
+    this.resolve();
+  }
+
+  private resolve() {
+    const outcomes: ElevenOutcome[] = [];
+    const give = (pid: string, footballer: Footballer, how: ElevenOutcome['how'], price: number) => {
+      const t = this.team(pid);
+      t.picks[this.slotIndex] = footballer;
+      t.spent += price;
+      if (!footballer.id.startsWith('flop-')) this.owned.add(footballer.id);
+      outcomes.push({ playerId: pid, footballer, how, price });
+    };
+    const pos = this.slots[this.slotIndex].pos;
+
+    for (const pid of this.participants()) {
+      const fid = this.choices.get(pid);
+      if (!fid) {
+        give(pid, this.surpriseFlop(pos), 'broke', 0); // budget épuisé : remplaçant gratuit
+        continue;
+      }
+      const duel = this.duels.find((d) => d.footballer.id === fid);
+      if (!duel || duel.winner === pid) {
+        const fb = this.offers.find((o) => o.id === fid)!;
+        give(pid, fb, duel ? 'duel' : this.autoPicked.has(pid) ? 'auto' : 'pick', fb.price);
+      }
+    }
+    // Les perdants des duels : surprise (après les gagnants, pour ne pas leur piquer une star)
+    for (const d of this.duels) {
+      for (const pid of d.players) {
+        if (pid === d.winner) continue;
+        const s = this.surprise(pos);
+        give(pid, s.footballer, s.star ? 'surprise-star' : 'surprise-flop', 0);
+      }
+    }
+    this.outcomes = outcomes;
+    this.setPhase('resolve', RESOLVE_MS, () => this.nextSlot());
+  }
+
+  private surpriseFlop(pos: FootPos): Footballer {
+    const f = FLOPS[pos][Math.floor(Math.random() * FLOPS[pos].length)];
+    return { ...f, id: `${f.id}-${++this.flopSeq}` };
+  }
+
+  private final() {
+    const results: ElevenTeamResult[] = [...this.teams].map(([playerId, t]) => {
+      const total = t.picks.reduce((s, p) => s + (p?.rating ?? 0), 0);
+      const note = Math.round((total / this.slots.length) * 10) / 10;
+      return { playerId, picks: t.picks, spent: t.spent, note, points: Math.round(note * 30), best: false };
+    });
+    results.sort((a, b) => b.note - a.note);
     const top = results[0]?.note;
     for (const r of results) {
-      if (results.length > 1 && r.note === top && r.note > 0) {
+      if (results.length > 1 && r.note === top) {
         r.best = true;
-        r.points += 200; // bonus du meilleur 11
+        r.points += 500;
       }
       this.ctx.addScore(r.playerId, r.points);
     }
     this.results = results;
-    this.endsAt = this.now() + 25000;
-    this.setTimer(25000, () => this.ctx.finish());
-    this.ctx.sync();
+    this.offers = [];
+    this.setPhase('final', FINAL_MS, () => this.ctx.finish());
+  }
+
+  /* ---------------- Actions ---------------- */
+
+  onAction(playerId: string, action: GameAction) {
+    if (this.phase === 'pick' && action.type === 'pick') {
+      const fb = this.offers.find((o) => o.id === action.footballerId);
+      if (!fb || fb.price > this.remaining(playerId)) return;
+      this.team(playerId);
+      this.choices.set(playerId, fb.id);
+      const everyone = this.participants().filter((id) => this.ctx.players().find((p) => p.id === id)?.connected);
+      if (everyone.length && everyone.every((id) => this.choices.has(id))) {
+        this.clearTimers();
+        this.setTimer(700, () => this.closePicks());
+      }
+      this.ctx.sync();
+    } else if (this.phase === 'duel' && action.type === 'answer' && this.duelQuestion) {
+      const duel = this.duels.find((d) => d.players.includes(playerId));
+      if (!duel || duel.answers.has(playerId)) return;
+      if (!Number.isInteger(action.choice) || action.choice < 0 || action.choice > 3) return;
+      duel.answers.set(playerId, { choice: action.choice, ms: this.now() - this.phaseStartedAt });
+      const connected = new Set(this.ctx.players().filter((p) => p.connected).map((p) => p.id));
+      const done = this.duels.every((d) => d.players.filter((id) => connected.has(id)).every((id) => d.answers.has(id)));
+      if (done) {
+        this.clearTimers();
+        this.setTimer(700, () => this.resolveDuels());
+      }
+      this.ctx.sync();
+    }
   }
 
   skip() {
-    if (this.phase === 'build') this.reveal();
+    if (this.phase === 'pick') this.closePicks();
+    else if (this.phase === 'reveal') this.duels.length ? this.startDuels() : this.resolve();
+    else if (this.phase === 'duel') this.resolveDuels();
+    else if (this.phase === 'resolve') this.nextSlot();
     else this.ctx.finish();
   }
 
   view(playerId: string): ElevenView {
-    const me = this.team(playerId);
-    const progress: ElevenView['progress'] = {};
-    for (const p of this.ctx.players()) {
-      const t = this.teams.get(p.id);
-      progress[p.id] = { filled: t ? t.picks.filter(Boolean).length : 0, submitted: t?.submitted ?? false };
-    }
+    const myDuel = this.duels.find((d) => d.players.includes(playerId));
+    const showAnswers = this.phase === 'resolve';
     return {
       kind: 'eleven',
       gameId: 'eleven',
       phase: this.phase,
       endsAt: this.endsAt,
-      durationMs: this.phase === 'build' ? this.durationMs : 25000,
-      challenge: {
-        name: this.challenge.name,
-        description: this.challenge.description,
-        budget: this.challenge.budget,
-        rules: this.challenge.rules,
-        bonuses: this.challenge.bonuses.map(({ label, value }) => ({ label, value })),
-      },
+      durationMs: this.durationMs,
       formation: this.settings.formation,
       slots: this.slots,
-      pool: this.pool.map(({ clubs: _clubs, ...p }) => p),
-      me: { picks: me.picks, spent: this.spent(me.picks), submitted: me.submitted },
-      progress,
+      slotIndex: Math.min(this.slotIndex, this.slots.length - 1),
+      budget: this.budget,
+      offers: this.offers,
+      teams: Object.fromEntries(this.teams),
+      picked: [...this.choices.keys()],
+      me: {
+        choice: this.choices.get(playerId) ?? null,
+        duelChoice: myDuel?.answers.get(playerId)?.choice ?? null,
+      },
+      choices: this.revealed,
+      duelQuestion: this.duelQuestion
+        ? { question: this.duelQuestion.question, choices: this.duelQuestion.choices, correctIndex: showAnswers ? this.duelQuestion.answer : null }
+        : null,
+      duels: this.duels.map((d) => ({
+        footballer: d.footballer,
+        players: d.players,
+        answered: [...d.answers.keys()],
+        answers: showAnswers ? Object.fromEntries(d.players.map((id) => [id, d.answers.get(id)?.choice ?? null])) : null,
+        winner: showAnswers ? d.winner : null,
+        byChance: showAnswers && d.byChance,
+      })),
+      outcomes: this.outcomes,
       results: this.results,
     };
   }

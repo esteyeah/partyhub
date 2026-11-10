@@ -116,7 +116,7 @@ export function Lobby() {
                       .map((gameId) => ({
                         uid: uid(),
                         gameId,
-                        settings: { ...defaultSettings(gameId), ...(gameId === 'eleven' ? { time: '90' } : { rounds: 5 }) },
+                        settings: { ...defaultSettings(gameId), ...(gameId === 'eleven' ? { time: '15' } : { rounds: 5 }) },
                       })),
                   )
                 }

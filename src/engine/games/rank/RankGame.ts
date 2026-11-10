@@ -1,5 +1,6 @@
 import { RANK_CLIPS, RANK_LADDERS, type RankClip } from '@content/rank';
 import type { RankExtra, RankPrompt } from '@shared/types';
+import { loadCustomRankClips } from '../../customContent';
 import { shuffle } from '../../utils/random';
 import { RoundGame, type ChoiceScore, type RoundSpec } from '../RoundGame';
 
@@ -11,8 +12,9 @@ type Settings = { rounds: number; time: string };
 export class RankGame extends RoundGame<RankClip, RankPrompt, RankExtra, Settings> {
   readonly gameId = 'rank' as const;
 
-  protected prepare() {
-    const valid = RANK_CLIPS.filter((c) => (RANK_LADDERS[c.game].ranks as readonly string[]).includes(c.rank));
+  protected async prepare() {
+    const all = [...RANK_CLIPS, ...(await loadCustomRankClips())];
+    const valid = all.filter((c) => (RANK_LADDERS[c.game].ranks as readonly string[]).includes(c.rank));
     return shuffle(valid).slice(0, this.settings.rounds);
   }
 

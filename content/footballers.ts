@@ -118,72 +118,41 @@ export const FOOTBALLERS: FootballerFull[] = ROWS.map(([id, name, pos, nat, club
 }));
 
 /* ------------------------------------------------------------------ */
-/* Défis                                                               */
+/* Joueurs « surprise » (fictifs) donnés au perdant d'un duel           */
 /* ------------------------------------------------------------------ */
 
-export interface ElevenChallenge {
-  id: string;
-  name: string;
-  description: string;
-  budget: number;
-  rules: string[];
-  /** Restreint la liste des joueurs disponibles */
-  pool?: (p: FootballerFull) => boolean;
-  /** Bonus ajoutés à la note si la condition est remplie (équipe complète uniquement) */
-  bonuses: { label: string; value: number; test: (team: FootballerFull[]) => boolean }[];
-}
+/**
+ * 85 % du temps, le perdant d'un duel hérite d'un de ces joueurs du dimanche (gratuits).
+ * Les 15 % restants, il récupère une star (note ≥ 88) qui n'était pas proposée.
+ */
+const flop = (id: string, name: string, pos: FootPos, rating: number): Footballer => ({
+  id: `flop-${id}`, name, pos, nat: 'FRA', flag: '🥴', club: 'AS Dimanche Matin', league: 'District', rating, price: 0,
+});
 
-const BIG5 = ['Ligue 1', 'Premier League', 'Liga', 'Serie A', 'Bundesliga'];
-const countBy = <T,>(arr: T[], key: (x: T) => string) =>
-  arr.reduce<Record<string, number>>((acc, x) => ((acc[key(x)] = (acc[key(x)] ?? 0) + 1), acc), {});
-
-export const ELEVEN_CHALLENGES: Record<string, ElevenChallenge> = {
-  budget: {
-    id: 'budget',
-    name: 'Budget serré',
-    description: 'Les stars coûtent cher : compose le meilleur 11 possible avec 250 M€.',
-    budget: 250,
-    rules: ['Tous les joueurs sont disponibles', 'Budget maximum : 250 M€'],
-    bonuses: [
-      { label: 'Au moins 3 joueurs de Ligue 1', value: 2, test: (t) => t.filter((p) => p.league === 'Ligue 1').length >= 3 },
-      { label: 'Aucun joueur à plus de 60 M€', value: 2, test: (t) => t.every((p) => p.price <= 60) },
-      { label: 'Il reste au moins 20 M€', value: 1, test: (t) => t.reduce((s, p) => s + p.price, 0) <= 230 },
-    ],
-  },
-  bleus: {
-    id: 'bleus',
-    name: '100% Bleus',
-    description: 'Uniquement des joueurs de l’équipe de France, avec 350 M€.',
-    budget: 350,
-    rules: ['Nationalité imposée : 🇫🇷 France', 'Budget maximum : 350 M€'],
-    pool: (p) => p.nat === 'FRA',
-    bonuses: [
-      { label: 'Au moins 3 joueurs évoluant en Ligue 1', value: 2, test: (t) => t.filter((p) => p.league === 'Ligue 1').length >= 3 },
-      { label: 'Au moins 3 championnats différents', value: 2, test: (t) => new Set(t.map((p) => p.league)).size >= 3 },
-    ],
-  },
-  galacticos: {
-    id: 'galacticos',
-    name: 'Galácticos',
-    description: 'Seulement des joueurs passés (ou actuellement) au Real Madrid, budget 400 M€.',
-    budget: 400,
-    rules: ['Joueurs passés par le Real Madrid uniquement', 'Budget maximum : 400 M€'],
-    pool: (p) => p.clubs.includes('Real Madrid'),
-    bonuses: [
-      { label: 'Au moins 3 anciens (ne jouent plus au Real)', value: 3, test: (t) => t.filter((p) => p.club !== 'Real Madrid').length >= 3 },
-      { label: 'Au moins 4 nationalités', value: 1, test: (t) => new Set(t.map((p) => p.nat)).size >= 4 },
-    ],
-  },
-  europe: {
-    id: 'europe',
-    name: 'Tour d’Europe',
-    description: 'Fais voyager ton équipe : bonus pour la diversité des championnats et des clubs. Budget 450 M€.',
-    budget: 450,
-    rules: ['Tous les joueurs sont disponibles', 'Budget maximum : 450 M€'],
-    bonuses: [
-      { label: 'Les 5 grands championnats représentés', value: 4, test: (t) => BIG5.every((l) => t.some((p) => p.league === l)) },
-      { label: 'Maximum 2 joueurs par club', value: 2, test: (t) => Object.values(countBy(t, (p) => p.club)).every((n) => n <= 2) },
-      { label: 'Au moins 1 joueur hors du Big 5', value: 1, test: (t) => t.some((p) => !BIG5.includes(p.league)) },
-    ],
-  },
+export const FLOPS: Record<FootPos, Footballer[]> = {
+  GK: [
+    flop('passoire', 'Jean-Claude Passoire', 'GK', 48),
+    flop('mainsmoites', 'Gérard Mains-Moites', 'GK', 52),
+    flop('lucarne', 'Bernard Lucarne', 'GK', 55),
+    flop('poteau', 'Patrice Poteau', 'GK', 58),
+  ],
+  DEF: [
+    flop('tacle', 'Jacky Tacle-Retard', 'DEF', 50),
+    flop('csc', 'Rodrigue Contre-son-Camp', 'DEF', 53),
+    flop('glissade', 'Régis Glissade', 'DEF', 55),
+    flop('plot', 'Didier Plot', 'DEF', 57),
+    flop('horsjeu', 'Mickaël Hors-Jeu', 'DEF', 60),
+  ],
+  MID: [
+    flop('passeratee', 'Gégé Passe-Ratée', 'MID', 51),
+    flop('essouffle', 'Thierry Essoufflé', 'MID', 54),
+    flop('talonnade', 'Dylan Talonnade', 'MID', 57),
+    flop('petitpont', 'Steevy Petit-Pont', 'MID', 61),
+  ],
+  ATT: [
+    flop('tribune', 'Momo Tir-Tribune', 'ATT', 50),
+    flop('dimanche', 'Ronaldo du Dimanche', 'ATT', 53),
+    flop('transversale', 'Christophe Barre-Transversale', 'ATT', 56),
+    flop('horscadre', 'Franck Hors-Cadre', 'ATT', 59),
+  ],
 };

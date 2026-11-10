@@ -8,6 +8,8 @@ export interface QuizQuestion {
   choices: [string, string, string, string];
   answer: 0 | 1 | 2 | 3;
   explanation?: string;
+  /** Thème facultatif : les questions 'foot' servent aussi aux duels de « Compose ton 11 » */
+  theme?: 'foot';
 }
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
@@ -123,4 +125,87 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { category: 'piege', question: 'Quel astre est le plus proche de la Terre ?', choices: ['Le Soleil', 'Mars', 'La Lune', 'Vénus'], answer: 2 },
   { category: 'piege', question: 'Quelle est la valeur de π arrondie au centième ?', choices: ['3,12', '3,14', '3,16', '3,41'], answer: 1 },
   { category: 'piege', question: 'Si tu doubles le 2ᵉ d’une course, à quelle place es-tu ?', choices: ['1ʳᵉ', '2ᵉ', '3ᵉ', 'Dernière'], answer: 1, explanation: 'Tu prends sa place : tu es 2ᵉ, pas 1ᵉʳ !' },
+
+  // ───────── Pack 3 : thèmes ─────────
+  // ⚽ Foot (aussi utilisées pour les duels de « Compose ton 11 »)
+  { category: 'culture', theme: 'foot', question: 'Qui a remporté le Ballon d’Or 2025 ?', choices: ['Lamine Yamal', 'Ousmane Dembélé', 'Kylian Mbappé', 'Vitinha'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Combien de Coupes du monde l’équipe de France a-t-elle gagnées ?', choices: ['1', '2', '3', '4'], answer: 1, explanation: '1998 et 2018.' },
+  { category: 'culture', theme: 'foot', question: 'Quel joueur détient le record de Ballons d’Or ?', choices: ['Cristiano Ronaldo', 'Lionel Messi', 'Michel Platini', 'Johan Cruyff'], answer: 1, explanation: 'Messi en compte 8.' },
+  { category: 'culture', theme: 'foot', question: 'Qui a inscrit un triplé en finale de la Coupe du monde 2022 ?', choices: ['Lionel Messi', 'Kylian Mbappé', 'Ángel Di María', 'Olivier Giroud'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Quel club français a remporté la Ligue des champions en 1993 ?', choices: ['Le PSG', 'L’OM', 'Monaco', 'Lyon'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'En quelle année le PSG a-t-il remporté sa première Ligue des champions ?', choices: ['2020', '2023', '2024', '2025'], answer: 3 },
+  { category: 'culture', theme: 'foot', question: 'Quel joueur a donné un coup de tête à Materazzi en finale de la Coupe du monde 2006 ?', choices: ['Thierry Henry', 'Zinédine Zidane', 'Patrick Vieira', 'Franck Ribéry'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Quel pays a remporté l’Euro 2024 ?', choices: ['L’Angleterre', 'La France', 'L’Espagne', 'L’Italie'], answer: 2 },
+  { category: 'culture', theme: 'foot', question: 'Quel club est surnommé « les Gunners » ?', choices: ['Chelsea', 'Arsenal', 'Tottenham', 'West Ham'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Comment s’appelle le stade historique du FC Barcelone ?', choices: ['Santiago Bernabéu', 'Camp Nou', 'Mestalla', 'Wanda Metropolitano'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Quels pays organisent la Coupe du monde 2026 ?', choices: ['Le Qatar', 'États-Unis, Canada et Mexique', 'Maroc, Espagne et Portugal', 'L’Arabie saoudite'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Qui était le sélectionneur de la France championne du monde en 2018 ?', choices: ['Aimé Jacquet', 'Laurent Blanc', 'Didier Deschamps', 'Raymond Domenech'], answer: 2 },
+  { category: 'culture', theme: 'foot', question: 'Quel gardien était le capitaine des Bleus champions du monde en 2018 ?', choices: ['Steve Mandanda', 'Hugo Lloris', 'Mike Maignan', 'Alphonse Areola'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Qui a remporté le Ballon d’Or 1998 ?', choices: ['Ronaldo', 'Zinédine Zidane', 'Davor Šuker', 'Dennis Bergkamp'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Que se passe-t-il quand un joueur reçoit deux cartons jaunes dans le même match ?', choices: ['Rien', 'Il est expulsé', 'Penalty pour l’adversaire', 'Il sort 10 minutes'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Combien dure une mi-temps au football (hors temps additionnel) ?', choices: ['40 minutes', '45 minutes', '50 minutes', '60 minutes'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Quel club a remporté la Ligue 1 2024-2025 ?', choices: ['L’OM', 'Monaco', 'Le PSG', 'Lille'], answer: 2 },
+
+  // 🍺 How I Met Your Mother
+  { category: 'culture', question: 'Dans How I Met Your Mother, quel est le métier de Ted Mosby ?', choices: ['Avocat', 'Architecte', 'Journaliste', 'Médecin'], answer: 1 },
+  { category: 'culture', question: 'Comment s’appelle le bar où se retrouve la bande de How I Met Your Mother ?', choices: ['Central Perk', 'MacLaren’s', 'Paddy’s Pub', 'Chez Moe'], answer: 1 },
+  { category: 'culture', question: 'Complète la réplique culte de Barney : « Legen… wait for it… »', choices: ['…dary !', '…darious !', '…day !', '…dor !'], answer: 0 },
+  { category: 'culture', question: 'Quelle est la nationalité de Robin Scherbatsky ?', choices: ['Américaine', 'Anglaise', 'Canadienne', 'Australienne'], answer: 2 },
+  { category: 'culture', question: 'Quel est le prénom de « la mère » dans How I Met Your Mother ?', choices: ['Victoria', 'Stella', 'Tracy', 'Zoey'], answer: 2 },
+  { category: 'culture', question: 'Quel est le métier de Lily Aldrin ?', choices: ['Institutrice de maternelle', 'Avocate', 'Présentatrice télé', 'Architecte'], answer: 0 },
+
+  // 📺 Sitcoms
+  { category: 'culture', question: 'Dans Friends, comment s’appelle le café où se retrouvent les personnages ?', choices: ['MacLaren’s', 'Central Perk', 'The Coffee Bean', 'Monk’s Café'], answer: 1 },
+  { category: 'culture', question: 'Quelle est l’expression fétiche de Sheldon Cooper dans The Big Bang Theory ?', choices: ['« Bazinga ! »', '« How you doin’ ? »', '« D’oh ! »', '« Cowabunga ! »'], answer: 0 },
+  { category: 'culture', question: 'Dans quelle ville se trouve l’agence Dunder Mifflin de The Office (US) ?', choices: ['Scranton', 'Stamford', 'Pittsburgh', 'Chicago'], answer: 0 },
+  { category: 'culture', question: 'Combien de saisons compte la série Friends ?', choices: ['8', '9', '10', '12'], answer: 2 },
+  { category: 'culture', question: 'Quel est le métier de Ross Geller dans Friends ?', choices: ['Paléontologue', 'Chef cuisinier', 'Acteur', 'Masseur'], answer: 0 },
+  { category: 'culture', question: 'Qui a créé Kaamelott et y joue le roi Arthur ?', choices: ['Franck Pitiot', 'Alexandre Astier', 'Jean-Christophe Hembert', 'Thomas Cousseau'], answer: 1 },
+  { category: 'culture', question: 'Comment s’appelle le capitaine du commissariat dans Brooklyn Nine-Nine ?', choices: ['Raymond Holt', 'Terry Jeffords', 'Jake Peralta', 'Charles Boyle'], answer: 0 },
+
+  // 🤼 Catch
+  { category: 'culture', question: 'Quel catcheur devenu acteur est surnommé « The Rock » ?', choices: ['John Cena', 'Dwayne Johnson', 'Dave Bautista', 'Hulk Hogan'], answer: 1 },
+  { category: 'culture', question: 'Qui a mis fin à la série d’invincibilité de l’Undertaker à WrestleMania en 2014 ?', choices: ['John Cena', 'Brock Lesnar', 'Roman Reigns', 'Triple H'], answer: 1 },
+  { category: 'culture', question: 'À quel catcheur est associée la phrase « You can’t see me » ?', choices: ['Randy Orton', 'John Cena', 'The Rock', 'Batista'], answer: 1 },
+  { category: 'culture', question: 'Quel est le plus grand événement annuel de la WWE ?', choices: ['SummerSlam', 'Royal Rumble', 'WrestleMania', 'Survivor Series'], answer: 2 },
+
+  // ▶️ YouTube français
+  { category: 'culture', question: 'Quel youtubeur est à l’origine de la série « Salut les geeks » ?', choices: ['Mathieu Sommet', 'Norman', 'Cyprien', 'Squeezie'], answer: 0 },
+  { category: 'culture', question: 'Quel youtubeur organise la course automobile GP Explorer ?', choices: ['Inoxtag', 'Squeezie', 'Michou', 'Amixem'], answer: 1 },
+  { category: 'culture', question: 'Quel streamer a lancé le marathon caritatif ZEvent ?', choices: ['ZeratoR', 'Squeezie', 'Gotaga', 'Kameto'], answer: 0 },
+  { category: 'culture', question: 'Quel youtubeur a gravi l’Everest dans le documentaire « Kaizen » (2024) ?', choices: ['Michou', 'Inoxtag', 'Amixem', 'Tibo InShape'], answer: 1 },
+  { category: 'culture', question: 'Quel président a participé à un concours d’anecdotes avec McFly et Carlito ?', choices: ['François Hollande', 'Nicolas Sarkozy', 'Emmanuel Macron', 'Jacques Chirac'], answer: 2 },
+
+  // 🎬 Bref
+  { category: 'culture', question: 'Qui a créé la série « Bref » et y joue le personnage principal ?', choices: ['Kyan Khojandi', 'Navo', 'Baptiste Lecaplain', 'Kev Adams'], answer: 0 },
+  { category: 'culture', question: 'Sur quelle chaîne la première saison de « Bref » a-t-elle été diffusée ?', choices: ['M6', 'Canal+', 'France 2', 'TF1'], answer: 1 },
+  { category: 'piege', question: 'Combien de temps dure environ un épisode de la première saison de « Bref » ?', choices: ['30 secondes', '2 minutes', '10 minutes', '22 minutes'], answer: 1 },
+  { category: 'culture', question: 'Sur quelle plateforme la suite « Bref. 2 » est-elle sortie en 2025 ?', choices: ['Netflix', 'Disney+', 'Prime Video', 'Canal+'], answer: 1 },
+
+  // 🛋️ Bloqué
+  { category: 'culture', question: 'Quel duo joue dans la série « Bloqué » ?', choices: ['Orelsan et Gringe', 'Éric et Ramzy', 'Omar et Fred', 'Kev Adams et Gad Elmaleh'], answer: 0 },
+  { category: 'enigme', question: 'Dans « Bloqué », où sont coincés les deux personnages pendant toute la série ?', choices: ['Dans un ascenseur', 'Sur un canapé', 'Dans une voiture', 'En prison'], answer: 1 },
+  { category: 'culture', question: 'Sous quel nom Orelsan et Gringe forment-ils un duo de rap ?', choices: ['PNL', 'Casseurs Flowters', 'Bigflo & Oli', 'Sexion d’Assaut'], answer: 1 },
+
+  // 🎮 Jeux vidéo
+  { category: 'culture', question: 'Dans quel jeu vidéo croise-t-on des Creepers ?', choices: ['Fortnite', 'Minecraft', 'Terraria', 'Roblox'], answer: 1 },
+  { category: 'culture', question: 'Quel studio a développé « The Witcher 3 » ?', choices: ['Ubisoft', 'Bethesda', 'CD Projekt Red', 'BioWare'], answer: 2 },
+  { category: 'piege', question: 'Comment s’appelle le héros de la série de jeux « The Legend of Zelda » ?', choices: ['Zelda', 'Link', 'Ganon', 'Epona'], answer: 1, explanation: 'Zelda, c’est la princesse !' },
+  { category: 'culture', question: 'En quelle année la première PlayStation est-elle sortie au Japon ?', choices: ['1992', '1994', '1996', '1998'], answer: 1 },
+  { category: 'culture', question: 'Comment s’appelle le frère de Mario ?', choices: ['Wario', 'Luigi', 'Toad', 'Yoshi'], answer: 1 },
+  { category: 'culture', question: 'Quel studio a créé League of Legends ?', choices: ['Blizzard', 'Valve', 'Riot Games', 'Epic Games'], answer: 2 },
+
+  // 🔫 CS:GO
+  { category: 'culture', question: 'Combien de joueurs compte chaque équipe en match compétitif de CS:GO ?', choices: ['4', '5', '6', '7'], answer: 1 },
+  { category: 'culture', question: 'Quelle carte de CS:GO, au décor désertique, est la plus célèbre de la série ?', choices: ['Nuke', 'Inferno', 'Dust II', 'Mirage'], answer: 2 },
+  { category: 'culture', question: 'Combien coûte un AWP dans CS:GO ?', choices: ['3 100 $', '4 750 $', '5 000 $', '2 700 $'], answer: 1 },
+  { category: 'culture', question: 'En format MR15, combien de rounds faut-il gagner pour remporter un match de CS:GO ?', choices: ['13', '15', '16', '30'], answer: 2 },
+  { category: 'culture', question: 'Dans CS:GO, quel camp peut poser la bombe ?', choices: ['Les terroristes', 'Les antiterroristes', 'Les deux', 'Aucun'], answer: 0 },
+  { category: 'enigme', question: 'Dans CS:GO, à quoi sert le kit de désamorçage des antiterroristes ?', choices: ['À voir la bombe à travers les murs', 'À désamorcer deux fois plus vite', 'À poser une contre-bombe', 'À se soigner'], answer: 1, explanation: '5 secondes au lieu de 10.' },
+
+  // 😂 Palmashow
+  { category: 'culture', question: 'Quel duo forme le Palmashow ?', choices: ['Grégoire Ludig et David Marsais', 'Kev Adams et Gad Elmaleh', 'Éric et Quentin', 'McFly et Carlito'], answer: 0 },
+  { category: 'culture', question: 'Quel est le premier long-métrage du Palmashow, sorti en 2016 ?', choices: ['La Folle Histoire de Max et Léon', 'Les Vedettes', 'Mandibules', 'Babysitting'], answer: 0 },
+  { category: 'culture', question: 'Dans quel film de Quentin Dupieux le Palmashow trouve-t-il une mouche géante ?', choices: ['Le Daim', 'Mandibules', 'Fumer fait tousser', 'Rubber'], answer: 1 },
+  { category: 'culture', question: 'Quelle série de sketchs courts a fait connaître le Palmashow à partir de 2011 ?', choices: ['Very Bad Blagues', 'Bref', 'Kaamelott', 'Le Golden Show'], answer: 0 },
 ];

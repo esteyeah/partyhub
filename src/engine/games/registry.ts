@@ -1,4 +1,5 @@
 import { RANK_CLIPS } from '@content/rank';
+import { customCounts } from '../customContent';
 import { VIDEO_QUESTIONS } from '@content/video';
 import type { GameAvailability, GameId, GameSettings } from '@shared/types';
 import { BlindTestGame } from './blindtest/BlindTestGame';
@@ -25,12 +26,16 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
   video: {
     create: (ctx, s) => new VideoGame(ctx, s as never),
     availability: () =>
-      VIDEO_QUESTIONS.length ? { available: true } : { available: false, reason: 'Ajoute tes extraits dans content/video.ts' },
+      VIDEO_QUESTIONS.length + customCounts().video
+        ? { available: true }
+        : { available: false, reason: 'Ajoute des vidéos depuis l’espace admin' },
   },
   rank: {
     create: (ctx, s) => new RankGame(ctx, s as never),
     availability: () =>
-      RANK_CLIPS.length ? { available: true } : { available: false, reason: 'Ajoute tes clips dans content/rank.ts' },
+      RANK_CLIPS.length + customCounts().rank
+        ? { available: true }
+        : { available: false, reason: 'Ajoute des clips depuis l’espace admin' },
   },
   eleven: { create: (ctx, s) => new ElevenGame(ctx, s as never), availability: always },
 };

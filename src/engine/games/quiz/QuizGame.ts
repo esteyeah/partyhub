@@ -1,6 +1,6 @@
 import { QUIZ_QUESTIONS, type QuizQuestion } from '@content/quiz';
 import type { QuizExtra, QuizPrompt } from '@shared/types';
-import { loadCustomQuestions } from '../../customQuestions';
+import { loadCustomQuestions } from '../../customContent';
 import { shuffle } from '../../utils/random';
 import { RoundGame, type RoundSpec } from '../RoundGame';
 

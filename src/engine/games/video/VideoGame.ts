@@ -1,5 +1,6 @@
 import { VIDEO_QUESTIONS, type VideoQuestion } from '@content/video';
 import type { VideoExtra, VideoPrompt } from '@shared/types';
+import { loadCustomVideoQuestions } from '../../customContent';
 import { shuffle } from '../../utils/random';
 import { RoundGame, type RoundSpec } from '../RoundGame';
 
@@ -8,8 +9,9 @@ type Settings = { rounds: number; time: string };
 export class VideoGame extends RoundGame<VideoQuestion, VideoPrompt, VideoExtra, Settings> {
   readonly gameId = 'video' as const;
 
-  protected prepare() {
-    return shuffle(VIDEO_QUESTIONS).slice(0, this.settings.rounds);
+  protected async prepare() {
+    const all = [...VIDEO_QUESTIONS, ...(await loadCustomVideoQuestions())];
+    return shuffle(all).slice(0, this.settings.rounds);
   }
 
   protected buildRound(q: VideoQuestion): RoundSpec<VideoPrompt, VideoExtra> {

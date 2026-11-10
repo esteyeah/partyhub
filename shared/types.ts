@@ -197,42 +197,64 @@ export interface ElevenSlot {
   y: number;
 }
 
-export interface ElevenBonusResult {
-  label: string;
-  value: number;
-  ok: boolean;
+/** Équipe d'un joueur, poste par poste (dans l'ordre des slots) */
+export interface ElevenTeam {
+  picks: (Footballer | null)[];
+  spent: number;
+}
+
+/** Comment un footballeur a été obtenu */
+export type ElevenHow = 'pick' | 'duel' | 'auto' | 'surprise-star' | 'surprise-flop' | 'broke';
+
+export interface ElevenOutcome {
+  playerId: string;
+  footballer: Footballer;
+  how: ElevenHow;
+  price: number;
+}
+
+export interface ElevenDuel {
+  footballer: Footballer;
+  players: string[];
+  /** Joueurs ayant déjà répondu (sans dévoiler la réponse) */
+  answered: string[];
+  /** Réponses dévoilées après le duel */
+  answers: Record<string, number | null> | null;
+  winner: string | null;
+  /** Personne n'a trouvé : tirage au sort */
+  byChance: boolean;
 }
 
 export interface ElevenTeamResult {
   playerId: string;
-  picks: (string | null)[];
+  picks: (Footballer | null)[];
   spent: number;
-  average: number;
   note: number;
-  bonuses: ElevenBonusResult[];
   points: number;
-  complete: boolean;
   best: boolean;
 }
 
 export interface ElevenView {
   kind: 'eleven';
   gameId: 'eleven';
-  phase: 'build' | 'reveal';
+  /** pick : choix secret · reveal : choix dévoilés · duel : question foot · resolve : attributions · final : notes */
+  phase: 'pick' | 'reveal' | 'duel' | 'resolve' | 'final';
   endsAt: number | null;
   durationMs: number;
-  challenge: {
-    name: string;
-    description: string;
-    budget: number;
-    rules: string[];
-    bonuses: { label: string; value: number }[];
-  };
   formation: string;
   slots: ElevenSlot[];
-  pool: Footballer[];
-  me: { picks: (string | null)[]; spent: number; submitted: boolean };
-  progress: Record<string, { filled: number; submitted: boolean }>;
+  slotIndex: number;
+  budget: number;
+  offers: Footballer[];
+  teams: Record<string, ElevenTeam>;
+  /** Joueurs ayant fait leur choix pour ce poste */
+  picked: string[];
+  me: { choice: string | null; duelChoice: number | null };
+  /** Choix de chacun, dévoilés après la phase de choix */
+  choices: Record<string, string | null> | null;
+  duelQuestion: { question: string; choices: string[]; correctIndex: number | null } | null;
+  duels: ElevenDuel[];
+  outcomes: ElevenOutcome[] | null;
   results: ElevenTeamResult[] | null;
 }
 
@@ -245,6 +267,4 @@ export type AnyGameView = RoundGameView | ElevenView;
 export type GameAction =
   | { type: 'answer'; choice: number }
   | { type: 'guess'; text: string }
-  | { type: 'pick'; slot: number; footballerId: string }
-  | { type: 'clear'; slot: number }
-  | { type: 'submit'; value: boolean };
+  | { type: 'pick'; footballerId: string };

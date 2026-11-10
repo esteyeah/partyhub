@@ -1,6 +1,7 @@
 import type { DataConnection, Peer } from 'peerjs';
 import { hostPeerId, type AckResult, type HostEvents, type Notifications, type ProfileInput, type Requests, type Session, type WireMessage } from '@shared/events';
 import type { GameAction, PlaylistItem } from '@shared/types';
+import { refreshCustomCounts } from '@/engine/customContent';
 import { Room, type Connection } from '@/engine/Room';
 import { randomCode, randomId } from '@/engine/utils/random';
 import { openPeer } from './peer';
@@ -26,6 +27,7 @@ export class HostRuntime {
   private ctxs = new Set<Ctx>();
   private local!: Ctx;
   private destroyed = false;
+  private refreshTimer?: ReturnType<typeof setInterval>;
 
   private constructor(private peer: Peer, readonly room: Room) {}
 
@@ -53,6 +55,11 @@ export class HostRuntime {
     const player = runtime.room.addPlayer(profile.nickname, profile.emoji);
     runtime.local.playerId = player.id;
     runtime.room.attach(player.id, localConn);
+
+    // Clips ajoutés via /admin : on (re)vérifie régulièrement ce qui est disponible
+    const refresh = () => refreshCustomCounts().then((changed) => changed && runtime.room.sync()).catch(() => {});
+    refresh();
+    runtime.refreshTimer = setInterval(refresh, 45_000);
 
     peer.on('connection', (dc) => runtime.accept(dc));
     peer.on('disconnected', () => {
@@ -164,6 +171,7 @@ export class HostRuntime {
   destroy(reason = 'L’hôte a fermé la partie.') {
     if (this.destroyed) return;
     this.destroyed = true;
+    clearInterval(this.refreshTimer);
     for (const ctx of this.ctxs) ctx.conn.send('room:closed', reason);
     this.room.destroy();
     // Laisse le temps au message de partir avant de couper

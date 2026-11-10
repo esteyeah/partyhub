@@ -5,11 +5,11 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 
 | Jeu | Statut | Contenu fourni |
 | --- | --- | --- |
-| 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 100 questions + les tiennes via `/admin` |
+| 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
-| ⚽ **Compose ton 11** (budget, nationalité, club, bonus) | ✅ jouable | 87 joueurs, 4 défis, 3 formations |
-| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ moteur prêt | à compléter avec tes clips |
-| 🎬 **Devine la suite** (vidéo coupée + QCM + reveal) | ✅ moteur prêt | à compléter avec tes clips |
+| ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 87 footballeurs + joueurs « surprise » |
+| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable dès qu’un clip est ajouté | clips YouTube ajoutés via `/admin` |
+| 🎬 **Devine la suite** (vidéo coupée + QCM + reveal) | ✅ jouable dès qu’une vidéo est ajoutée | vidéos YouTube ajoutées via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
 
@@ -48,21 +48,26 @@ npm run build
 
 ---
 
-## 🔐 Espace admin : ajouter des questions depuis le site
+## 🔐 Espace admin : questions et vidéos depuis le site
 
-Va sur **`/admin`** (lien « ⚙️ Admin » sur l’accueil). Deux modes :
+Va sur **`/admin`** (lien « ⚙️ Admin » sur l’accueil). Trois onglets :
 
-**☁️ Sauvegarde GitHub (recommandé)** — les questions sont enregistrées dans `public/questions.json` de ton dépôt ; le site se met à jour tout seul en 1 à 2 minutes et tout le monde en profite.
+- **🧠 Questions du quiz** : catégorie, 4 réponses, bonne réponse, explication.
+- **🏆 Devine le rang** : colle un lien YouTube (vidéo ou short), règle le début et la fin avec le lecteur (« ⏱ = position actuelle »), choisis le jeu et le rang réel. Coupe l’extrait avant que le rang n’apparaisse.
+- **🎬 Devine la suite** : lien YouTube, début, **coupure** (où la vidéo s’arrête), **fin de la suite** (rejouée après le vote), puis 3 ou 4 propositions.
+
+Les jeux vidéo sont grisés dans le lobby tant qu’ils n’ont aucun clip. Deux modes de sauvegarde :
+
+**☁️ GitHub (recommandé)** — enregistré dans `public/questions.json`, `public/rank-clips.json` et `public/video-clips.json` du dépôt ; le site se met à jour tout seul en 1 à 2 minutes et tout le monde en profite.
 
 1. Crée une clé sur https://github.com/settings/personal-access-tokens/new (« Fine-grained token ») :
    - **Repository access** → *Only select repositories* → ton dépôt `partyhub` ;
-   - **Permissions** → **Contents : Read and write** ;
-   - une date d’expiration de ton choix.
+   - **Permissions** → **Contents : Read and write**.
 2. Colle-la dans `/admin` → « Se connecter ». Elle reste uniquement dans ton navigateur et ne donne accès qu’à ce dépôt.
 
-Un site github.io est public : n’importe qui peut lire son code. Un mot de passe placé dans le site serait donc visible ; la clé GitHub est la seule protection fiable.
+Un site github.io est public : un mot de passe placé dans le site serait lisible par tous ; la clé GitHub est la seule protection fiable.
 
-**💾 Mode local** — sans clé : questions gardées dans ton navigateur et utilisées quand tu héberges depuis cet appareil. Boutons **Exporter / Importer** pour les sauvegarder, et « Les envoyer sur GitHub » si tu passes ensuite au mode GitHub.
+**💾 Local** — sans clé : contenu gardé dans ton navigateur et utilisé quand tu héberges depuis cet appareil. **Exporter / Importer** pour sauvegarder, et « Les envoyer sur GitHub » si tu passes ensuite au mode GitHub.
 
 ---
 
@@ -73,7 +78,7 @@ partyhub/
 ├── .github/workflows/deploy.yml  # Build + publication GitHub Pages à chaque push
 ├── shared/                       # Types, protocole réseau, catalogue des jeux, validation des questions
 ├── content/                      # 📝 Contenus éditables (questions, playlist, clips, footballeurs)
-├── public/questions.json         # Questions ajoutées via /admin (mode GitHub)
+├── public/*.json                 # Questions et clips ajoutés via /admin (mode GitHub)
 └── src/
     ├── app/                      # page unique (/ et /?salle=CODE) + /admin
     ├── engine/                   # Moteur de jeu (tourne dans le navigateur de l'hôte)
@@ -115,7 +120,7 @@ partyhub/
 | `content/blindtest.ts` | Titres : `{ title, artist, tags, artistAliases?, titleAliases?, previewUrl? }` — mets un MP3 dans `public/audio/` et `previewUrl: '/partyhub/audio/x.mp3'` pour te passer d’iTunes |
 | `content/rank.ts` | Clips : `{ game: 'valorant' \| 'lol' \| 'rocket' \| 'cs2', clip, rank, context? }` |
 | `content/video.ts` | Extraits : `{ clip, revealClip?, question, choices, answer }` |
-| `content/footballers.ts` | Joueurs (notes/prix fictifs) + défis |
+| `content/footballers.ts` | Footballeurs (notes/prix fictifs) + joueurs « surprise » |
 
 Format d’un clip vidéo :
 
@@ -124,7 +129,7 @@ Format d’un clip vidéo :
 { type: 'file', src: '/partyhub/clips/mon-clip.mp4', start: 0, end: 12 }
 ```
 
-Tant que `content/rank.ts` ou `content/video.ts` est vide, le jeu correspondant est grisé dans le lobby.
+Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `content/video.ts` restent possibles pour du contenu intégré au code.
 
 ---
 
@@ -133,7 +138,12 @@ Tant que `content/rank.ts` ou `content/video.ts` est vide, le jeu correspondant 
 - **Quiz / Devine la suite / Blind Test QCM** : 1000 pts si réponse instantanée → 500 pts à la dernière seconde, 0 si faux.
 - **Blind Test réponse libre** : artiste et titre valent chacun 500 → 250 pts selon la rapidité, +150 / +75 / +25 pour les 1er/2e/3e à trouver. Tolérance : 1 faute (≤ 6 lettres), 2 (≤ 12), 3 au-delà ; accents, ponctuation, « the/le/la » et « (feat. …) » ignorés ; « Presque ! » si c’est proche.
 - **Devine le Rang** : 100 pts rang exact, 50 pts à un rang près, 0 sinon.
-- **Compose ton 11** : note = moyenne des 11 notes (poste vide = 0) + bonus du défi ; points = note × 10, +200 pour le meilleur 11.
+- **Compose ton 11** (draft) :
+  1. Poste par poste (gardien → défense → milieu → attaque), 3 à 5 footballeurs sont proposés, du plus cher au moins cher.
+  2. Chacun choisit en secret dans la limite de son budget (réglable : 150 à 500 M€). Pas de choix à temps → le moins cher abordable ; plus assez d’argent → remplaçant gratuit.
+  3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
+  4. Le perdant reçoit un **joueur surprise gratuit** : 85 % du temps un joueur du dimanche (fictif, note 48-61), 15 % une star (note ≥ 88) qui n’était pas proposée.
+  5. À la fin : note = moyenne des 11 ; points = note × 30, +500 pour le meilleur 11.
 
 ---
 
