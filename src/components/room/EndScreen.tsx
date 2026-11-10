@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { GAME_CATALOG } from '@shared/catalog';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { backToLobby, leaveRoom } from '@/lib/socket';
+import { backToLobby, leaveRoom } from '@/lib/net';
 import { useClientState } from '@/lib/store';
 
 const PODIUM = [
@@ -125,7 +125,7 @@ export function EndScreen() {
           variant="secondary"
           onClick={() => {
             leaveRoom();
-            router.push('/');
+            router.replace('/');
           }}
         >
           Quitter le salon

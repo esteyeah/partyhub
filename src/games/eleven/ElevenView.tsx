@@ -6,7 +6,7 @@ import type { ElevenSlot, ElevenView as View, FootPos, Footballer, PlayerPublic 
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { TimerRing } from '@/components/ui/Timer';
-import { sendAction } from '@/lib/socket';
+import { sendAction } from '@/lib/net';
 import type { GameViewProps } from '../types';
 
 const POS_LABEL: Record<FootPos, string> = { GK: 'Gardiens', DEF: 'Défenseurs', MID: 'Milieux', ATT: 'Attaquants' };

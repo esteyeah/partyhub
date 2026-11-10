@@ -6,7 +6,7 @@ import { GAME_CATALOG, GAME_IDS, defaultSettings, type SettingField } from '@sha
 import type { GameId, PlaylistItem, SettingValue } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { kickPlayer, setPlaylist, startGame } from '@/lib/socket';
+import { kickPlayer, setPlaylist, startGame } from '@/lib/net';
 import { useClientState } from '@/lib/store';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
@@ -41,6 +41,11 @@ export function Lobby() {
           <p className="relative text-sm text-zinc-400">Code du salon</p>
           <p className="relative mt-1 font-mono text-5xl font-extrabold tracking-[0.25em] text-gradient">{room.code}</p>
           <p className="relative mt-2 text-xs text-zinc-500">Partage ce code ou le lien 🔗 en haut de l’écran</p>
+          {isHost && (
+            <p className="relative mt-3 rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs text-amber-200">
+              💡 La partie tourne dans ton onglet : garde-le ouvert jusqu’à la fin.
+            </p>
+          )}
         </div>
 
         <div className="panel p-5">

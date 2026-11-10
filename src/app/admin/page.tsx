@@ -2,22 +2,21 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { QUIZ_QUESTIONS, type QuizQuestion } from '@content/quiz';
+import { LOCAL_QUESTIONS_KEY, newQuestionId, parseQuestion, sanitizeQuestionList, type CustomQuestion } from '@shared/questions';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
 import { CHOICE_STYLES } from '@/lib/colors';
 
-type Category = 'culture' | 'enigme' | 'piege';
+/**
+ * Espace admin (site statique) :
+ *  - mode GitHub : les questions sont enregistrées dans public/questions.json du dépôt
+ *    via l'API GitHub, avec une clé personnelle limitée au dépôt → le site se met à jour tout seul ;
+ *  - mode local : enregistrées dans ce navigateur (export / import possibles).
+ */
 
-interface Question {
-  id?: string;
-  category: Category;
-  question: string;
-  choices: [string, string, string, string];
-  answer: number;
-  explanation?: string;
-  author?: string;
-  createdAt?: number;
-}
+type Category = QuizQuestion['category'];
+type Draft = Omit<QuizQuestion, 'answer'> & { id?: string; answer: number };
 
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'culture', label: '🌍 Culture G' },
@@ -25,45 +24,131 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'piege', label: '🪤 Piège / scolaire' },
 ];
 const catLabel = (c: Category) => CATEGORIES.find((x) => x.value === c)?.label ?? c;
+const EMPTY: Draft = { category: 'culture', question: '', choices: ['', '', '', ''], answer: 0, explanation: '' };
 
-const EMPTY: Question = { category: 'culture', question: '', choices: ['', '', '', ''], answer: 0, explanation: '' };
-const TOKEN_KEY = 'partyhub:admin-token';
+const FILE_PATH = 'public/questions.json';
+const TOKEN_KEY = 'partyhub:gh-token';
+const REPO_KEY = 'partyhub:gh-repo';
+const MODE_KEY = 'partyhub:admin-mode';
+const DEFAULT_REPO = process.env.NEXT_PUBLIC_GITHUB_REPO ?? '';
 
-function getToken() {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
+const store = {
+  get: (k: string) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k: string, v: string | null) => {
+    try {
+      if (v === null) localStorage.removeItem(k);
+      else localStorage.setItem(k, v);
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
+/* ---------------- GitHub ---------------- */
+
+const toBase64 = (text: string) => {
+  const bytes = new TextEncoder().encode(text);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+};
+const fromBase64 = (b64: string) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, '')), (c) => c.charCodeAt(0)));
+
+class GitHubError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
   }
 }
-function setToken(t: string | null) {
-  try {
-    if (t) localStorage.setItem(TOKEN_KEY, t);
-    else localStorage.removeItem(TOKEN_KEY);
-  } catch {
-    /* ignore */
-  }
-}
 
-async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = getToken();
-  const res = await fetch(`/api/admin/${path}`, {
+async function gh<T>(token: string, path: string, init: RequestInit = {}): Promise<T> {
+  const res = await fetch(`https://api.github.com${path}`, {
     ...init,
-    headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...init.headers },
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+    },
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error ?? `Erreur ${res.status}`), { status: res.status });
+  if (!res.ok) {
+    const msg =
+      res.status === 401
+        ? 'Clé GitHub invalide ou expirée.'
+        : res.status === 403
+          ? 'Cette clé n’a pas le droit d’écrire dans le dépôt (permission « Contents : Read and write »).'
+          : res.status === 404
+            ? 'Dépôt introuvable avec cette clé.'
+            : res.status === 409 || res.status === 422
+              ? 'Le fichier a changé entre-temps : recharge et réessaie.'
+              : data.message ?? `Erreur GitHub ${res.status}`;
+    throw new GitHubError(msg, res.status);
+  }
   return data as T;
 }
 
+async function loadFromGitHub(token: string, repo: string): Promise<{ list: CustomQuestion[]; sha?: string }> {
+  try {
+    const file = await gh<{ content: string; sha: string }>(token, `/repos/${repo}/contents/${FILE_PATH}`);
+    return { list: sanitizeQuestionList(JSON.parse(fromBase64(file.content) || '[]')), sha: file.sha };
+  } catch (err) {
+    if (err instanceof GitHubError && err.status === 404) {
+      await gh(token, `/repos/${repo}`); // le dépôt existe-t-il ?
+      return { list: [], sha: undefined };
+    }
+    throw err;
+  }
+}
+
+async function saveToGitHub(token: string, repo: string, list: CustomQuestion[], sha: string | undefined, message: string) {
+  const res = await gh<{ content: { sha: string } }>(token, `/repos/${repo}/contents/${FILE_PATH}`, {
+    method: 'PUT',
+    body: JSON.stringify({ message, content: toBase64(`${JSON.stringify(list, null, 2)}\n`), ...(sha ? { sha } : {}) }),
+  });
+  return res.content.sha;
+}
+
+/* ---------------- Local ---------------- */
+
+const loadLocal = () => {
+  try {
+    return sanitizeQuestionList(JSON.parse(store.get(LOCAL_QUESTIONS_KEY) ?? '[]'));
+  } catch {
+    return [];
+  }
+};
+const saveLocal = (list: CustomQuestion[]) => store.set(LOCAL_QUESTIONS_KEY, JSON.stringify(list));
+
+/* ================================================================== */
+
 export default function AdminPage() {
-  const [configured, setConfigured] = useState<boolean | null>(null);
-  const [authed, setAuthed] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [mode, setMode] = useState<'none' | 'github' | 'local'>('none');
+  const [token, setToken] = useState('');
+  const [repo, setRepo] = useState(DEFAULT_REPO);
 
   useEffect(() => {
-    api<{ configured: boolean }>('status').then((r) => setConfigured(r.configured)).catch(() => setConfigured(false));
-    setAuthed(!!getToken());
+    const t = store.get(TOKEN_KEY);
+    setRepo(store.get(REPO_KEY) || DEFAULT_REPO);
+    if (t) {
+      setToken(t);
+      setMode('github');
+    } else if (store.get(MODE_KEY) === 'local') setMode('local');
+    setReady(true);
   }, []);
+
+  const logout = () => {
+    store.set(TOKEN_KEY, null);
+    store.set(MODE_KEY, null);
+    setToken('');
+    setMode('none');
+  };
 
   return (
     <main className="mx-auto min-h-dvh max-w-5xl px-4 py-6 sm:px-6">
@@ -73,39 +158,31 @@ export default function AdminPage() {
           Espace admin
         </span>
       </header>
-      {configured === null ? null : !configured ? (
-        <NotConfigured />
-      ) : authed ? (
-        <Dashboard
-          onLogout={() => {
-            setToken(null);
-            setAuthed(false);
+      {!ready ? null : mode === 'none' ? (
+        <Connect
+          repo={repo}
+          onGitHub={(t, r) => {
+            store.set(TOKEN_KEY, t);
+            store.set(REPO_KEY, r);
+            setToken(t);
+            setRepo(r);
+            setMode('github');
+          }}
+          onLocal={() => {
+            store.set(MODE_KEY, 'local');
+            setMode('local');
           }}
         />
       ) : (
-        <Login onSuccess={() => setAuthed(true)} />
+        <Dashboard mode={mode} token={token} repo={repo} onLogout={logout} />
       )}
     </main>
   );
 }
 
-function NotConfigured() {
-  return (
-    <div className="panel mx-auto max-w-lg p-8">
-      <h1 className="text-2xl font-black">Espace admin non configuré</h1>
-      <p className="mt-3 text-zinc-400">
-        Crée un fichier <code className="rounded bg-white/10 px-1.5">.env.local</code> à la racine du projet avec ton nom d’admin et un mot de passe (6 caractères minimum), puis redémarre le serveur :
-      </p>
-      <pre className="mt-4 rounded-xl bg-black/40 p-4 font-mono text-sm text-emerald-300">
-        ADMIN_NAME=TonPseudo{'\n'}ADMIN_PASSWORD=unMotDePasseSolide
-      </pre>
-    </div>
-  );
-}
-
-function Login({ onSuccess }: { onSuccess: () => void }) {
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
+function Connect({ repo: initialRepo, onGitHub, onLocal }: { repo: string; onGitHub: (token: string, repo: string) => void; onLocal: () => void }) {
+  const [token, setToken] = useState('');
+  const [repo, setRepo] = useState(initialRepo);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -114,9 +191,10 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
     setLoading(true);
     setError(null);
     try {
-      const r = await api<{ token: string }>('login', { method: 'POST', body: JSON.stringify({ name, password }) });
-      setToken(r.token);
-      onSuccess();
+      const r = repo.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+      const info = await gh<{ permissions?: { push?: boolean } }>(token.trim(), `/repos/${r}`);
+      if (info.permissions && !info.permissions.push) throw new Error('Ce compte n’a pas le droit de modifier ce dépôt.');
+      onGitHub(token.trim(), r);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -125,131 +203,229 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="panel mx-auto max-w-sm space-y-4 p-7">
-      <h1 className="text-2xl font-black">Connexion admin</h1>
-      <div>
-        <label className="label" htmlFor="admin-name">
-          Nom admin
-        </label>
-        <input id="admin-name" className="input" autoComplete="username" value={name} onChange={(e) => setName(e.target.value)} />
+    <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-[1.3fr_1fr]">
+      <form onSubmit={submit} className="panel space-y-4 p-6">
+        <div>
+          <h1 className="text-2xl font-black">Connexion avec GitHub</h1>
+          <p className="mt-1 text-sm text-zinc-400">Tes questions sont enregistrées dans ton dépôt et le site se met à jour tout seul (1 à 2 min).</p>
+        </div>
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-zinc-300">
+          <li>
+            Ouvre{' '}
+            <a className="text-fuchsia-300 underline" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noreferrer">
+              la création de clé GitHub
+            </a>{' '}
+            (« Fine-grained token »).
+          </li>
+          <li>
+            <b>Repository access</b> → <i>Only select repositories</i> → choisis ton dépôt.
+          </li>
+          <li>
+            <b>Permissions</b> → <i>Contents</i> → <b>Read and write</b>.
+          </li>
+          <li>Génère la clé, copie-la et colle-la ici (elle reste uniquement dans ce navigateur).</li>
+        </ol>
+        <div>
+          <label className="label" htmlFor="gh-repo">
+            Dépôt (propriétaire/nom)
+          </label>
+          <input id="gh-repo" className="input" placeholder="pseudo/partyhub" value={repo} onChange={(e) => setRepo(e.target.value)} />
+        </div>
+        <div>
+          <label className="label" htmlFor="gh-token">
+            Clé GitHub
+          </label>
+          <input id="gh-token" type="password" className="input font-mono text-sm" placeholder="github_pat_…" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)} />
+        </div>
+        {error && <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</p>}
+        <Button type="submit" className="w-full" disabled={loading || !token.trim() || !repo.includes('/')}>
+          {loading ? 'Vérification…' : 'Se connecter'}
+        </Button>
+      </form>
+      <div className="panel flex flex-col justify-between gap-4 p-6">
+        <div>
+          <h2 className="text-lg font-bold">Sans GitHub</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Les questions sont gardées dans ce navigateur et utilisées quand tu héberges une partie depuis cet appareil. Pense à les exporter pour les sauvegarder.
+          </p>
+        </div>
+        <Button variant="secondary" onClick={onLocal}>
+          Continuer en mode local
+        </Button>
       </div>
-      <div>
-        <label className="label" htmlFor="admin-password">
-          Mot de passe
-        </label>
-        <input id="admin-password" type="password" className="input" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </div>
-      {error && <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</p>}
-      <Button type="submit" className="w-full" disabled={loading || !name || !password}>
-        {loading ? 'Connexion…' : 'Se connecter'}
-      </Button>
-    </form>
+    </div>
   );
 }
 
-function Dashboard({ onLogout }: { onLogout: () => void }) {
-  const [custom, setCustom] = useState<Question[]>([]);
-  const [builtin, setBuiltin] = useState<Question[]>([]);
-  const [editing, setEditing] = useState<Question>(EMPTY);
+function Dashboard({ mode, token, repo, onLogout }: { mode: 'github' | 'local'; token: string; repo: string; onLogout: () => void }) {
+  const [list, setList] = useState<CustomQuestion[]>([]);
+  const [sha, setSha] = useState<string | undefined>();
+  const [localList, setLocalList] = useState<CustomQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Draft>(EMPTY);
   const [error, setError] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [showBuiltin, setShowBuiltin] = useState(false);
 
-  const handleError = useCallback(
-    (err: unknown) => {
-      if ((err as { status?: number }).status === 401) onLogout();
-      else setError((err as Error).message);
-    },
-    [onLogout],
-  );
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setLocalList(loadLocal());
+    try {
+      if (mode === 'github') {
+        const r = await loadFromGitHub(token, repo);
+        setList(r.list);
+        setSha(r.sha);
+      } else setList(loadLocal());
+    } catch (err) {
+      setError((err as Error).message);
+      if (err instanceof GitHubError && err.status === 401) onLogout();
+    } finally {
+      setLoading(false);
+    }
+  }, [mode, token, repo, onLogout]);
 
-  const refresh = useCallback(() => {
-    api<{ custom: Question[]; builtin: Question[] }>('questions')
-      .then((r) => {
-        setCustom(r.custom);
-        setBuiltin(r.builtin);
-      })
-      .catch(handleError);
-  }, [handleError]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-  useEffect(refresh, [refresh]);
-
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
+  /** Enregistre la nouvelle liste (GitHub ou navigateur). */
+  async function persist(next: CustomQuestion[], message: string, success: string) {
     setSaving(true);
     setError(null);
     setFlash(null);
     try {
-      const body = JSON.stringify(editing);
-      if (editing.id) await api(`questions/${editing.id}`, { method: 'PUT', body });
-      else await api('questions', { method: 'POST', body });
-      setFlash(editing.id ? 'Question modifiée ✅' : 'Question ajoutée au quiz ✅');
-      setTimeout(() => setFlash(null), 2500);
-      setEditing({ ...EMPTY, category: editing.category });
-      refresh();
+      if (mode === 'github') setSha(await saveToGitHub(token, repo, next, sha, message));
+      else saveLocal(next);
+      setList(next);
+      setFlash(success);
+      setTimeout(() => setFlash(null), 4000);
+      return true;
     } catch (err) {
-      handleError(err);
+      setError((err as Error).message);
+      return false;
     } finally {
       setSaving(false);
     }
   }
 
-  async function remove(q: Question) {
-    if (!q.id || !confirm(`Supprimer la question « ${q.question} » ?`)) return;
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const q = parseQuestion(editing);
+    if (typeof q === 'string') return setError(q);
+    const existing = editing.id ? list.find((x) => x.id === editing.id) : undefined;
+    const next = existing
+      ? list.map((x) => (x.id === existing.id ? { ...existing, ...q } : x))
+      : [...list, { ...q, id: newQuestionId(), createdAt: Date.now(), author: mode === 'github' ? repo.split('/')[0] : undefined }];
+    const ok = await persist(
+      next,
+      existing ? `Quiz : modification d’une question` : `Quiz : ajout « ${q.question.slice(0, 60)} »`,
+      mode === 'github' ? 'Enregistré sur GitHub ✅ — en ligne dans 1 à 2 min' : 'Enregistré dans ce navigateur ✅',
+    );
+    if (ok) setEditing({ ...EMPTY, category: editing.category });
+  }
+
+  async function remove(q: CustomQuestion) {
+    if (!confirm(`Supprimer la question « ${q.question} » ?`)) return;
+    if (editing.id === q.id) setEditing(EMPTY);
+    await persist(list.filter((x) => x.id !== q.id), 'Quiz : suppression d’une question', 'Question supprimée');
+  }
+
+  async function pushLocalToGitHub() {
+    const known = new Set(list.map((q) => q.question.toLowerCase()));
+    const extra = localList.filter((q) => !known.has(q.question.toLowerCase()));
+    if (!extra.length) return setFlash('Rien de nouveau à envoyer.');
+    if (await persist([...list, ...extra], `Quiz : import de ${extra.length} question(s)`, `${extra.length} question(s) envoyée(s) sur GitHub ✅`)) {
+      saveLocal([]);
+      setLocalList([]);
+    }
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'questions-partyhub.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function importJson(file: File) {
     try {
-      await api(`questions/${q.id}`, { method: 'DELETE' });
-      if (editing.id === q.id) setEditing(EMPTY);
-      refresh();
-    } catch (err) {
-      handleError(err);
+      const imported = sanitizeQuestionList(JSON.parse(await file.text()));
+      const known = new Set(list.map((q) => q.question.toLowerCase()));
+      const extra = imported.filter((q) => !known.has(q.question.toLowerCase()));
+      if (!extra.length) return setFlash('Aucune nouvelle question dans ce fichier.');
+      await persist([...list, ...extra], `Quiz : import de ${extra.length} question(s)`, `${extra.length} question(s) importée(s) ✅`);
+    } catch {
+      setError('Fichier invalide (JSON attendu).');
     }
   }
 
   const counts = useMemo(() => {
-    const all = [...builtin, ...custom];
-    return {
-      total: all.length,
-      culture: all.filter((q) => q.category === 'culture').length,
-      enigme: all.filter((q) => q.category === 'enigme').length,
-      piege: all.filter((q) => q.category === 'piege').length,
-    };
-  }, [builtin, custom]);
+    const all = [...QUIZ_QUESTIONS, ...list];
+    const by = (c: Category) => all.filter((q) => q.category === c).length;
+    return { total: all.length, culture: by('culture'), enigme: by('enigme'), piege: by('piege') };
+  }, [list]);
 
-  const match = (q: Question) => {
+  const match = (q: QuizQuestion) => {
     const s = search.trim().toLowerCase();
     return !s || `${q.question} ${q.choices.join(' ')}`.toLowerCase().includes(s);
   };
-
   const setChoice = (i: number, v: string) => {
-    const choices = [...editing.choices] as Question['choices'];
+    const choices = [...editing.choices] as Draft['choices'];
     choices[i] = v;
     setEditing({ ...editing, choices });
   };
+  const sorted = [...list].sort((a, b) => b.createdAt - a.createdAt).filter(match);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black">Questions du quiz</h1>
-          <p className="text-sm text-zinc-400">Les questions ajoutées ici sont utilisées dès la prochaine partie de « Quiz Culture G ».</p>
+          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+            {mode === 'github' ? (
+              <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-emerald-200">☁️ Sauvegarde GitHub · {repo}</span>
+            ) : (
+              <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-amber-200">💾 Sauvegarde dans ce navigateur</span>
+            )}
+          </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={onLogout}>
-          Se déconnecter
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" size="sm" onClick={exportJson}>
+            ⬇️ Exporter
+          </Button>
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/8 px-3 py-1.5 text-sm font-semibold hover:bg-white/12">
+            ⬆️ Importer
+            <input type="file" accept="application/json,.json" className="hidden" onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
+          </label>
+          <Button variant="ghost" size="sm" onClick={onLogout}>
+            {mode === 'github' ? 'Se déconnecter' : 'Changer de mode'}
+          </Button>
+        </div>
       </div>
+
+      {mode === 'github' && localList.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm">
+          <span>Tu as {localList.length} question(s) enregistrée(s) dans ce navigateur.</span>
+          <Button size="sm" onClick={pushLocalToGitHub} disabled={saving}>
+            Les envoyer sur GitHub
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <Stat label="Total" value={counts.total} />
-        <Stat label="Ajoutées par toi" value={custom.length} accent />
+        <Stat label="Ajoutées par toi" value={list.length} accent />
         <Stat label="🌍 Culture" value={counts.culture} />
         <Stat label="🧩 Énigmes" value={counts.enigme} />
         <Stat label="🪤 Pièges" value={counts.piege} />
       </div>
 
-      {/* Formulaire */}
-      <form onSubmit={save} className="panel space-y-4 p-5 sm:p-6">
+      <form onSubmit={submit} className="panel space-y-4 p-5 sm:p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">{editing.id ? '✏️ Modifier la question' : '➕ Nouvelle question'}</h2>
           {editing.id && (
@@ -329,9 +505,9 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
           />
         </div>
         {error && <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</p>}
-        <div className="flex items-center gap-3">
-          <Button type="submit" variant="success" disabled={saving}>
-            {editing.id ? 'Enregistrer les modifications' : 'Ajouter la question'}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" variant="success" disabled={saving || loading}>
+            {saving ? 'Enregistrement…' : editing.id ? 'Enregistrer les modifications' : 'Ajouter la question'}
           </Button>
           <AnimatePresence>
             {flash && (
@@ -343,30 +519,39 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         </div>
       </form>
 
-      {/* Liste */}
       <div className="panel p-5 sm:p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Tes questions ({custom.length})</h2>
+          <h2 className="text-lg font-bold">Tes questions ({list.length})</h2>
           <input className="input max-w-xs py-2 text-sm" placeholder="Rechercher…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        {custom.filter(match).length ? (
+        {loading ? (
+          <p className="p-6 text-center text-sm text-zinc-500">Chargement…</p>
+        ) : sorted.length ? (
           <ul className="space-y-2">
-            {custom.filter(match).map((q) => (
-              <QuestionRow key={q.id} q={q} onEdit={() => { setEditing({ ...q, explanation: q.explanation ?? '' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }} onDelete={() => remove(q)} />
+            {sorted.map((q) => (
+              <QuestionRow
+                key={q.id}
+                q={q}
+                onEdit={() => {
+                  setEditing({ ...q, explanation: q.explanation ?? '' });
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onDelete={() => remove(q)}
+              />
             ))}
           </ul>
         ) : (
           <p className="rounded-xl border-2 border-dashed border-white/8 p-6 text-center text-sm text-zinc-500">
-            {custom.length ? 'Aucun résultat.' : 'Tu n’as pas encore ajouté de question.'}
+            {list.length ? 'Aucun résultat.' : 'Tu n’as pas encore ajouté de question.'}
           </p>
         )}
 
         <button onClick={() => setShowBuiltin(!showBuiltin)} className="mt-6 text-sm font-semibold text-zinc-400 hover:text-white">
-          {showBuiltin ? '▾' : '▸'} Questions intégrées ({builtin.length}) — modifiables dans content/quiz.ts
+          {showBuiltin ? '▾' : '▸'} Questions intégrées ({QUIZ_QUESTIONS.length}) — modifiables dans content/quiz.ts
         </button>
         {showBuiltin && (
           <ul className="mt-3 space-y-2">
-            {builtin.filter(match).map((q, i) => (
+            {QUIZ_QUESTIONS.filter(match).map((q, i) => (
               <QuestionRow key={i} q={q} />
             ))}
           </ul>
@@ -385,7 +570,7 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
   );
 }
 
-function QuestionRow({ q, onEdit, onDelete }: { q: Question; onEdit?: () => void; onDelete?: () => void }) {
+function QuestionRow({ q, onEdit, onDelete }: { q: QuizQuestion; onEdit?: () => void; onDelete?: () => void }) {
   return (
     <li className="rounded-2xl border border-white/8 bg-ink-900/70 p-3">
       <div className="flex items-start gap-3">

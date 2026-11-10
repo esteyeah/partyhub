@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { serverNow } from './socket';
+import { serverNow } from './net';
 
 /** Temps restant (ms) jusqu'à `endsAt` (heure serveur), rafraîchi ~10 fois par seconde. */
 export function useRemaining(endsAt: number | null | undefined): number {

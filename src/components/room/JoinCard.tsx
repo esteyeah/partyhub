@@ -1,16 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { Logo } from '@/components/Logo';
 import { ProfileForm, useProfile } from '@/components/ProfileForm';
 import { Button } from '@/components/ui/Button';
 import { saveProfile } from '@/lib/session';
-import { joinRoom } from '@/lib/socket';
+import { joinRoom } from '@/lib/net';
 import { setState, useClientState } from '@/lib/store';
 
 /** Affiché quand on ouvre un lien de salon sans être encore joueur. */
 export function JoinCard({ code }: { code: string }) {
-  const { status, notice } = useClientState();
+  const { notice } = useClientState();
   const [profile, setProfile] = useProfile();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,8 +24,7 @@ export function JoinCard({ code }: { code: string }) {
     saveProfile(profile);
     const res = await joinRoom(code, profile.nickname, profile.emoji);
     setLoading(false);
-    if (!res.ok) setError(res.error);
-    else setState({ notice: null });
+    if (res.ok) setState({ notice: null });
   }
 
   return (
@@ -40,9 +40,12 @@ export function JoinCard({ code }: { code: string }) {
         {(error || notice) && (
           <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-200">{error ?? notice}</p>
         )}
-        <Button type="submit" size="lg" className="mt-6 w-full" disabled={loading || status !== 'connected'}>
+        <Button type="submit" size="lg" className="mt-6 w-full" disabled={loading}>
           {loading ? 'Connexion…' : 'Rejoindre →'}
         </Button>
+        <Link href="/" className="mt-4 block text-center text-sm text-zinc-500 hover:text-white">
+          ← Retour à l’accueil
+        </Link>
       </form>
     </main>
   );

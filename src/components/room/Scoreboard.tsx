@@ -7,7 +7,7 @@ import type { PlayerPublic, ScoreRow } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { useCountUp } from '@/lib/hooks';
-import { nextGame } from '@/lib/socket';
+import { nextGame } from '@/lib/net';
 import { useClientState } from '@/lib/store';
 
 /** Classement animé affiché entre deux mini-jeux. */

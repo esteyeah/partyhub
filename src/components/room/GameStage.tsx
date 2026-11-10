@@ -3,7 +3,7 @@
 import { GAME_CATALOG } from '@shared/catalog';
 import { Button } from '@/components/ui/Button';
 import { GAME_VIEWS } from '@/games/registry';
-import { skipStep } from '@/lib/socket';
+import { skipStep } from '@/lib/net';
 import { useClientState } from '@/lib/store';
 
 /** Affiche le mini-jeu en cours grâce au registre des vues client. */

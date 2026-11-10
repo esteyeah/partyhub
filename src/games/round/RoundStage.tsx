@@ -6,7 +6,7 @@ import type { PlayerPublic, RoomSnapshot, RoundGameView } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { TimerBar, TimerRing } from '@/components/ui/Timer';
 import { CHOICE_STYLES } from '@/lib/colors';
-import { sendAction } from '@/lib/socket';
+import { sendAction } from '@/lib/net';
 
 /**
  * Vue générique des jeux à manches. Chaque jeu fournit seulement

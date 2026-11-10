@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
-import { leaveRoom } from '@/lib/socket';
+import { leaveRoom } from '@/lib/net';
 import { useClientState } from '@/lib/store';
 
 export function RoomHeader() {
@@ -16,7 +16,7 @@ export function RoomHeader() {
   const online = room.players.filter((p) => p.connected).length;
 
   async function copyLink() {
-    const url = `${window.location.origin}/room/${room.code}`;
+    const url = `${window.location.origin}${window.location.pathname}?salle=${room.code}`;
     try {
       if (navigator.share && /Mobi/i.test(navigator.userAgent)) await navigator.share({ title: 'PartyHub', url });
       else await navigator.clipboard.writeText(url);
@@ -49,7 +49,7 @@ export function RoomHeader() {
           size="sm"
           onClick={() => {
             leaveRoom();
-            router.push('/');
+            router.replace('/');
           }}
         >
           Quitter

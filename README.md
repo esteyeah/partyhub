@@ -1,21 +1,32 @@
 # 🎮 PartyHub — mini-jeux multijoueurs entre amis
 
-Crée un salon privé, partage le code (ou le lien), et enchaînez des mini-jeux en temps réel :
+Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABCDE`) et enchaînez des mini-jeux en temps réel.
+**Aucun serveur à héberger :** le site est 100 % statique (GitHub Pages) et les joueurs se connectent directement entre eux (WebRTC).
 
 | Jeu | Statut | Contenu fourni |
 | --- | --- | --- |
-| 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 100 questions (culture, énigmes, pièges) + ajout depuis le site via `/admin` |
+| 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 100 questions + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
 | ⚽ **Compose ton 11** (budget, nationalité, club, bonus) | ✅ jouable | 87 joueurs, 4 défis, 3 formations |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ moteur prêt | à compléter avec tes clips |
 | 🎬 **Devine la suite** (vidéo coupée + QCM + reveal) | ✅ moteur prêt | à compléter avec tes clips |
 
-**Stack :** Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Socket.io 4 · Framer Motion · TypeScript.
-Un seul serveur Node sert les pages **et** les WebSockets sur le même port.
+**Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
 
 ---
 
-## 🚀 Installation
+## 🌍 Mettre le site en ligne sur GitHub Pages
+
+1. Dans le dépôt GitHub : **Settings → Pages → Build and deployment → Source : « GitHub Actions »**.
+2. C’est tout : à chaque push sur `main`, le workflow `.github/workflows/deploy.yml` construit et publie le site (onglet **Actions** pour suivre). L’adresse est `https://<pseudo>.github.io/<nom-du-depot>/`.
+
+Pour inviter des amis : crée un salon, clique sur le code en haut de l’écran (🔗) pour copier le lien `…/?salle=CODE` et envoie-le.
+
+> ⚠️ **L’hôte héberge la partie dans son onglet.** S’il le ferme ou le recharge, la partie s’arrête pour tout le monde (les autres joueurs, eux, peuvent recharger : ils sont reconnectés automatiquement).
+
+---
+
+## 💻 Lancer en local
 
 Prérequis : **Node.js ≥ 20**.
 
@@ -27,21 +38,31 @@ npm install
 npm run dev
 ```
 
-Ouvre http://localhost:3000, crée un salon, puis ouvre un **2ᵉ onglet** (ou ton téléphone sur le même Wi-Fi : `http://IP-DE-TON-PC:3000`) pour rejoindre avec le code.
+Ouvre http://localhost:3000, crée un salon, puis ouvre un **2ᵉ onglet** pour rejoindre avec le code. Ton téléphone sur le même Wi-Fi peut aussi rejoindre via `http://IP-DE-TON-PC:3000/?salle=CODE`.
 
-Production :
+Build statique (dossier `out/`) :
 
 ```bash
 npm run build
 ```
 
-```bash
-npm start
-```
+---
 
-Variables d’environnement (facultatives, voir `.env.example`) : `PORT`, `HOST`, `ITUNES_COUNTRY`, `ADMIN_NAME`, `ADMIN_PASSWORD`, `QUESTIONS_FILE`.
+## 🔐 Espace admin : ajouter des questions depuis le site
 
-> 💡 Le Blind Test a besoin d’Internet (API publique `itunes.apple.com`) pour récupérer les extraits de 30 s. Sans accès réseau, le jeu est automatiquement passé ; tu peux aussi fournir tes propres MP3 (voir plus bas).
+Va sur **`/admin`** (lien « ⚙️ Admin » sur l’accueil). Deux modes :
+
+**☁️ Sauvegarde GitHub (recommandé)** — les questions sont enregistrées dans `public/questions.json` de ton dépôt ; le site se met à jour tout seul en 1 à 2 minutes et tout le monde en profite.
+
+1. Crée une clé sur https://github.com/settings/personal-access-tokens/new (« Fine-grained token ») :
+   - **Repository access** → *Only select repositories* → ton dépôt `partyhub` ;
+   - **Permissions** → **Contents : Read and write** ;
+   - une date d’expiration de ton choix.
+2. Colle-la dans `/admin` → « Se connecter ». Elle reste uniquement dans ton navigateur et ne donne accès qu’à ce dépôt.
+
+Un site github.io est public : n’importe qui peut lire son code. Un mot de passe placé dans le site serait donc visible ; la clé GitHub est la seule protection fiable.
+
+**💾 Mode local** — sans clé : questions gardées dans ton navigateur et utilisées quand tu héberges depuis cet appareil. Boutons **Exporter / Importer** pour les sauvegarder, et « Les envoyer sur GitHub » si tu passes ensuite au mode GitHub.
 
 ---
 
@@ -49,64 +70,40 @@ Variables d’environnement (facultatives, voir `.env.example`) : `PORT`, `HOST`
 
 ```
 partyhub/
-├── server/                      # Backend temps réel (Node + Socket.io)
-│   ├── index.ts                 # Serveur HTTP unique : Next.js + Socket.io
-│   ├── socket.ts                # Événements Socket.io (créer/rejoindre/reprendre, actions…)
-│   ├── admin/                   # API /api/admin : auth (nom + mot de passe), stockage des questions
-│   ├── rooms/
-│   │   ├── Room.ts              # Salon : joueurs, hôte, programme, scores, sync par joueur
-│   │   └── RoomManager.ts       # Création des codes, nettoyage des salons inactifs
-│   ├── games/
-│   │   ├── GameModule.ts        # Classe de base d’un mini-jeu (timers, vue, actions)
-│   │   ├── RoundGame.ts         # Moteur générique « à manches » (QCM / réponse libre)
-│   │   ├── registry.ts          # gameId → module serveur (+ disponibilité)
-│   │   ├── quiz/QuizGame.ts
-│   │   ├── blindtest/           # BlindTestGame.ts + itunes.ts (résolution des extraits)
-│   │   ├── video/VideoGame.ts
-│   │   ├── rank/RankGame.ts
-│   │   └── eleven/ElevenGame.ts
-│   └── utils/                   # fuzzy.ts (Levenshtein), random.ts
-├── shared/                      # Code partagé client ⇄ serveur
-│   ├── types.ts                 # Snapshots, vues de jeux, actions
-│   ├── events.ts                # Contrat Socket.io typé
-│   └── catalog.ts               # Métadonnées + réglages de chaque jeu (formulaires auto)
-├── content/                     # 📝 Contenus éditables (questions, playlist, clips, joueurs)
-├── src/                         # Frontend Next.js
-│   ├── app/                     # page d’accueil, /room/[code], /admin
-│   ├── components/
-│   │   ├── room/                # RoomScreen, Lobby, GameStage, Scoreboard, EndScreen…
-│   │   ├── media/               # ClipPlayer (YouTube/MP4 anti-spoiler), AudioPlayer
-│   │   └── ui/                  # Button, Avatar, Timer
-│   ├── games/                   # Vues client de chaque jeu + registry.tsx
-│   │   └── round/RoundStage.tsx # UI générique des jeux à manches
-│   └── lib/                     # socket.ts, store.ts, session.ts, hooks.ts
-└── public/{audio,clips}/        # Tes fichiers médias locaux
+├── .github/workflows/deploy.yml  # Build + publication GitHub Pages à chaque push
+├── shared/                       # Types, protocole réseau, catalogue des jeux, validation des questions
+├── content/                      # 📝 Contenus éditables (questions, playlist, clips, footballeurs)
+├── public/questions.json         # Questions ajoutées via /admin (mode GitHub)
+└── src/
+    ├── app/                      # page unique (/ et /?salle=CODE) + /admin
+    ├── engine/                   # Moteur de jeu (tourne dans le navigateur de l'hôte)
+    │   ├── Room.ts               # Salon : joueurs, programme, scores, snapshots par joueur
+    │   └── games/                # GameModule, RoundGame + un dossier par mini-jeu, registry.ts
+    ├── net/
+    │   ├── host.ts               # L'hôte : accepte les connexions WebRTC et pilote le salon
+    │   └── peer.ts               # Configuration PeerJS
+    ├── lib/net.ts                # Côté joueur : créer / rejoindre / reprendre, actions
+    ├── components/               # Accueil, lobby, classement, podium, lecteurs audio/vidéo…
+    └── games/                    # Vues de chaque jeu + registry.tsx
 ```
 
-### Principes
+### Comment ça marche
 
-- **Serveur autoritaire** : toute la logique (chrono, points, bonnes réponses) vit côté serveur. Les réponses ne sont envoyées aux clients qu’au moment du *reveal* → impossible de tricher via les DevTools.
-- **Vue par joueur** : à chaque changement, le salon envoie à chaque socket `room:sync` = `{ room, game: game.view(playerId), serverNow }`. Les envois sont regroupés (un seul par tick).
-- **Chronos synchronisés** : le serveur envoie `endsAt` (heure serveur) ; le client corrige le décalage d’horloge avec `serverNow`.
-- **Reconnexion** : la session (`code + playerId + token`) est gardée par onglet. Un rafraîchissement ou une coupure réseau reconnecte au même joueur (60 s de grâce). Si l’hôte part, l’hôte est transféré.
-- **Hôte** : compose le programme, règle chaque jeu, peut exclure un joueur et « ⏭ Passer » une étape.
-
-### Déroulé d’une partie
-
-`lobby` → `playing` (mini-jeu 1) → `scoreboard` (classement animé, auto 15 s) → `playing` (mini-jeu 2) → … → `ended` (podium + récap par jeu) → « Rejouer » ramène au lobby.
+- **Mise en relation :** l’hôte s’enregistre sur le service public gratuit PeerJS sous l’identifiant `partyhub-v1-<CODE>`. Les joueurs s’y connectent avec le code. Ensuite les données passent **directement entre navigateurs** (WebRTC, avec relais TURN de PeerJS si une connexion directe est impossible).
+- **L’hôte fait autorité :** chronos, points et bonnes réponses sont calculés dans son navigateur. Les réponses ne sont envoyées aux autres qu’au moment du *reveal*.
+- **Vue par joueur :** à chaque changement, l’hôte envoie à chacun un snapshot `{ room, game, serverNow }` ; les chronos sont calés sur l’horloge de l’hôte.
+- **Reconnexion :** la session de chaque onglet est gardée (sessionStorage). Un joueur qui recharge ou perd le réseau est reconnecté automatiquement pendant ~30 s.
 
 ---
 
 ## ➕ Ajouter un nouveau mini-jeu
 
-1. **Catalogue** — `shared/catalog.ts` : ajoute l’id dans `GameId` (`shared/types.ts`) et une entrée `GAME_CATALOG` (nom, emoji, réglages). Le lobby génère le formulaire automatiquement.
-2. **Serveur** — crée `server/games/mon-jeu/MonJeu.ts` :
-   - jeu à manches (QCM ou texte) → étends `RoundGame` et implémente `prepare()` + `buildRound()` (≈ 30 lignes, voir `QuizGame.ts`) ;
+1. **Catalogue** — ajoute l’id dans `GameId` (`shared/types.ts`) et une entrée dans `GAME_CATALOG` (`shared/catalog.ts`) : nom, emoji, réglages. Le lobby génère le formulaire tout seul.
+2. **Moteur** — crée `src/engine/games/mon-jeu/MonJeu.ts` :
+   - jeu à manches (QCM ou texte) → étends `RoundGame` et implémente `prepare()` + `buildRound()` (voir `QuizGame.ts`) ;
    - jeu libre → étends `GameModule` et implémente `start()`, `onAction()`, `view()` (voir `ElevenGame.ts`).
-   Puis enregistre-le dans `server/games/registry.ts`.
-3. **Client** — crée `src/games/mon-jeu/MonJeuView.tsx` (pour un jeu à manches, il suffit d’un `<RoundStage renderPrompt={…} />`) et ajoute-le dans `src/games/registry.tsx`.
-
-Pour un barème différent, surcharge `scoreChoice()` (comme `RankGame`) ou `textPoints()`.
+   Enregistre-le dans `src/engine/games/registry.ts`.
+3. **Vue** — crée `src/games/mon-jeu/MonJeuView.tsx` (pour un jeu à manches, un `<RoundStage renderPrompt={…} />` suffit) et ajoute-le dans `src/games/registry.tsx`.
 
 ---
 
@@ -114,41 +111,20 @@ Pour un barème différent, surcharge `scoreChoice()` (comme `RankGame`) ou `tex
 
 | Fichier | Quoi |
 | --- | --- |
-| `content/quiz.ts` | Questions : `{ category, question, choices[4], answer, explanation? }` (choix mélangés à chaque partie) |
-| `content/blindtest.ts` | Titres : `{ title, artist, tags, artistAliases?, titleAliases?, previewUrl? }` — mets un MP3 dans `public/audio/` et `previewUrl: '/audio/x.mp3'` pour te passer d’iTunes |
-| `content/rank.ts` | Clips : `{ game: 'valorant' \| 'lol' \| 'rocket' \| 'cs2', clip, rank, context? }` + échelles de rangs |
+| `content/quiz.ts` | Questions intégrées : `{ category, question, choices[4], answer, explanation? }` |
+| `content/blindtest.ts` | Titres : `{ title, artist, tags, artistAliases?, titleAliases?, previewUrl? }` — mets un MP3 dans `public/audio/` et `previewUrl: '/partyhub/audio/x.mp3'` pour te passer d’iTunes |
+| `content/rank.ts` | Clips : `{ game: 'valorant' \| 'lol' \| 'rocket' \| 'cs2', clip, rank, context? }` |
 | `content/video.ts` | Extraits : `{ clip, revealClip?, question, choices, answer }` |
-| `content/footballers.ts` | Joueurs (notes/prix fictifs) + défis (`pool`, `budget`, `bonuses`) |
+| `content/footballers.ts` | Joueurs (notes/prix fictifs) + défis |
 
 Format d’un clip vidéo :
 
 ```ts
 { type: 'youtube', id: 'ID_YOUTUBE', start: 42, end: 55 }        // secondes
-{ type: 'file', src: '/clips/mon-clip.mp4', start: 0, end: 12 }   // fichier dans public/clips
+{ type: 'file', src: '/partyhub/clips/mon-clip.mp4', start: 0, end: 12 }
 ```
 
-Le lecteur coupe l’extrait à `end` et le masque (pas de miniatures/suggestions YouTube). Pour « Devine la suite », `revealClip` est joué pendant le reveal.
-
 Tant que `content/rank.ts` ou `content/video.ts` est vide, le jeu correspondant est grisé dans le lobby.
-
----
-
-## 🔐 Espace admin : ajouter des questions depuis le site
-
-1. Crée un fichier `.env.local` à la racine (il n’est jamais commité) :
-
-   ```
-   ADMIN_NAME=TonPseudo
-   ADMIN_PASSWORD=unMotDePasseSolide
-   ```
-
-2. Redémarre le serveur, va sur **http://localhost:3000/admin** (lien « ⚙️ Admin » sur l’accueil) et connecte-toi avec ce nom et ce mot de passe.
-3. Ajoute, modifie ou supprime tes questions (catégorie, 4 réponses, bonne réponse, explication). Elles sont utilisées dès la prochaine partie de Quiz, mélangées aux questions intégrées.
-
-Détails :
-- Les questions sont enregistrées dans `data/custom-questions.json` (modifiable via `QUESTIONS_FILE`). Ce dossier est ignoré par git. Sur un hébergeur, place-le sur un **disque persistant** (volume Railway/Render/Fly), sinon il est vidé à chaque redéploiement.
-- Le mot de passe est obligatoire : un simple pseudo pourrait être tapé par n’importe qui. La session admin dure 7 jours, et changer le mot de passe déconnecte toutes les sessions. Après 10 échecs, une IP est bloquée 15 minutes.
-- API utilisée par la page : `POST /api/admin/login`, `GET|POST /api/admin/questions`, `PUT|DELETE /api/admin/questions/:id` (jeton `Authorization: Bearer`).
 
 ---
 
@@ -161,12 +137,6 @@ Détails :
 
 ---
 
-## 🌐 Déploiement
+## ⚙️ Variables facultatives
 
-Il faut un hébergeur qui garde un **process Node long** avec WebSockets (Railway, Render, Fly.io, un VPS…). Vercel/Netlify en mode serverless ne conviennent pas pour Socket.io.
-
-```bash
-npm ci && npm run build && npm start
-```
-
-Les salons sont en mémoire : une seule instance suffit pour jouer entre amis. Pour monter en charge sur plusieurs instances, ajoute l’adaptateur Redis de Socket.io et stocke les salons dans Redis.
+Voir `.env.example` : pays iTunes, serveur PeerJS personnel (si le service public est saturé ou bloqué), etc.
