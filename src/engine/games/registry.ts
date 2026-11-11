@@ -1,6 +1,5 @@
 import { RANK_CLIPS } from '@content/rank';
 import { customCounts } from '../customContent';
-import { VIDEO_QUESTIONS } from '@content/video';
 import type { GameAvailability, GameId, GameSettings } from '@shared/types';
 import { BlindTestGame } from './blindtest/BlindTestGame';
 import { ElevenGame } from './eleven/ElevenGame';
@@ -25,10 +24,7 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
   blindtest: { create: (ctx, s) => new BlindTestGame(ctx, s as never), availability: always },
   video: {
     create: (ctx, s) => new VideoGame(ctx, s as never),
-    availability: () =>
-      VIDEO_QUESTIONS.length + customCounts().video
-        ? { available: true }
-        : { available: false, reason: 'Ajoute des vidéos depuis l’espace admin' },
+    availability: always, // vidéos Rocket League + mèmes intégrés
   },
   rank: {
     create: (ctx, s) => new RankGame(ctx, s as never),

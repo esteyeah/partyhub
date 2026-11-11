@@ -1,4 +1,5 @@
 import type { Clip } from '../shared/types';
+import RL_SUITE from './rl-suite.json';
 
 /**
  * "Devine la suite" : l'extrait `clip` est joué puis coupé à `clip.end`.
@@ -20,7 +21,11 @@ export interface VideoQuestion {
   explanation?: string;
 }
 
+/** Vidéos Rocket League générées par tools/rl/make_clips.py (issue connue grâce aux données du replay) */
+export const RL_QUESTIONS = RL_SUITE as VideoQuestion[];
+
 export const VIDEO_QUESTIONS: VideoQuestion[] = [
+  ...RL_QUESTIONS,
   // Exemple (remplace l'id et les timings par une vraie vidéo) :
   // {
   //   clip: { type: 'youtube', id: 'XXXXXXXXXXX', start: 30, end: 42 },

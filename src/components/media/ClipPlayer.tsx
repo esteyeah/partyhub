@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Clip } from '@shared/types';
+import { BASE_PATH } from '@/lib/basePath';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -33,7 +34,7 @@ export function loadYouTubeApi(): Promise<any> {
  * Lecteur d'extrait "anti-spoiler" : joue `clip` de `start` à `end`, puis se fige
  * derrière un cache. Le joueur ne peut ni cliquer sur la vidéo ni avancer.
  */
-export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se passer ?' }: { clip: Clip; endedLabel?: string }) {
+export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se passer ?', portrait = false }: { clip: Clip; endedLabel?: string; portrait?: boolean }) {
   const [ended, setEnded] = useState(false);
   const [needsClick, setNeedsClick] = useState(false);
   const play = useRef<() => void>(() => {});
@@ -45,7 +46,7 @@ export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se pas
   }, [key]);
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+    <div className={`relative w-full overflow-hidden rounded-2xl bg-black ${portrait ? 'aspect-[540/760]' : 'aspect-video'}`}>
       {clip.type === 'youtube' ? (
         <YouTubeClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} />
       ) : (
@@ -64,11 +65,18 @@ export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se pas
           <span className="rounded-2xl bg-white px-5 py-3 text-black">▶ Lancer l’extrait</span>
         </button>
       )}
-      {ended && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/85 p-4 text-center text-xl font-black backdrop-blur-md sm:text-2xl">
-          {endedLabel}
-        </div>
-      )}
+      {ended &&
+        (clip.type === 'file' ? (
+          // Nos vidéos : on garde l'image figée visible (elle sert à deviner la suite)
+          <div className="absolute inset-x-0 top-12 flex justify-center px-3">
+            <span className="rounded-xl bg-black/75 px-3 py-1.5 text-center text-sm font-black sm:text-base">{endedLabel}</span>
+          </div>
+        ) : (
+          // YouTube : cache complet pour éviter les suggestions / spoilers
+          <div className="absolute inset-0 flex items-center justify-center bg-black/85 p-4 text-center text-xl font-black backdrop-blur-md sm:text-2xl">
+            {endedLabel}
+          </div>
+        ))}
     </div>
   );
 }
@@ -175,7 +183,7 @@ function FileClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<Clip
   return (
     <video
       ref={ref}
-      src={clip.src}
+      src={clip.src.startsWith('/') && BASE_PATH && !clip.src.startsWith(BASE_PATH + '/') ? BASE_PATH + clip.src : clip.src}
       playsInline
       preload="auto"
       className="absolute inset-0 h-full w-full object-contain"

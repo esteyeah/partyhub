@@ -1,0 +1,632 @@
+[
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/ff1cd4437a.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/ff1cd4437a.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/f5d9af4f69.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/f5d9af4f69.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 1v1 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/6d4c0203a5.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/6d4c0203a5.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 2v2 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/fac4d367e1.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/fac4d367e1.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/9ce01244ab.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/9ce01244ab.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/2be6f650a3.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/2be6f650a3.mp4",
+      "start": 7.15,
+      "end": 9.38
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/ba4d526c0a.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/ba4d526c0a.mp4",
+      "start": 7.15,
+      "end": 8.82
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/47e116dbca.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/47e116dbca.mp4",
+      "start": 7.15,
+      "end": 9.62
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/9511d9ccf2.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/9511d9ccf2.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/ee6650a5f8.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/ee6650a5f8.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/33444c1fbd.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/33444c1fbd.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/943c3bbd3a.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/943c3bbd3a.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 2v2 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/b047b12676.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/b047b12676.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 2v2 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/568b933496.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/568b933496.mp4",
+      "start": 7.15,
+      "end": 9.27
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/5f338ebcc0.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/5f338ebcc0.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/35f45f9aec.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/35f45f9aec.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 2v2 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/f98eb5d4e0.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/f98eb5d4e0.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/6c89714421.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/6c89714421.mp4",
+      "start": 7.15,
+      "end": 8.65
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/ab86dd9092.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/ab86dd9092.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/4f014390be.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/4f014390be.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/447ae06763.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/447ae06763.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/a2f9aead70.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/a2f9aead70.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/2353e4ee43.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/2353e4ee43.mp4",
+      "start": 7.15,
+      "end": 9.5
+    },
+    "question": "Rocket League 2v2 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/f0dafc492c.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/f0dafc492c.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/54dd45ae74.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/54dd45ae74.mp4",
+      "start": 7.15,
+      "end": 9.07
+    },
+    "question": "Rocket League 2v2 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/f550499206.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/f550499206.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/a8a93838b1.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/a8a93838b1.mp4",
+      "start": 7.15,
+      "end": 8.77
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/6a30d13530.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/6a30d13530.mp4",
+      "start": 7.15,
+      "end": 9.35
+    },
+    "question": "Rocket League 3v3 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 0
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/23ae75cb97.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/23ae75cb97.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 1v1 — l’équipe BLEUE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 2
+  },
+  {
+    "clip": {
+      "type": "file",
+      "src": "/clips/rl/fa7f0e60a9.mp4",
+      "start": 0,
+      "end": 7.15
+    },
+    "revealClip": {
+      "type": "file",
+      "src": "/clips/rl/fa7f0e60a9.mp4",
+      "start": 7.15,
+      "end": 11.0
+    },
+    "question": "Rocket League 3v3 — l’équipe ORANGE frappe… que se passe-t-il ?",
+    "choices": [
+      "⚽ BUT !",
+      "🧤 Arrêt du gardien",
+      "❌ À côté / contré"
+    ],
+    "answer": 1
+  }
+]

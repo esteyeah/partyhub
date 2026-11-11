@@ -153,12 +153,17 @@ export interface BlindExtra {
 }
 
 export interface VideoPrompt {
-  clip: Clip;
+  /** Extrait vidéo… */
+  clip?: Clip;
+  /** …ou réplique à compléter (« Complète la phrase ») */
+  quote?: { text: string; source: string };
   question: string;
 }
 export interface VideoExtra {
   revealClip?: Clip;
   explanation?: string;
+  /** Réplique complète, pour « Complète la phrase » */
+  fullQuote?: string;
 }
 
 export interface RankPrompt {

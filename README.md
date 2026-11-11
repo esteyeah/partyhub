@@ -9,7 +9,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 87 footballeurs + joueurs « surprise » |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable dès qu’un clip est ajouté | clips YouTube ajoutés via `/admin` |
-| 🎬 **Devine la suite** (vidéo coupée + QCM + reveal) | ✅ jouable dès qu’une vidéo est ajoutée | vidéos YouTube ajoutées via `/admin` |
+| 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 30 vidéos Rocket League générées + 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
 
@@ -144,6 +144,22 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
   3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
   4. Le perdant reçoit un **joueur surprise gratuit** : 85 % du temps un joueur du dimanche (fictif, note 48-61), 15 % une star (note ≥ 88) qui n’était pas proposée.
   5. À la fin : note = moyenne des 11 ; points = note × 30, +500 pour le meilleur 11.
+
+---
+
+## 🚗 Vidéos Rocket League générées automatiquement
+
+`tools/rl/make_clips.py` transforme des replays Rocket League (`.replay`) en vidéos MP4 vues du dessus pour « Devine la suite » : la vidéo s’arrête juste après une frappe et la bonne réponse (but / arrêt / à côté) vient des événements du replay, elle n’est jamais devinée à la main. Les noms des joueurs ne sont pas affichés.
+
+```bash
+pip install -r tools/rl/requirements.txt
+```
+
+```bash
+python tools/rl/make_clips.py DOSSIER_DE_REPLAYS --out public/clips/rl --manifest content/rl-suite.json --max 30
+```
+
+Les 30 vidéos fournies ont été générées à partir des replays de test publics du projet [boxcars](https://github.com/nickbabcock/boxcars) (licence MIT). Tes propres replays se trouvent dans `Documents/My Games/Rocket League/TAGame/Demos`.
 
 ---
 
