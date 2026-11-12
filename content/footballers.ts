@@ -584,6 +584,13 @@ const ROWS: Row[] = [
 
 const RETIRED_ROWS: [name: string, nat: string, club: string, rating: number, roles: string][] = [
   // Ballon d'Or, grand Barça 2011-2016, anciens de l'OM et joueurs plus abordables
+  ['Sergio Romero', 'ARG', 'Manchester United', 80, 'GB'],
+  ['Guillermo Ochoa', 'MEX', 'Ajaccio', 82, 'GB'],
+  ['Nicolas N\'Koulou', 'CMR', 'Marseille', 80, 'DC'],
+  ['Aaron Ramsey', 'WAL', 'Arsenal', 82, 'MC/MOC'],
+  ['Oscar', 'BRA', 'Chelsea', 84, 'MOC/AD'],
+  ['Yohann Pelé', 'FRA', 'Marseille', 77, 'GB'],
+  ['Marcel Schmelzer', 'GER', 'Dortmund', 81, 'DG'],
   ['Raúl', 'ESP', 'Real Madrid', 86, 'BU/AG'],
   ['Fabio Cannavaro', 'ITA', 'Real Madrid', 86, 'DC'],
   ['Javier Zanetti', 'ARG', 'Inter', 85, 'DD/MC'],
