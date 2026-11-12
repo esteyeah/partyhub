@@ -197,6 +197,7 @@ export interface Footballer {
   club: string;
   league: string;
   rating: number;
+  age?: number;
   /** Prix fictif en M€ */
   price: number;
 }
