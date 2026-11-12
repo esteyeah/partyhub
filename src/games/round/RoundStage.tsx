@@ -117,7 +117,7 @@ function ChoiceInput<P, X>({ view, isHost }: { view: RoundGameView<P, X>; isHost
           {reveal
             ? 'Le vrai rang était…'
             : hostJudging
-              ? '🧑‍⚖️ Regarde la révélation et clique sur le VRAI rang'
+              ? '🧑‍⚖️ Votes clos ! Regarde la révélation et clique sur le VRAI rang'
               : judging
                 ? '🎬 Révélation… l’hôte valide le vrai rang'
                 : mine !== null

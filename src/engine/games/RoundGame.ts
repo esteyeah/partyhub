@@ -234,13 +234,9 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
 
     const active = this.ctx.players().filter((p) => p.connected);
     if (active.length && active.every((p) => this.isDone(p.id))) {
-      if (!this.spec.judged) {
-        this.clearTimers();
-        this.setTimer(600, () => this.reveal());
-      } else if (this.frozen) {
-        this.clearTimers();
-        this.setTimer(600, () => this.startJudge());
-      }
+      this.clearTimers();
+      // Mode arbitre : dès que tout le monde a voté, la vidéo continue jusqu'à la révélation
+      this.setTimer(600, () => (this.spec?.judged ? this.startJudge() : this.reveal()));
     }
     this.ctx.sync();
   }
