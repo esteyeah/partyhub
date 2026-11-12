@@ -1,6 +1,9 @@
-import { FLOPS, FOOTBALLERS } from '@content/footballers';
+import { FOOTBALLERS, SURPRISES, fitsSlot } from '@content/footballers';
 import { QUIZ_QUESTIONS, type QuizQuestion } from '@content/quiz';
 import type { ElevenOutcome, ElevenSlot, ElevenTeam, ElevenTeamResult, ElevenView, FootPos, Footballer, GameAction } from '@shared/types';
+
+/** Les postes pour lesquels on a déjà proposé un joueur (pour varier d'une partie à l'autre) */
+const recentlyOffered: string[] = [];
 import { GameModule } from '../GameModule';
 import { shuffle } from '../../utils/random';
 
@@ -52,7 +55,6 @@ export function buildSlots(formation: string): ElevenSlot[] {
   return slots;
 }
 
-const strip = ({ clubs: _c, ...f }: Footballer & { clubs?: string[] }): Footballer => f;
 
 interface Duel {
   footballer: Footballer;
@@ -122,30 +124,39 @@ export class ElevenGame extends GameModule<Settings> {
     this.ctx.sync();
   }
 
-  /** Propositions variées : on découpe les candidats par niveau et on en tire un par tranche. */
-  private makeOffers(pos: FootPos): Footballer[] {
+  /**
+   * Propositions pour le poste exact du créneau (ex : DD), variées en niveau et en prix :
+   * on découpe les candidats par note et on en tire un par tranche, en évitant ceux vus récemment.
+   */
+  private makeOffers(slot: ElevenSlot): Footballer[] {
     const n = Math.max(3, Math.min(5, Number(this.settings.choices) || 4));
-    const candidates = FOOTBALLERS.filter((p) => p.pos === pos && !this.owned.has(p.id)).sort((a, b) => b.rating - a.rating);
-    if (candidates.length <= n) return candidates.map(strip).sort((a, b) => b.price - a.price);
-    const picked: Footballer[] = [];
-    for (let i = 0; i < n; i++) {
-      const from = Math.floor((i * candidates.length) / n);
-      const to = Math.floor(((i + 1) * candidates.length) / n);
-      const bucket = candidates.slice(from, Math.max(to, from + 1));
-      picked.push(strip(bucket[Math.floor(Math.random() * bucket.length)]));
+    const all = FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && !this.owned.has(p.id));
+    const fresh = all.filter((p) => !recentlyOffered.includes(p.id));
+    const candidates = (fresh.length >= n * 2 ? fresh : all).sort((a, b) => b.rating - a.rating);
+    let picked: Footballer[];
+    if (candidates.length <= n) picked = candidates;
+    else {
+      picked = [];
+      for (let i = 0; i < n; i++) {
+        const from = Math.floor((i * candidates.length) / n);
+        const to = Math.floor(((i + 1) * candidates.length) / n);
+        const bucket = candidates.slice(from, Math.max(to, from + 1));
+        picked.push(bucket[Math.floor(Math.random() * bucket.length)]);
+      }
     }
+    recentlyOffered.push(...picked.map((p) => p.id));
+    if (recentlyOffered.length > 150) recentlyOffered.splice(0, recentlyOffered.length - 150);
     return picked.sort((a, b) => b.price - a.price || b.rating - a.rating);
   }
 
-  private surprise(pos: FootPos): { footballer: Footballer; star: boolean } {
+  /** Joueur surprise pour le perdant d'un duel : une star (15 %) ou un joueur raté, au bon poste */
+  private surprise(slot: ElevenSlot): { footballer: Footballer; star: boolean } {
     if (Math.random() < STAR_CHANCE) {
       const offered = new Set(this.offers.map((o) => o.id));
-      const stars = FOOTBALLERS.filter((p) => p.pos === pos && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
-      if (stars.length) return { footballer: strip(stars[Math.floor(Math.random() * stars.length)]), star: true };
+      const stars = FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
+      if (stars.length) return { footballer: stars[Math.floor(Math.random() * stars.length)], star: true };
     }
-    const flops = FLOPS[pos];
-    const f = flops[Math.floor(Math.random() * flops.length)];
-    return { footballer: { ...f, id: `${f.id}-${++this.flopSeq}` }, star: false };
+    return { footballer: this.surpriseFlop(slot), star: false };
   }
 
   private pickDuelQuestion() {
@@ -166,7 +177,7 @@ export class ElevenGame extends GameModule<Settings> {
     this.slotIndex++;
     if (this.slotIndex >= this.slots.length) return this.final();
     for (const id of this.participants()) this.team(id);
-    this.offers = this.makeOffers(this.slots[this.slotIndex].pos);
+    this.offers = this.makeOffers(this.slots[this.slotIndex]);
     this.choices.clear();
     this.autoPicked.clear();
     this.broke.clear();
@@ -230,12 +241,12 @@ export class ElevenGame extends GameModule<Settings> {
       if (!footballer.id.startsWith('flop-')) this.owned.add(footballer.id);
       outcomes.push({ playerId: pid, footballer, how, price });
     };
-    const pos = this.slots[this.slotIndex].pos;
+    const slot = this.slots[this.slotIndex];
 
     for (const pid of this.participants()) {
       const fid = this.choices.get(pid);
       if (!fid) {
-        give(pid, this.surpriseFlop(pos), 'broke', 0); // budget épuisé : remplaçant gratuit
+        give(pid, this.surpriseFlop(slot), 'broke', 0); // budget épuisé : remplaçant gratuit
         continue;
       }
       const duel = this.duels.find((d) => d.footballer.id === fid);
@@ -248,7 +259,7 @@ export class ElevenGame extends GameModule<Settings> {
     for (const d of this.duels) {
       for (const pid of d.players) {
         if (pid === d.winner) continue;
-        const s = this.surprise(pos);
+        const s = this.surprise(slot);
         give(pid, s.footballer, s.star ? 'surprise-star' : 'surprise-flop', 0);
       }
     }
@@ -256,8 +267,13 @@ export class ElevenGame extends GameModule<Settings> {
     this.setPhase('resolve', RESOLVE_MS, () => this.nextSlot());
   }
 
-  private surpriseFlop(pos: FootPos): Footballer {
-    const f = FLOPS[pos][Math.floor(Math.random() * FLOPS[pos].length)];
+  private surpriseFlop(slot: ElevenSlot): Footballer {
+    const used = new Set([...this.teams.values()].flatMap((t) => t.picks.filter(Boolean).map((p) => p!.name)));
+    const fit = SURPRISES.filter((f) => fitsSlot(slot.label, f));
+    const sameLine = SURPRISES.filter((f) => f.pos === slot.pos);
+    const pool = (fit.length ? fit : sameLine.length ? sameLine : SURPRISES).filter((f) => !used.has(f.name));
+    const list = pool.length ? pool : fit.length ? fit : SURPRISES;
+    const f = list[Math.floor(Math.random() * list.length)];
     return { ...f, id: `${f.id}-${++this.flopSeq}` };
   }
 

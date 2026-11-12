@@ -7,7 +7,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | --- | --- | --- |
 | 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
-| ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 87 footballeurs + joueurs « surprise » |
+| ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 313 footballeurs avec postes précis (DG, DC, DD, MDC…) + 23 joueurs « surprise » |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable | 21 vidéos « guess the rank » Rocket League & CS (mode arbitre) + tes clips via `/admin` ; mode « CS rounds pistolet » |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 30 vidéos Rocket League générées + 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
 
@@ -142,7 +142,8 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
   1. Poste par poste (gardien → défense → milieu → attaque), 3 à 5 footballeurs sont proposés, du plus cher au moins cher.
   2. Chacun choisit en secret dans la limite de son budget (réglable : 150 à 500 M€). Pas de choix à temps → le moins cher abordable ; plus assez d’argent → remplaçant gratuit.
   3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
-  4. Le perdant reçoit un **joueur surprise gratuit** : 85 % du temps un joueur du dimanche (fictif, note 48-61), 15 % une star (note ≥ 88) qui n’était pas proposée.
+  4. Le perdant reçoit un **joueur surprise gratuit** au même poste : 85 % du temps un joueur en fin de carrière ou célèbre pour ses ratés (Germain, Mitroglou, Bendtner…), 15 % une star (note ≥ 88) qui n’était pas proposée.
+  - Chaque joueur n’est proposé qu’aux postes qu’il occupe réellement (rôles façon Transfermarkt) ; le prix dépend de la note (≈ 4 M€ à 72, 20 M€ à 80, 120 M€ à 90).
   5. À la fin : note = moyenne des 11 ; points = note × 30, +500 pour le meilleur 11.
 
 ---

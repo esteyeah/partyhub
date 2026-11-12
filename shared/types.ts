@@ -190,6 +190,8 @@ export interface Footballer {
   id: string;
   name: string;
   pos: FootPos;
+  /** Postes détaillés (GB, DG, DC, DD, MDC, MC, MOC, MG, MD, AG, AD, BU) — le 1er est le poste principal */
+  roles: string[];
   nat: string;
   flag: string;
   club: string;

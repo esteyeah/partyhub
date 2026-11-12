@@ -346,7 +346,7 @@ function FootCard({
       <div className="flex w-full items-start justify-between">
         <div className="text-left leading-none">
           <div className={`font-mono font-black ${small ? 'text-2xl' : 'text-3xl'}`}>{f.rating}</div>
-          <div className="text-[10px] font-bold opacity-70">{f.pos}</div>
+          <div className="text-[10px] font-bold opacity-70">{f.roles?.[0] ?? f.pos}</div>
         </div>
         <span className={small ? 'text-lg' : 'text-2xl'}>{f.flag}</span>
       </div>
