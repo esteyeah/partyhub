@@ -92,11 +92,13 @@ export function parseRankClip(raw: unknown): RankClip | string {
     clip = parseClip({ id: c.id, start, end: end !== null && end > start + 2 ? end : start + MAX_CLIP_SECONDS }, 600);
   } else clip = parseClip(r.clip);
   if (typeof clip === 'string') return clip;
+  const rawMask = Number(((r.clip ?? {}) as Record<string, unknown>).maskBottom);
+  const maskBottom = Number.isFinite(rawMask) && rawMask > 0 ? Math.min(40, rawMask) : undefined;
   return {
     game,
     ...(judged ? { judged: true } : { rank }),
     ...(r.pistol === true ? { pistol: true } : {}),
-    clip: { type: 'youtube', ...clip },
+    clip: { type: 'youtube', ...clip, ...(maskBottom ? { maskBottom } : {}) },
     context: text(r.context, 80) || undefined,
     source: text(r.source, 120) || undefined,
   };

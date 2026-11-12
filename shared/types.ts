@@ -77,8 +77,9 @@ export interface SyncPayload {
 
 /** Un extrait vidéo : YouTube (id + bornes en secondes) ou fichier local (public/clips). */
 export type Clip =
-  | { type: 'youtube'; id: string; start: number; end: number }
-  | { type: 'file'; src: string; start: number; end: number };
+  | { type: 'youtube'; id: string; start: number; end: number; maskBottom?: number }
+  | { type: 'file'; src: string; start: number; end: number; maskBottom?: number };
+/* maskBottom : hauteur (en %) d'un cache noir en bas de l'image, pour masquer une barre avec un pseudo */
 
 /* ------------------------------------------------------------------ */
 /* Vue générique des jeux "à manches" (Quiz, Blind Test, Vidéo, Rang)  */

@@ -76,6 +76,7 @@ export function ClipPlayer({
           <span className="rounded-xl bg-black/80 px-3 py-1.5 text-center text-sm font-black sm:text-base">{pausedLabel}</span>
         </div>
       )}
+      {clip.maskBottom ? <div className="absolute inset-x-0 bottom-0 bg-black" style={{ height: `${clip.maskBottom}%` }} /> : null}
       {/* Empêche toute interaction avec le lecteur (pas de scrub, pas de titre cliquable) */}
       <div className="absolute inset-0" />
       {needsClick && !ended && (

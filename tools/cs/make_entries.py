@@ -39,6 +39,7 @@ def main():
     ap.add_argument('--t0', type=float, required=True, help='seconde de la vidéo où commence le round 1')
     ap.add_argument('--out', default='public/rank-clips.json')
     ap.add_argument('--label', default='Match Premier · Nuke')
+    ap.add_argument('--mask-bottom', type=float, default=14, help='cache noir en bas de l’image (%%) pour masquer la barre du pseudo')
     a = ap.parse_args()
 
     h = json.load(open(a.highlights))
@@ -59,7 +60,7 @@ def main():
             'game': 'premier',
             'rank': rank,
             **({'pistol': True} if c['pistol'] else {}),
-            'clip': {'type': 'youtube', 'id': vid, 'start': round(start), 'end': round(end)},
+            'clip': {'type': 'youtube', 'id': vid, 'start': round(start), 'end': round(end), **({'maskBottom': a.mask_bottom} if a.mask_bottom else {})},
             'context': f"{a.label} · {what}",
             'id': f"{vid}-{c['round']}-{random.randint(0, 10**6)}",
             'createdAt': int(time.time() * 1000),
