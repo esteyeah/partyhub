@@ -179,7 +179,17 @@ pip install demoparser2
 python tools/cs/highlights.py match.dem --player esteyeah8
 ```
 
-Ensuite : filme chaque clip (Xbox Game Bar `Win + Alt + R` ou OBS), mets-le sur YouTube en non répertorié et ajoute-le dans `/admin` → Devine le rang → « CS2 Premier », en cochant « Round pistolet » si besoin.
+Le plus simple : filme **une seule fois** le match depuis la vue du joueur, en commençant au round 1, sans interface (`cl_drawhud 0`), mets la vidéo sur YouTube en non répertorié, puis :
+
+```bash
+python tools/cs/highlights.py match.dem --player esteyeah8 --json highlights.json
+```
+
+```bash
+python tools/cs/make_entries.py highlights.json --youtube "LIEN_YOUTUBE" --t0 SECONDE_DU_ROUND_1
+```
+
+Chaque clip (meilleurs rounds + rounds pistolet) est calculé à partir de la démo et ajouté à `public/rank-clips.json` avec le vrai rang Premier.
 
 ---
 

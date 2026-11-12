@@ -41,9 +41,15 @@ def main():
 
     p = DemoParser(a.demo)
     header = p.parse_header()
-    deaths = p.parse_event('player_death', other=['total_rounds_played'])
-    round_ends = p.parse_event('round_end')
-    freeze_ends = p.parse_event('round_freeze_end')
+    events = set(p.list_game_events())
+
+    def ticks_of(name):
+        return sorted(int(t) for t in p.parse_event(name)['tick']) if name in events else []
+
+    # Début du vrai match (on ignore l'échauffement)
+    match_start = max(ticks_of('begin_new_match') + ticks_of('round_announce_match_start') or [0])
+    deaths = p.parse_event('player_death')
+    deaths = deaths[deaths['tick'] >= match_start]
     last_tick = int(deaths['tick'].max())
 
     players = p.parse_ticks(['name', 'rank', 'comp_rank_type', 'team_num'], ticks=[last_tick])
@@ -56,8 +62,8 @@ def main():
     rank_type = int(me['comp_rank_type'] or 0)
 
     # Début de chaque round = fin du freeze time
-    starts = sorted(int(t) for t in freeze_ends['tick'])
-    ends = sorted(int(t) for t in round_ends['tick'])
+    starts = [t for t in ticks_of('round_freeze_end') if t >= match_start]
+    ends = [t for t in (ticks_of('round_end') or ticks_of('round_officially_ended')) if t >= match_start]
 
     def round_of(tick):
         n = 0
