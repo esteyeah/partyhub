@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "game": "premier",
+    "rank": "5 000 – 9 999",
+    "pistol": true,
+    "clip": {
+      "type": "youtube",
+      "id": "WiH9ashFZYU",
+      "start": 0,
+      "end": 52
+    },
+    "context": "Match Premier · Nuke · Round pistolet",
+    "id": "WiH9ashFZYU-r1",
+    "createdAt": 1794515881592
+  },
+  {
+    "game": "premier",
+    "rank": "5 000 – 9 999",
+    "clip": {
+      "type": "youtube",
+      "id": "WiH9ashFZYU",
+      "start": 54,
+      "end": 77
+    },
+    "context": "Match Premier · Nuke · Round 2",
+    "id": "WiH9ashFZYU-r2",
+    "createdAt": 1794515881592
+  },
+  {
+    "game": "premier",
+    "rank": "5 000 – 9 999",
+    "clip": {
+      "type": "youtube",
+      "id": "WiH9ashFZYU",
+      "start": 79,
+      "end": 130
+    },
+    "context": "Match Premier · Nuke · Round 3",
+    "id": "WiH9ashFZYU-r3",
+    "createdAt": 1794515881592
+  },
+  {
+    "game": "premier",
+    "rank": "5 000 – 9 999",
+    "pistol": true,
+    "clip": {
+      "type": "youtube",
+      "id": "WiH9ashFZYU",
+      "start": 132,
+      "end": 158
+    },
+    "context": "Match Premier · Nuke · Round pistolet (2e mi-temps)",
+    "id": "WiH9ashFZYU-r13",
+    "createdAt": 1794515881592
+  }
+]
