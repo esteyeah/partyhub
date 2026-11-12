@@ -1,2 +1,0 @@
-subtr-actor-py
-pillow

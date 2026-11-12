@@ -113,7 +113,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
     id: 'rank',
     name: 'Devine le Rang',
     emoji: '🏆',
-    tagline: 'Bronze ou Champion ? Silver ou Global ?',
+    tagline: 'Devine le vrai rang du joueur',
     description:
       'Regarde le gameplay et estime le rang du joueur. 100 pts pour le rang exact, 50 pts à un rang près. Sur les vidéos « guess the rank », l’hôte stoppe avant la révélation puis valide le vrai rang.',
     gradient: 'from-cyan-500 to-sky-600',
@@ -123,12 +123,9 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
         label: 'Jeu',
         type: 'select',
         options: [
-          { value: 'all', label: '🎲 Tous' },
-          { value: 'rocket', label: '🚗 Rocket League' },
+          { value: 'all', label: '🎲 Tous les clips' },
           { value: 'cs2', label: '🔫 Counter-Strike' },
           { value: 'cs2-pistol', label: '🔫 CS — rounds pistolet uniquement' },
-          { value: 'valorant', label: '🎯 Valorant' },
-          { value: 'lol', label: '🧙 League of Legends' },
         ],
         default: 'all',
       },

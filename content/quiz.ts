@@ -8,6 +8,8 @@ export interface QuizQuestion {
   choices: [string, string, string, string];
   answer: 0 | 1 | 2 | 3;
   explanation?: string;
+  /** Énigmes (réponse libre) : réponses acceptées en plus de la bonne proposition */
+  accept?: string[];
   /** Thème facultatif : les questions 'foot' servent aussi aux duels de « Compose ton 11 » */
   theme?: 'foot';
 }
@@ -34,17 +36,17 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { category: 'culture', question: 'Quel est l’os le plus long du corps humain ?', choices: ['Le tibia', 'Le fémur', 'L’humérus', 'Le péroné'], answer: 1 },
 
   // 🧩 Énigmes
-  { category: 'enigme', question: 'Je suis plein de trous mais je retiens l’eau. Qui suis-je ?', choices: ['Une passoire', 'Une éponge', 'Un filet', 'Un gruyère'], answer: 1 },
-  { category: 'enigme', question: 'Le père de Toto a trois fils : Riri, Fifi et… ?', choices: ['Loulou', 'Toto', 'Titi', 'Lulu'], answer: 1 },
-  { category: 'enigme', question: 'Qu’est-ce qui monte et descend sans jamais bouger ?', choices: ['Un ascenseur', 'Un escalier', 'Un yo-yo', 'La marée'], answer: 1 },
-  { category: 'enigme', question: 'Si tu prononces mon nom, je disparais. Qui suis-je ?', choices: ['Un secret', 'Le silence', 'L’ombre', 'Un rêve'], answer: 1 },
-  { category: 'enigme', question: 'Quel nombre complète la suite : 2, 6, 12, 20, 30, … ?', choices: ['40', '42', '44', '36'], answer: 1, explanation: 'n × (n + 1) : 6 × 7 = 42.' },
-  { category: 'enigme', question: 'Quel nombre complète la suite : 1, 1, 2, 3, 5, 8, … ?', choices: ['11', '12', '13', '15'], answer: 2, explanation: 'Suite de Fibonacci : chaque terme est la somme des deux précédents.' },
-  { category: 'enigme', question: 'Une batte et une balle coûtent 1,10 € au total. La batte coûte 1 € de plus que la balle. Combien coûte la balle ?', choices: ['0,10 €', '0,05 €', '0,01 €', '0,15 €'], answer: 1, explanation: 'Balle 0,05 € + batte 1,05 € = 1,10 €.' },
-  { category: 'enigme', question: 'Qu’est-ce qui t’appartient mais que les autres utilisent plus que toi ?', choices: ['Ton téléphone', 'Ton prénom', 'Ta voiture', 'Ton temps'], answer: 1 },
-  { category: 'enigme', question: 'Je commence la nuit et je termine le matin. Qui suis-je ?', choices: ['Le sommeil', 'La lettre N', 'La lune', 'Un rêve'], answer: 1 },
-  { category: 'enigme', question: '5 machines fabriquent 5 objets en 5 minutes. Combien de temps faut-il à 100 machines pour fabriquer 100 objets ?', choices: ['5 minutes', '20 minutes', '100 minutes', '1 minute'], answer: 0 },
-  { category: 'enigme', question: 'Un fermier a 17 moutons. Tous sauf 9 meurent. Combien en reste-t-il ?', choices: ['8', '9', '17', '0'], answer: 1 },
+  { category: 'enigme', question: 'Je suis plein de trous mais je retiens l’eau. Qui suis-je ?', choices: ['Une passoire', 'Une éponge', 'Un filet', 'Un gruyère'], answer: 1, accept: ['éponge'] },
+  { category: 'enigme', question: 'Le père de Toto a trois fils : Riri, Fifi et… ?', choices: ['Loulou', 'Toto', 'Titi', 'Lulu'], answer: 1, accept: ['Toto'] },
+  { category: 'enigme', question: 'Qu’est-ce qui monte et descend sans jamais bouger ?', choices: ['Un ascenseur', 'Un escalier', 'Un yo-yo', 'La marée'], answer: 1, accept: ['escalier', 'escaliers'] },
+  { category: 'enigme', question: 'Si tu prononces mon nom, je disparais. Qui suis-je ?', choices: ['Un secret', 'Le silence', 'L’ombre', 'Un rêve'], answer: 1, accept: ['silence'] },
+  { category: 'enigme', question: 'Quel nombre complète la suite : 2, 6, 12, 20, 30, … ?', choices: ['40', '42', '44', '36'], answer: 1, explanation: 'n × (n + 1) : 6 × 7 = 42.', accept: ['42', 'quarante-deux'] },
+  { category: 'enigme', question: 'Quel nombre complète la suite : 1, 1, 2, 3, 5, 8, … ?', choices: ['11', '12', '13', '15'], answer: 2, explanation: 'Suite de Fibonacci : chaque terme est la somme des deux précédents.', accept: ['13', 'treize'] },
+  { category: 'enigme', question: 'Une batte et une balle coûtent 1,10 € au total. La batte coûte 1 € de plus que la balle. Combien coûte la balle ?', choices: ['0,10 €', '0,05 €', '0,01 €', '0,15 €'], answer: 1, explanation: 'Balle 0,05 € + batte 1,05 € = 1,10 €.', accept: ['0,05', '0.05', '5 centimes', '5 cts', '5 cents', 'cinq centimes'] },
+  { category: 'enigme', question: 'Qu’est-ce qui t’appartient mais que les autres utilisent plus que toi ?', choices: ['Ton téléphone', 'Ton prénom', 'Ta voiture', 'Ton temps'], answer: 1, accept: ['prénom', 'mon prénom', 'ton prénom', 'nom', 'mon nom'] },
+  { category: 'enigme', question: 'Je commence la nuit et je termine le matin. Qui suis-je ?', choices: ['Le sommeil', 'La lettre N', 'La lune', 'Un rêve'], answer: 1, accept: ['N', 'lettre N', 'la lettre N'] },
+  { category: 'enigme', question: '5 machines fabriquent 5 objets en 5 minutes. Combien de temps faut-il à 100 machines pour fabriquer 100 objets ?', choices: ['5 minutes', '20 minutes', '100 minutes', '1 minute'], answer: 0, accept: ['5', '5 minutes', 'cinq minutes', '5 min'] },
+  { category: 'enigme', question: 'Un fermier a 17 moutons. Tous sauf 9 meurent. Combien en reste-t-il ?', choices: ['8', '9', '17', '0'], answer: 1, accept: ['9', 'neuf'] },
 
   // 🪤 Pièges & questions « scolaires »
   { category: 'piege', question: 'Combien de mois de l’année comptent 28 jours ?', choices: ['1', '2', '6', '12'], answer: 3, explanation: 'Tous les mois ont au moins 28 jours !' },
@@ -89,20 +91,20 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { category: 'culture', question: 'Dans quel pays sont nés les Jeux olympiques antiques ?', choices: ['L’Italie', 'L’Égypte', 'La Grèce', 'La Turquie'], answer: 2 },
 
   // 🧩 Énigmes
-  { category: 'enigme', question: 'Plus il y en a, moins on voit. Qu’est-ce que c’est ?', choices: ['Le vent', 'L’obscurité', 'La lumière', 'La pluie'], answer: 1 },
-  { category: 'enigme', question: 'Qu’est-ce qui a des dents mais ne mord jamais ?', choices: ['Un peigne', 'Un requin', 'Un chien', 'Un crocodile'], answer: 0 },
-  { category: 'enigme', question: 'Qu’est-ce qui se mouille en séchant ?', choices: ['Une éponge', 'Une serviette', 'Un parapluie', 'Le linge'], answer: 1 },
-  { category: 'enigme', question: 'C’est l’enfant de tes parents, mais ce n’est ni ton frère ni ta sœur. Qui est-ce ?', choices: ['Ton cousin', 'Toi-même', 'Ton oncle', 'Ton neveu'], answer: 1 },
-  { category: 'enigme', question: 'Quel nombre complète la suite : 3, 9, 27, 81, … ?', choices: ['162', '243', '324', '729'], answer: 1, explanation: 'On multiplie par 3 à chaque fois.' },
-  { category: 'enigme', question: 'Quel nombre complète la suite : 1, 4, 9, 16, 25, … ?', choices: ['30', '34', '36', '49'], answer: 2, explanation: 'Ce sont les carrés : 6 × 6 = 36.' },
-  { category: 'enigme', question: 'Quelle lettre complète la suite : J, F, M, A, M, J, J, … ?', choices: ['S', 'A', 'O', 'N'], answer: 1, explanation: 'Les initiales des mois : … juin, juillet, août.' },
-  { category: 'enigme', question: 'Quelle lettre complète la suite : L, M, M, J, V, S, … ?', choices: ['L', 'D', 'S', 'M'], answer: 1, explanation: 'Les jours de la semaine : … samedi, dimanche.' },
-  { category: 'enigme', question: 'Un escargot au fond d’un puits de 10 m monte de 3 m le jour et redescend de 2 m la nuit. En combien de jours sort-il ?', choices: ['7 jours', '8 jours', '10 jours', '12 jours'], answer: 1, explanation: 'Au matin du 8ᵉ jour il est à 7 m : il grimpe ses 3 m et sort avant de redescendre.' },
-  { category: 'enigme', question: 'Si 3 chats attrapent 3 souris en 3 minutes, combien faut-il de chats pour attraper 100 souris en 100 minutes ?', choices: ['3', '33', '100', '300'], answer: 0, explanation: 'Chaque chat attrape une souris toutes les 3 minutes.' },
-  { category: 'enigme', question: 'Je suis toujours devant toi mais tu ne peux jamais me voir. Qui suis-je ?', choices: ['Ton ombre', 'L’avenir', 'L’horizon', 'Le vent'], answer: 1 },
-  { category: 'enigme', question: 'Qu’est-ce qui peut remplir une pièce sans prendre de place ?', choices: ['L’air', 'La lumière', 'L’eau', 'Un meuble gonflable'], answer: 1 },
-  { category: 'enigme', question: 'Un père et son fils ont 36 ans à eux deux. Le père a 30 ans de plus que son fils. Quel âge a le fils ?', choices: ['6 ans', '3 ans', '4 ans', '5 ans'], answer: 1, explanation: 'Fils 3 ans + père 33 ans = 36 ans.' },
-  { category: 'enigme', question: 'Combien de fois la lettre « a » apparaît-elle dans « abracadabra » ?', choices: ['3', '4', '5', '6'], answer: 2, explanation: 'A-br-A-c-A-d-A-br-A.' },
+  { category: 'enigme', question: 'Plus il y en a, moins on voit. Qu’est-ce que c’est ?', choices: ['Le vent', 'L’obscurité', 'La lumière', 'La pluie'], answer: 1, accept: ['obscurité', 'le noir', 'noir', 'ténèbres', 'la nuit'] },
+  { category: 'enigme', question: 'Qu’est-ce qui a des dents mais ne mord jamais ?', choices: ['Un peigne', 'Un requin', 'Un chien', 'Un crocodile'], answer: 0, accept: ['peigne'] },
+  { category: 'enigme', question: 'Qu’est-ce qui se mouille en séchant ?', choices: ['Une éponge', 'Une serviette', 'Un parapluie', 'Le linge'], answer: 1, accept: ['serviette'] },
+  { category: 'enigme', question: 'C’est l’enfant de tes parents, mais ce n’est ni ton frère ni ta sœur. Qui est-ce ?', choices: ['Ton cousin', 'Toi-même', 'Ton oncle', 'Ton neveu'], answer: 1, accept: ['moi', 'moi-même', 'toi', 'toi-même'] },
+  { category: 'enigme', question: 'Quel nombre complète la suite : 3, 9, 27, 81, … ?', choices: ['162', '243', '324', '729'], answer: 1, explanation: 'On multiplie par 3 à chaque fois.', accept: ['243'] },
+  { category: 'enigme', question: 'Quel nombre complète la suite : 1, 4, 9, 16, 25, … ?', choices: ['30', '34', '36', '49'], answer: 2, explanation: 'Ce sont les carrés : 6 × 6 = 36.', accept: ['36', 'trente-six'] },
+  { category: 'enigme', question: 'Quelle lettre complète la suite : J, F, M, A, M, J, J, … ?', choices: ['S', 'A', 'O', 'N'], answer: 1, explanation: 'Les initiales des mois : … juin, juillet, août.', accept: ['A', 'août'] },
+  { category: 'enigme', question: 'Quelle lettre complète la suite : L, M, M, J, V, S, … ?', choices: ['L', 'D', 'S', 'M'], answer: 1, explanation: 'Les jours de la semaine : … samedi, dimanche.', accept: ['D', 'dimanche'] },
+  { category: 'enigme', question: 'Un escargot au fond d’un puits de 10 m monte de 3 m le jour et redescend de 2 m la nuit. En combien de jours sort-il ?', choices: ['7 jours', '8 jours', '10 jours', '12 jours'], answer: 1, explanation: 'Au matin du 8ᵉ jour il est à 7 m : il grimpe ses 3 m et sort avant de redescendre.', accept: ['8', '8 jours', 'huit jours', 'huit'] },
+  { category: 'enigme', question: 'Si 3 chats attrapent 3 souris en 3 minutes, combien faut-il de chats pour attraper 100 souris en 100 minutes ?', choices: ['3', '33', '100', '300'], answer: 0, explanation: 'Chaque chat attrape une souris toutes les 3 minutes.', accept: ['3', 'trois', '3 chats'] },
+  { category: 'enigme', question: 'Je suis toujours devant toi mais tu ne peux jamais me voir. Qui suis-je ?', choices: ['Ton ombre', 'L’avenir', 'L’horizon', 'Le vent'], answer: 1, accept: ['avenir', 'futur', 'le futur', 'demain'] },
+  { category: 'enigme', question: 'Qu’est-ce qui peut remplir une pièce sans prendre de place ?', choices: ['L’air', 'La lumière', 'L’eau', 'Un meuble gonflable'], answer: 1, accept: ['lumière', 'la lumière'] },
+  { category: 'enigme', question: 'Un père et son fils ont 36 ans à eux deux. Le père a 30 ans de plus que son fils. Quel âge a le fils ?', choices: ['6 ans', '3 ans', '4 ans', '5 ans'], answer: 1, explanation: 'Fils 3 ans + père 33 ans = 36 ans.', accept: ['3', '3 ans', 'trois', 'trois ans'] },
+  { category: 'enigme', question: 'Combien de fois la lettre « a » apparaît-elle dans « abracadabra » ?', choices: ['3', '4', '5', '6'], answer: 2, explanation: 'A-br-A-c-A-d-A-br-A.', accept: ['5', 'cinq', '5 fois'] },
 
   // 🪤 Pièges & questions « scolaires »
   { category: 'piege', question: 'Un avion s’écrase pile sur la frontière franco-espagnole. Où enterre-t-on les survivants ?', choices: ['En France', 'En Espagne', 'Dans leur pays d’origine', 'On n’enterre pas les survivants'], answer: 3 },
@@ -184,7 +186,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   // 🛋️ Bloqué
   { category: 'culture', question: 'Quel duo joue dans la série « Bloqué » ?', choices: ['Orelsan et Gringe', 'Éric et Ramzy', 'Omar et Fred', 'Kev Adams et Gad Elmaleh'], answer: 0 },
-  { category: 'enigme', question: 'Dans « Bloqué », où sont coincés les deux personnages pendant toute la série ?', choices: ['Dans un ascenseur', 'Sur un canapé', 'Dans une voiture', 'En prison'], answer: 1 },
+  { category: 'culture', question: 'Dans « Bloqué », où sont coincés les deux personnages pendant toute la série ?', choices: ['Dans un ascenseur', 'Sur un canapé', 'Dans une voiture', 'En prison'], answer: 1 },
   { category: 'culture', question: 'Sous quel nom Orelsan et Gringe forment-ils un duo de rap ?', choices: ['PNL', 'Casseurs Flowters', 'Bigflo & Oli', 'Sexion d’Assaut'], answer: 1 },
 
   // 🎮 Jeux vidéo
@@ -201,7 +203,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { category: 'culture', question: 'Combien coûte un AWP dans CS:GO ?', choices: ['3 100 $', '4 750 $', '5 000 $', '2 700 $'], answer: 1 },
   { category: 'culture', question: 'En format MR15, combien de rounds faut-il gagner pour remporter un match de CS:GO ?', choices: ['13', '15', '16', '30'], answer: 2 },
   { category: 'culture', question: 'Dans CS:GO, quel camp peut poser la bombe ?', choices: ['Les terroristes', 'Les antiterroristes', 'Les deux', 'Aucun'], answer: 0 },
-  { category: 'enigme', question: 'Dans CS:GO, à quoi sert le kit de désamorçage des antiterroristes ?', choices: ['À voir la bombe à travers les murs', 'À désamorcer deux fois plus vite', 'À poser une contre-bombe', 'À se soigner'], answer: 1, explanation: '5 secondes au lieu de 10.' },
+  { category: 'culture', question: 'Dans CS:GO, à quoi sert le kit de désamorçage des antiterroristes ?', choices: ['À voir la bombe à travers les murs', 'À désamorcer deux fois plus vite', 'À poser une contre-bombe', 'À se soigner'], answer: 1, explanation: '5 secondes au lieu de 10.' },
 
   // 😂 Palmashow
   { category: 'culture', question: 'Quel duo forme le Palmashow ?', choices: ['Grégoire Ludig et David Marsais', 'Kev Adams et Gad Elmaleh', 'Éric et Quentin', 'McFly et Carlito'], answer: 0 },

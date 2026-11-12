@@ -22,8 +22,9 @@ export function QuizView({ view, room, you }: GameViewProps<RoundGameView<QuizPr
       )}
       renderReveal={(v) => {
         const r = v.reveal!;
-        const total = r.stats?.reduce((a, b) => a + b, 0) ?? 0;
-        const right = r.correctIndex !== null ? r.stats?.[r.correctIndex] ?? 0 : 0;
+        // QCM : à partir des votes ; énigme (réponse libre) : à partir des bonnes réponses tapées
+        const total = r.stats ? r.stats.reduce((a, b) => a + b, 0) : r.results.length;
+        const right = r.stats ? (r.correctIndex !== null ? r.stats[r.correctIndex] ?? 0 : 0) : r.results.filter((x) => x.correct).length;
         return (
           <div className="mb-4 flex flex-col gap-2 rounded-2xl bg-emerald-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

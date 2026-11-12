@@ -5,11 +5,11 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 
 | Jeu | Statut | Contenu fourni |
 | --- | --- | --- |
-| 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
-| 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
+| 🧠 **Quiz Culture G & Énigmes** (énigmes en réponse libre) | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
+| 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 100 titres (69 francophones), extraits via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
-| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable | 21 vidéos « guess the rank » Rocket League & CS (mode arbitre) + tes clips via `/admin` ; mode « CS rounds pistolet » |
-| 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 30 vidéos Rocket League générées + 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
+| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
+| 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
 
@@ -147,26 +147,6 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
   5. À la fin : note = moyenne des 11 ; points = note × 30, +500 pour le meilleur 11.
 
 ---
-
-## 🚗 Vidéos Rocket League générées automatiquement
-
-`tools/rl/make_clips.py` transforme des replays Rocket League (`.replay`) en vidéos MP4 vues du dessus pour « Devine la suite » : la vidéo s’arrête juste après une frappe et la bonne réponse (but / arrêt / à côté) vient des événements du replay, elle n’est jamais devinée à la main. Les noms des joueurs ne sont pas affichés.
-
-```bash
-pip install -r tools/rl/requirements.txt
-```
-
-```bash
-python tools/rl/make_clips.py DOSSIER_DE_REPLAYS --out public/clips/rl --manifest content/rl-suite.json --max 30
-```
-
-Les 30 vidéos fournies ont été générées à partir des replays de test publics du projet [boxcars](https://github.com/nickbabcock/boxcars) (licence MIT). Tes propres replays se trouvent dans `Documents/My Games/Rocket League/TAGame/Demos`.
-
----
-
-## 🧑‍⚖️ Devine le rang : mode arbitre
-
-Les vidéos « guess the rank » (Rankdle…) révèlent elles-mêmes le rang à la fin. En mode arbitre, la vidéo se joue depuis le début ; l’hôte appuie sur **⏸ STOP** avant la révélation, tout le monde vote, la vidéo reprend, puis l’hôte clique sur le vrai rang affiché. Dans l’admin, choisis « 🧑‍⚖️ l’hôte arbitrera » pour ajouter ce type de vidéo sans connaître le rang.
 
 ## 🔫 Clips de tes propres matchs CS2
 
