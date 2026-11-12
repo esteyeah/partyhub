@@ -6,7 +6,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | Jeu | Statut | Contenu fourni |
 | --- | --- | --- |
 | 🧠 **Quiz Culture G & Énigmes** (énigmes en réponse libre) | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
-| 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 100 titres (69 francophones), extraits via l’API iTunes |
+| 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 222 titres (69 francophones, 153 internationaux), extraits via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
