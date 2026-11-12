@@ -64,7 +64,6 @@ const ROWS: Row[] = [
   ['Lucas Hernandez', 'FRA', 'PSG', 'Ligue 1', 81, 'DG/DC'],
   ['Raphaël Guerreiro', 'POR', 'Bayern Munich', 'Bundesliga', 80, 'DG/MC'],
   ['Lucas Digne', 'FRA', 'Aston Villa', 'Premier League', 79, 'DG'],
-  ['Jordi Alba', 'ESP', 'Inter Miami', 'MLS', 79, 'DG'],
   ['Myles Lewis-Skelly', 'ENG', 'Arsenal', 'Premier League', 79, 'DG/MC'],
   ['Ian Maatsen', 'NED', 'Aston Villa', 'Premier League', 78, 'DG'],
   ['Nicolás Tagliafico', 'ARG', 'Lyon', 'Ligue 1', 78, 'DG'],
@@ -148,7 +147,6 @@ const ROWS: Row[] = [
   ['Pierre-Emile Højbjerg', 'DEN', 'Marseille', 'Ligue 1', 80, 'MDC/MC'],
   ['Casemiro', 'BRA', 'Manchester United', 'Premier League', 79, 'MDC'],
   ['Manuel Ugarte', 'URU', 'Manchester United', 'Premier League', 79, 'MDC'],
-  ['Sergio Busquets', 'ESP', 'Inter Miami', 'MLS', 79, 'MDC'],
   ['Marc Casadó', 'ESP', 'FC Barcelone', 'Liga', 78, 'MDC'],
   ['Wataru Endo', 'JPN', 'Liverpool', 'Premier League', 76, 'MDC'],
 
@@ -354,6 +352,7 @@ const ROWS: Row[] = [
   ['Ludovic Ajorque', 'FRA', 'Brest', 'Ligue 1', 75, 'BU'],
 
   // ───── Recrues de l'été 2026
+  ['Alex Oxlade-Chamberlain', 'ENG', 'Beşiktaş', 'Süper Lig', 74, 'MC/AD'],
   ['Zachary Athekame', 'SUI', 'Lyon', 'Ligue 1', 75, 'DD'],
   ['Marc Pubill', 'ESP', 'Atlético Madrid', 'Liga', 76, 'DD/DC'],
   ['Héctor Fort', 'ESP', 'FC Barcelone', 'Liga', 72, 'DD'],
@@ -578,6 +577,109 @@ const ROWS: Row[] = [
 ];
 
 /* ------------------------------------------------------------------ */
+/* Retraités (21e siècle, en activité après 2010)                      */
+/* Note = meilleur niveau ; club = club emblématique.                  */
+/* Ils ne sortent que dans les thèmes « Tous » et « Retraités ».       */
+/* ------------------------------------------------------------------ */
+
+const RETIRED_ROWS: [name: string, nat: string, club: string, rating: number, roles: string][] = [
+  ['Petr Čech', 'CZE', 'Chelsea', 88, 'GB'],
+  ['Iker Casillas', 'ESP', 'Real Madrid', 89, 'GB'],
+  ['Gianluigi Buffon', 'ITA', 'Juventus', 89, 'GB'],
+  ['Steve Mandanda', 'FRA', 'Marseille', 84, 'GB'],
+  ['Víctor Valdés', 'ESP', 'FC Barcelone', 85, 'GB'],
+  ['Joe Hart', 'ENG', 'Manchester City', 83, 'GB'],
+  ['Edwin van der Sar', 'NED', 'Manchester United', 87, 'GB'],
+  ['Samir Handanović', 'SVN', 'Inter', 86, 'GB'],
+  ['Patrice Evra', 'FRA', 'Manchester United', 85, 'DG'],
+  ['Ashley Cole', 'ENG', 'Chelsea', 86, 'DG'],
+  ['Marcelo', 'BRA', 'Real Madrid', 87, 'DG/MG'],
+  ['Jordi Alba', 'ESP', 'FC Barcelone', 85, 'DG/MG'],
+  ['Leighton Baines', 'ENG', 'Everton', 82, 'DG'],
+  ['Filipe Luís', 'BRA', 'Atlético Madrid', 84, 'DG'],
+  ['Dani Alves', 'BRA', 'FC Barcelone', 87, 'DD/MD'],
+  ['Philipp Lahm', 'GER', 'Bayern Munich', 88, 'DD/MDC'],
+  ['Bacary Sagna', 'FRA', 'Arsenal', 83, 'DD'],
+  ['Pablo Zabaleta', 'ARG', 'Manchester City', 82, 'DD'],
+  ['Juanfran', 'ESP', 'Atlético Madrid', 83, 'DD'],
+  ['Stephan Lichtsteiner', 'SUI', 'Juventus', 82, 'DD'],
+  ['Mathieu Debuchy', 'FRA', 'Lille', 79, 'DD'],
+  ['Christophe Jallet', 'FRA', 'PSG', 77, 'DD'],
+  ['Carles Puyol', 'ESP', 'FC Barcelone', 88, 'DC'],
+  ['Gerard Piqué', 'ESP', 'FC Barcelone', 87, 'DC'],
+  ['Pepe', 'POR', 'Real Madrid', 86, 'DC'],
+  ['Raphaël Varane', 'FRA', 'Real Madrid', 86, 'DC'],
+  ['John Terry', 'ENG', 'Chelsea', 87, 'DC'],
+  ['Rio Ferdinand', 'ENG', 'Manchester United', 87, 'DC'],
+  ['Nemanja Vidić', 'SRB', 'Manchester United', 87, 'DC'],
+  ['Vincent Kompany', 'BEL', 'Manchester City', 86, 'DC'],
+  ['Giorgio Chiellini', 'ITA', 'Juventus', 87, 'DC/DG'],
+  ['Mats Hummels', 'GER', 'Dortmund', 86, 'DC'],
+  ['Laurent Koscielny', 'FRA', 'Arsenal', 83, 'DC'],
+  ['Andrea Barzagli', 'ITA', 'Juventus', 85, 'DC'],
+  ['Leonardo Bonucci', 'ITA', 'Juventus', 86, 'DC'],
+  ['Diego Godín', 'URU', 'Atlético Madrid', 86, 'DC'],
+  ['Sergio Busquets', 'ESP', 'FC Barcelone', 87, 'MDC'],
+  ['Xabi Alonso', 'ESP', 'Real Madrid', 87, 'MDC/MC'],
+  ['Claude Makélélé', 'FRA', 'Chelsea', 85, 'MDC'],
+  ['Bastian Schweinsteiger', 'GER', 'Bayern Munich', 87, 'MC/MDC'],
+  ['Javier Mascherano', 'ARG', 'FC Barcelone', 85, 'MDC/DC'],
+  ['Blaise Matuidi', 'FRA', 'PSG', 83, 'MC/MDC'],
+  ['Michael Carrick', 'ENG', 'Manchester United', 84, 'MDC/MC'],
+  ['Fernandinho', 'BRA', 'Manchester City', 85, 'MDC'],
+  ['Yaya Touré', 'CIV', 'Manchester City', 87, 'MC/MDC'],
+  ['Sami Khedira', 'GER', 'Real Madrid', 84, 'MC'],
+  ['Daniele De Rossi', 'ITA', 'AS Roma', 85, 'MDC/MC'],
+  ['Xavi', 'ESP', 'FC Barcelone', 90, 'MC'],
+  ['Andrés Iniesta', 'ESP', 'FC Barcelone', 90, 'MC/MOC'],
+  ['Toni Kroos', 'GER', 'Real Madrid', 89, 'MC'],
+  ['Thiago Alcántara', 'ESP', 'Bayern Munich', 86, 'MC'],
+  ['Andrea Pirlo', 'ITA', 'Juventus', 89, 'MC/MDC'],
+  ['Frank Lampard', 'ENG', 'Chelsea', 88, 'MC/MOC'],
+  ['Steven Gerrard', 'ENG', 'Liverpool', 88, 'MC'],
+  ['Paul Scholes', 'ENG', 'Manchester United', 86, 'MC'],
+  ['Cesc Fàbregas', 'ESP', 'Arsenal', 86, 'MC/MOC'],
+  ['Ivan Rakitić', 'CRO', 'FC Barcelone', 85, 'MC'],
+  ['Claudio Marchisio', 'ITA', 'Juventus', 84, 'MC'],
+  ['Mesut Özil', 'GER', 'Arsenal', 87, 'MOC'],
+  ['David Silva', 'ESP', 'Manchester City', 88, 'MOC/MC'],
+  ['Kaká', 'BRA', 'AC Milan', 89, 'MOC'],
+  ['Wesley Sneijder', 'NED', 'Inter', 86, 'MOC'],
+  ['Dimitri Payet', 'FRA', 'Marseille', 84, 'MOC/AG'],
+  ['Yoann Gourcuff', 'FRA', 'Lyon', 81, 'MOC'],
+  ['Mathieu Valbuena', 'FRA', 'Marseille', 81, 'MOC/AD'],
+  ['Ronaldinho', 'BRA', 'FC Barcelone', 90, 'AG/MOC'],
+  ['Franck Ribéry', 'FRA', 'Bayern Munich', 88, 'AG'],
+  ['Eden Hazard', 'BEL', 'Chelsea', 89, 'AG'],
+  ['André Schürrle', 'GER', 'Chelsea', 81, 'AG'],
+  ['Florent Malouda', 'FRA', 'Chelsea', 82, 'AG/MG'],
+  ['Nani', 'POR', 'Manchester United', 83, 'AG/AD'],
+  ['Ryan Giggs', 'WAL', 'Manchester United', 85, 'AG/MG'],
+  ['Arjen Robben', 'NED', 'Bayern Munich', 89, 'AD'],
+  ['Gareth Bale', 'WAL', 'Real Madrid', 88, 'AD'],
+  ['Jesús Navas', 'ESP', 'Séville', 82, 'AD/DD'],
+  ['Joaquín', 'ESP', 'Betis', 82, 'AD/MD'],
+  ['Romain Alessandrini', 'FRA', 'Marseille', 76, 'AD/AG'],
+  ['Ricardo Quaresma', 'POR', 'Porto', 82, 'AD'],
+  ['Theo Walcott', 'ENG', 'Arsenal', 80, 'AD'],
+  ['Zlatan Ibrahimović', 'SWE', 'PSG', 90, 'BU'],
+  ['Thierry Henry', 'FRA', 'Arsenal', 90, 'BU/AG'],
+  ['Didier Drogba', 'CIV', 'Chelsea', 88, 'BU'],
+  ['Wayne Rooney', 'ENG', 'Manchester United', 88, 'BU/MOC'],
+  ['Sergio Agüero', 'ARG', 'Manchester City', 89, 'BU'],
+  ['Fernando Torres', 'ESP', 'Atlético Madrid', 86, 'BU'],
+  ['David Villa', 'ESP', 'FC Barcelone', 87, 'BU/AG'],
+  ['Samuel Eto\'o', 'CMR', 'Inter', 88, 'BU'],
+  ['Gonzalo Higuaín', 'ARG', 'Naples', 86, 'BU'],
+  ['Mario Mandžukić', 'CRO', 'Juventus', 84, 'BU'],
+  ['Miroslav Klose', 'GER', 'Lazio', 85, 'BU'],
+  ['Diego Forlán', 'URU', 'Atlético Madrid', 85, 'BU'],
+  ['Robin van Persie', 'NED', 'Arsenal', 87, 'BU'],
+  ['Bafétimbi Gomis', 'FRA', 'Saint-Étienne', 80, 'BU'],
+  ['Mario Gómez', 'GER', 'Bayern Munich', 82, 'BU'],
+];
+
+/* ------------------------------------------------------------------ */
 /* Joueurs « surprise » : réels, en fin de carrière ou célèbres pour   */
 /* leurs ratés. Donnés gratuitement au perdant d'un duel (85 %).       */
 /* ------------------------------------------------------------------ */
@@ -611,6 +713,7 @@ const SURPRISE_ROWS: Row[] = [
 
 /** Années de naissance (pour l'âge et le prix) */
 const BIRTH_YEARS: Record<string, number> = {
+  'Alex Oxlade-Chamberlain': 1993,
   'Zachary Athekame': 2004,
   'Marc Pubill': 2003,
   'Héctor Fort': 2006,
@@ -1204,7 +1307,24 @@ function toFootballer([name, nat, club, league, rating, roles]: Row, surprise = 
   };
 }
 
-export const FOOTBALLERS: Footballer[] = ROWS.map((r) => toFootballer(r));
+export const RETIRED: Footballer[] = RETIRED_ROWS.map(([name, nat, club, rating, roles]) => {
+  const list = roles.split('/');
+  return {
+    id: 'ret-' + slug(name),
+    name,
+    pos: ROLE_TO_POS(list[0]),
+    roles: list,
+    nat,
+    flag: FLAGS[nat] ?? '🏳️',
+    club,
+    league: 'Retraités',
+    rating,
+    retired: true,
+    price: priceFor(rating),
+  };
+});
+
+export const FOOTBALLERS: Footballer[] = [...ROWS.map((r) => toFootballer(r)), ...RETIRED];
 export const SURPRISES: Footballer[] = SURPRISE_ROWS.map((r) => toFootballer(r, true));
 
 /**
@@ -1243,8 +1363,7 @@ export const UCL_CLUBS = [
   'Bodø/Glimt', 'Slavia Prague', 'Shakhtar Donetsk', 'AEK Athènes', 'LASK', 'Sabah', 'Slovan Bratislava', 'Viking',
 ];
 
-export const ELEVEN_THEMES: Record<string, { label: string; filter: (f: Footballer) => boolean }> = {
-  all: { label: '🌍 Tous les joueurs', filter: () => true },
+const ACTIVE_THEMES: Record<string, { label: string; filter: (f: Footballer) => boolean }> = {
   ligue1: { label: '🇫🇷 Ligue 1', filter: (f) => f.league === 'Ligue 1' },
   premier: { label: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League', filter: (f) => f.league === 'Premier League' },
   liga: { label: '🇪🇸 Liga', filter: (f) => f.league === 'Liga' },
@@ -1254,4 +1373,11 @@ export const ELEVEN_THEMES: Record<string, { label: string; filter: (f: Football
   france: { label: '🐓 Équipe de France', filter: (f) => f.nat === 'FRA' },
   pepites: { label: '🌱 Pépites (23 ans et moins)', filter: (f) => (f.age ?? 99) <= 23 },
   veterans: { label: '🧓 Vétérans (32 ans et plus)', filter: (f) => (f.age ?? 0) >= 32 },
+};
+
+/** Les retraités ne sortent que dans « Tous » et « Retraités » */
+export const ELEVEN_THEMES: Record<string, { label: string; filter: (f: Footballer) => boolean }> = {
+  all: { label: '🌍 Tous les joueurs', filter: () => true },
+  ...Object.fromEntries(Object.entries(ACTIVE_THEMES).map(([k, t]) => [k, { label: t.label, filter: (f: Footballer) => !f.retired && t.filter(f) }])),
+  retraites: { label: '👴 Spéciale retraités', filter: (f) => !!f.retired },
 };

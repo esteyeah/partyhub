@@ -198,6 +198,8 @@ export interface Footballer {
   league: string;
   rating: number;
   age?: number;
+  /** Joueur retraité (thème « Spéciale retraités ») */
+  retired?: boolean;
   /** Prix fictif en M€ */
   price: number;
 }

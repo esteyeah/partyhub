@@ -160,6 +160,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
           { value: 'france', label: '🐓 Équipe de France' },
           { value: 'pepites', label: '🌱 Pépites (≤ 23 ans)' },
           { value: 'veterans', label: '🧓 Vétérans (≥ 32 ans)' },
+          { value: 'retraites', label: '👴 Spéciale retraités' },
         ],
         default: 'all',
       },

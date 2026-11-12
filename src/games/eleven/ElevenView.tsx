@@ -353,7 +353,7 @@ function FootCard({
       <div className={`mt-2 w-full truncate font-black ${small ? 'text-sm' : 'text-base'}`}>{small ? shortName(f.name) : f.name}</div>
       <div className="w-full truncate text-[11px] opacity-70">
         {f.club}
-        {f.age ? ` · ${f.age} ans` : ''}
+        {f.retired ? ' · retraité' : f.age ? ` · ${f.age} ans` : ''}
       </div>
       <div className={`mt-2 rounded-lg bg-black/25 px-2 py-0.5 font-mono font-bold ${small ? 'text-xs' : 'text-sm'}`}>{f.price > 0 ? `${f.price} M€` : 'Gratuit'}</div>
       {selected && <span className="absolute right-2 top-2 rounded-full bg-fuchsia-500 px-1.5 text-xs text-white">✓</span>}
