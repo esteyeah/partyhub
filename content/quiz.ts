@@ -211,7 +211,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   // ───── Questions foot « expert » (coéquipiers, numéros, clubs formateurs…)
   { category: 'culture', theme: 'foot', question: 'Lors de la saison 2014-2015, quel joueur d’Arsenal portait le numéro 27 ?', choices: ['Theo Walcott', 'Serge Gnabry', 'Alex Oxlade-Chamberlain', 'Yaya Sanogo'], answer: 1 },
-  { category: 'culture', theme: 'foot', question: 'Avec quel gardien Granit Xhaka a-t-il joué à la fois à Mönchengladbach et en équipe de Suisse ?', choices: ['Roman Bürki', 'Yann Sommer', 'Gregor Kobel', 'Diego Benaglio'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Avec quel coéquipier Granit Xhaka a-t-il le plus évolué dans sa carrière ?', choices: ['Héctor Bellerín', 'Yann Sommer', 'Bukayo Saka', 'Florian Wirtz'], answer: 1, explanation: 'Ensemble à Mönchengladbach et en équipe de Suisse.' },
   { category: 'culture', theme: 'foot', question: 'Quel numéro portait Thierry Henry à Arsenal ?', choices: ['9', '10', '12', '14'], answer: 3 },
   { category: 'culture', theme: 'foot', question: 'Quel numéro portait Zinédine Zidane au Real Madrid ?', choices: ['5', '10', '7', '21'], answer: 0 },
   { category: 'culture', theme: 'foot', question: 'Quel numéro portait Zlatan Ibrahimović au PSG ?', choices: ['9', '10', '11', '18'], answer: 1 },
