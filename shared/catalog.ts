@@ -145,6 +145,24 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       'À chaque poste, choisis un joueur parmi ceux proposés sans dépasser ton budget. Même choix qu’un autre ? Duel sur une question foot : le perdant hérite d’un joueur surprise…',
     gradient: 'from-emerald-500 to-teal-600',
     settings: [
+      {
+        key: 'theme',
+        label: 'Thème',
+        type: 'select',
+        options: [
+          { value: 'all', label: '🌍 Tous les joueurs' },
+          { value: 'ligue1', label: '🇫🇷 Ligue 1' },
+          { value: 'premier', label: '🏴 Premier League' },
+          { value: 'liga', label: '🇪🇸 Liga' },
+          { value: 'seriea', label: '🇮🇹 Serie A' },
+          { value: 'bundesliga', label: '🇩🇪 Bundesliga' },
+          { value: 'ucl', label: '⭐ Ligue des champions' },
+          { value: 'france', label: '🐓 Équipe de France' },
+          { value: 'pepites', label: '🌱 Pépites (≤ 23 ans)' },
+          { value: 'veterans', label: '🧓 Vétérans (≥ 32 ans)' },
+        ],
+        default: 'all',
+      },
       { key: 'choices', label: 'Choix / poste', type: 'number', min: 3, max: 5, default: 4 },
       {
         key: 'budget',

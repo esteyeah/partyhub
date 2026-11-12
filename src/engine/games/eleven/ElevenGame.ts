@@ -1,4 +1,4 @@
-import { FOOTBALLERS, SURPRISES, fitsSlot } from '@content/footballers';
+import { ELEVEN_THEMES, FOOTBALLERS, SURPRISES, fitsSlot } from '@content/footballers';
 import { QUIZ_QUESTIONS, type QuizQuestion } from '@content/quiz';
 import type { ElevenOutcome, ElevenSlot, ElevenTeam, ElevenTeamResult, ElevenView, FootPos, Footballer, GameAction } from '@shared/types';
 
@@ -19,7 +19,7 @@ import { shuffle } from '../../utils/random';
  *  … poste suivant, puis notes finales.
  */
 
-type Settings = { choices: number; budget: string; formation: string; time: string };
+type Settings = { choices: number; budget: string; formation: string; time: string; theme: string };
 
 const REVEAL_MS = 3500;
 const DUEL_MS = 12000;
@@ -96,6 +96,11 @@ export class ElevenGame extends GameModule<Settings> {
 
   /* ---------------- Utilitaires ---------------- */
 
+  private themePool(): Footballer[] {
+    const theme = ELEVEN_THEMES[this.settings.theme] ?? ELEVEN_THEMES.all;
+    return FOOTBALLERS.filter(theme.filter);
+  }
+
   private team(playerId: string): ElevenTeam {
     let t = this.teams.get(playerId);
     if (!t) {
@@ -130,7 +135,9 @@ export class ElevenGame extends GameModule<Settings> {
    */
   private makeOffers(slot: ElevenSlot): Footballer[] {
     const n = Math.max(3, Math.min(5, Number(this.settings.choices) || 4));
-    const all = FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && !this.owned.has(p.id));
+    // Thème choisi par l'hôte ; si le thème n'a pas assez de joueurs à ce poste, on complète avec tous les joueurs
+    const inTheme = this.themePool().filter((p) => fitsSlot(slot.label, p) && !this.owned.has(p.id));
+    const all = inTheme.length >= n ? inTheme : FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && !this.owned.has(p.id));
     const fresh = all.filter((p) => !recentlyOffered.includes(p.id));
     const candidates = (fresh.length >= n * 2 ? fresh : all).sort((a, b) => b.rating - a.rating);
     let picked: Footballer[];
@@ -153,7 +160,7 @@ export class ElevenGame extends GameModule<Settings> {
   private surprise(slot: ElevenSlot): { footballer: Footballer; star: boolean } {
     if (Math.random() < STAR_CHANCE) {
       const offered = new Set(this.offers.map((o) => o.id));
-      const stars = FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
+      const stars = this.themePool().filter((p) => fitsSlot(slot.label, p) && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
       if (stars.length) return { footballer: stars[Math.floor(Math.random() * stars.length)], star: true };
     }
     return { footballer: this.surpriseFlop(slot), star: false };

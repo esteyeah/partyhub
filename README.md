@@ -7,7 +7,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | --- | --- | --- |
 | 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
-| ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 313 footballeurs avec postes précis (DG, DC, DD, MDC…) + 23 joueurs « surprise » |
+| ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable | 21 vidéos « guess the rank » Rocket League & CS (mode arbitre) + tes clips via `/admin` ; mode « CS rounds pistolet » |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 30 vidéos Rocket League générées + 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
 
