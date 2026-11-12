@@ -25,8 +25,8 @@ export class RankGame extends RoundGame<RankClip, RankPrompt, RankExtra, Setting
       (c) =>
         (this.settings.game === 'all' ||
           c.game === this.settings.game ||
-          (this.settings.game === 'cs2' && c.game === 'premier') ||
-          (this.settings.game === 'cs2-pistol' && (c.game === 'cs2' || c.game === 'premier') && c.pistol)) &&
+          (this.settings.game === 'cs2' && (c.game === 'premier' || c.game === 'faceit')) ||
+          (this.settings.game === 'cs2-pistol' && (c.game === 'cs2' || c.game === 'premier' || c.game === 'faceit') && c.pistol)) &&
         (c.judged || (c.rank !== undefined && (RANK_LADDERS[c.game].ranks as readonly string[]).includes(c.rank))),
     );
     // Les clips à rang connu d'abord (plus rapides à jouer), puis les clips arbitrés

@@ -28,7 +28,7 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseRankClip({ game: d.game, rank: d.rank, judged: d.judged, pistol: (d.game === 'cs2' || d.game === 'premier') && d.pistol, context: d.context, source: d.source, clip: draftToClip(d.clip) });
+    const parsed = parseRankClip({ game: d.game, rank: d.rank, judged: d.judged, pistol: (d.game === 'cs2' || d.game === 'premier' || d.game === 'faceit') && d.pistol, context: d.context, source: d.source, clip: draftToClip(d.clip) });
     if (typeof parsed === 'string') return s.setError(parsed);
     const existing = d.id ? s.list.find((x) => x.id === d.id) : undefined;
     const next = existing ? s.list.map((x) => (x.id === existing.id ? { ...existing, ...parsed } : x)) : [...s.list, { ...parsed, id: newQuestionIdForClip(), createdAt: Date.now() }];
@@ -99,7 +99,7 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
             </p>
           )}
         </div>
-        {(d.game === 'cs2' || d.game === 'premier') && (
+        {(d.game === 'cs2' || d.game === 'premier' || d.game === 'faceit') && (
           <label className="flex items-center gap-2 text-sm font-semibold">
             <input type="checkbox" checked={d.pistol} onChange={(e) => setD({ ...d, pistol: e.target.checked })} className="h-4 w-4 accent-fuchsia-500" />
             🔫 Round pistolet (pour le mode « rounds pistolet uniquement »)

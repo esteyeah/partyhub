@@ -12,6 +12,10 @@ export const RANK_LADDERS = {
   valorant: { name: 'Valorant', ranks: ['Fer', 'Bronze', 'Argent', 'Or', 'Platine', 'Diamant', 'Ascendant', 'Immortel', 'Radiant'] },
   rocket: { name: 'Rocket League', ranks: ['Bronze', 'Argent', 'Or', 'Platine', 'Diamant', 'Champion', 'Grand Champion', 'Supersonic Legend'] },
   cs2: { name: 'Counter-Strike', ranks: ['Silver', 'Gold Nova', 'Master Guardian', 'Legendary Eagle', 'Supreme', 'Global Elite'] },
+  faceit: {
+    name: 'CS2 Faceit',
+    ranks: ['Niveau 1', 'Niveau 2', 'Niveau 3', 'Niveau 4', 'Niveau 5', 'Niveau 6', 'Niveau 7', 'Niveau 8', 'Niveau 9', 'Niveau 10'],
+  },
   premier: {
     name: 'CS2 Premier',
     ranks: ['< 5 000', '5 000 – 9 999', '10 000 – 14 999', '15 000 – 19 999', '20 000 – 24 999', '25 000 – 29 999', '30 000+'],

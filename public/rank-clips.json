@@ -52,5 +52,18 @@
     "context": "Match Premier · Nuke · Round pistolet (2e mi-temps)",
     "id": "WiH9ashFZYU-r13",
     "createdAt": 1794515881592
+  },
+  {
+    "game": "faceit",
+    "rank": "Niveau 9",
+    "clip": {
+      "type": "youtube",
+      "id": "7pLsWXW4lGw",
+      "start": 1650,
+      "end": 1675
+    },
+    "context": "Partie Faceit",
+    "id": "7pLsWXW4lGw-1650",
+    "createdAt": 1794527258019
   }
 ]
