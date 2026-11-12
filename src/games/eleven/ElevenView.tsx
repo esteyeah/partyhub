@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 import type { ElevenOutcome, ElevenSlot, ElevenView as View, FootPos, Footballer, PlayerPublic } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { TimerRing } from '@/components/ui/Timer';
@@ -168,6 +169,7 @@ function DuelPhase({ view, players, you }: { view: View; players: Map<string, Pl
                     {i > 0 && <span className="font-black text-zinc-600">vs</span>}
                     <Avatar player={p} size="sm" />
                     <span className="text-sm font-semibold">{p.nickname}</span>
+                    {d.found.includes(id) && <span title="A trouvé au clavier">⚡</span>}
                     {d.answered.includes(id) && <span title="A répondu">🗳️</span>}
                   </span>
                 ) : null;
@@ -177,9 +179,14 @@ function DuelPhase({ view, players, you }: { view: View; players: Map<string, Pl
         </div>
       ))}
       <div className="panel p-5 text-center">
-        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Question foot · le plus rapide à trouver gagne</div>
+        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          {view.duelStage === 'open' ? '⌨️ Réponse libre : le premier qui tape la bonne réponse gagne' : 'Question foot · le plus rapide à trouver gagne'}
+        </div>
         <h3 className="mt-2 text-xl font-extrabold sm:text-2xl">{q.question}</h3>
       </div>
+      {view.duelStage === 'open' ? (
+        <OpenAnswer view={view} isPlayer={!!mine} found={!!mine?.found.length} />
+      ) : (
       <div className="grid gap-3 sm:grid-cols-2">
         {q.choices.map((c, i) => {
           const s = CHOICE_STYLES[i];
@@ -200,7 +207,36 @@ function DuelPhase({ view, players, you }: { view: View; players: Map<string, Pl
           );
         })}
       </div>
+      )}
       {!mine && <p className="text-center text-sm text-zinc-500">Tu n’es pas concerné : regarde le duel 🍿</p>}
+    </div>
+  );
+}
+
+/** Phase libre du duel : on tape la réponse ; les 4 propositions arrivent ensuite si personne n'a trouvé. */
+function OpenAnswer({ view, isPlayer, found }: { view: View; isPlayer: boolean; found: boolean }) {
+  const [text, setText] = useState('');
+  const fb = view.me.duelFeedback;
+  if (!isPlayer) return <p className="text-center text-sm text-zinc-400">Les joueurs du duel tapent leur réponse… (4 propositions dans 20 s si personne ne trouve)</p>;
+  if (found) return <p className="rounded-2xl bg-emerald-500/15 p-4 text-center font-bold text-emerald-200">⚡ Duel remporté au clavier !</p>;
+  return (
+    <div className="panel space-y-3 p-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!text.trim()) return;
+          sendAction({ type: 'guess', text });
+          setText('');
+        }}
+        className="flex gap-2"
+      >
+        <input className="input text-lg" placeholder="Ta réponse…" value={text} onChange={(e) => setText(e.target.value)} autoFocus autoComplete="off" />
+        <button className="rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 font-bold">↵</button>
+      </form>
+      {fb && fb.type !== 'found' && (
+        <p className={`text-center text-sm font-semibold ${fb.type === 'close' ? 'text-amber-300' : 'text-zinc-400'}`}>{fb.text}</p>
+      )}
+      <p className="text-center text-xs text-zinc-500">Pas d’idée ? Attends : 4 propositions arrivent après 20 secondes.</p>
     </div>
   );
 }
@@ -233,6 +269,7 @@ function ResolvePhase({ view, players }: { view: View; players: Map<string, Play
                   </span>
                 );
               })}
+              {d.byKeyboard && d.winner && <span className="rounded-lg bg-emerald-500/15 px-2 py-1 text-emerald-200">⚡ {players.get(d.winner)?.nickname} a trouvé au clavier</span>}
               {d.byChance && <span className="rounded-lg bg-amber-500/15 px-2 py-1 text-amber-200">Personne n’a trouvé : tirage au sort 🎲</span>}
             </div>
           ))}

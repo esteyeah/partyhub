@@ -6,6 +6,7 @@ import type { ElevenOutcome, ElevenSlot, ElevenTeam, ElevenTeamResult, ElevenVie
 const recentlyOffered: string[] = [];
 import { GameModule } from '../GameModule';
 import { shuffle } from '../../utils/random';
+import { fuzzyMatch, normalize } from '../../utils/fuzzy';
 
 /**
  * « Compose ton 11 » en draft :
@@ -23,6 +24,8 @@ type Settings = { choices: number; budget: string; formation: string; time: stri
 
 const REVEAL_MS = 3500;
 const DUEL_MS = 12000;
+/** Phase de réponse libre au clavier avant l'affichage des 4 propositions */
+const OPEN_MS = 20000;
 const RESOLVE_MS = 5500;
 const FINAL_MS = 30000;
 const STAR_CHANCE = 0.15;
@@ -60,8 +63,12 @@ interface Duel {
   footballer: Footballer;
   players: string[];
   answers: Map<string, { choice: number; ms: number }>;
+  /** Joueurs ayant trouvé au clavier pendant la phase libre (dans l'ordre) */
+  openFound: string[];
   winner: string | null;
   byChance: boolean;
+  /** Le gagnant a trouvé au clavier (avant les propositions) */
+  byKeyboard: boolean;
 }
 
 export class ElevenGame extends GameModule<Settings> {
@@ -83,6 +90,9 @@ export class ElevenGame extends GameModule<Settings> {
 
   private duels: Duel[] = [];
   private duelQuestion: { question: string; choices: string[]; answer: number } | null = null;
+  private duelStage: 'open' | 'choice' = 'open';
+  private duelFeedback = new Map<string, { type: 'close' | 'wrong' | 'found'; text: string; id: number }>();
+  private feedbackSeq = 0;
   private usedQuestions = new Set<string>();
   private outcomes: ElevenOutcome[] | null = null;
   private results: ElevenTeamResult[] | null = null;
@@ -215,20 +225,46 @@ export class ElevenGame extends GameModule<Settings> {
       footballer: this.offers.find((o) => o.id === fid)!,
       players: ids,
       answers: new Map(),
+      openFound: [],
       winner: null,
       byChance: false,
+      byKeyboard: false,
     }));
     this.setPhase('reveal', REVEAL_MS, () => (this.duels.length ? this.startDuels() : this.resolve()));
   }
 
+  /** 1) 20 s de réponse libre au clavier ; 2) si personne n'a trouvé, 4 propositions */
   private startDuels() {
     this.duelQuestion = this.pickDuelQuestion();
+    this.duelStage = 'open';
+    this.duelFeedback.clear();
+    this.setPhase('duel', OPEN_MS, () => this.toChoiceStage());
+  }
+
+  private toChoiceStage() {
+    if (this.phase !== 'duel') return;
+    if (this.duels.every((d) => d.openFound.length)) return this.resolveDuels();
+    this.duelStage = 'choice';
     this.setPhase('duel', DUEL_MS, () => this.resolveDuels());
+  }
+
+  /** Réponses acceptées au clavier : la bonne réponse, et ses mots qui ne figurent dans aucune autre proposition */
+  private acceptedAnswers(): string[] {
+    const q = this.duelQuestion!;
+    const answer = q.choices[q.answer];
+    const others = new Set(q.choices.filter((_, i) => i !== q.answer).flatMap((c) => normalize(c).split(' ')));
+    const words = normalize(answer).split(' ').filter((w) => w.length >= 4 && !others.has(w));
+    return [answer, ...words];
   }
 
   private resolveDuels() {
     if (this.phase !== 'duel' || !this.duelQuestion) return;
     for (const d of this.duels) {
+      if (d.openFound.length) {
+        d.winner = d.openFound[0];
+        d.byKeyboard = true;
+        continue;
+      }
       const right = [...d.answers].filter(([, a]) => a.choice === this.duelQuestion!.answer).sort((a, b) => a[1].ms - b[1].ms);
       if (right.length) d.winner = right[0][0];
       else {
@@ -318,7 +354,24 @@ export class ElevenGame extends GameModule<Settings> {
         this.setTimer(700, () => this.closePicks());
       }
       this.ctx.sync();
-    } else if (this.phase === 'duel' && action.type === 'answer' && this.duelQuestion) {
+    } else if (this.phase === 'duel' && this.duelStage === 'open' && action.type === 'guess' && this.duelQuestion) {
+      const duel = this.duels.find((d) => d.players.includes(playerId));
+      if (!duel || duel.openFound.length) return; // un seul gagnant par duel
+      const m = fuzzyMatch(String(action.text ?? '').slice(0, 80), this.acceptedAnswers());
+      if (m === 'exact') {
+        duel.openFound.push(playerId);
+        this.duelFeedback.set(playerId, { type: 'found', text: 'Bonne réponse ! ⚡', id: ++this.feedbackSeq });
+        if (this.duels.every((d) => d.openFound.length)) {
+          this.clearTimers();
+          this.setTimer(900, () => this.resolveDuels());
+        }
+      } else {
+        this.duelFeedback.set(playerId, m === 'close'
+          ? { type: 'close', text: 'Presque ! Vérifie l’orthographe 👀', id: ++this.feedbackSeq }
+          : { type: 'wrong', text: 'Non, essaie encore', id: ++this.feedbackSeq });
+      }
+      this.ctx.sync();
+    } else if (this.phase === 'duel' && this.duelStage === 'choice' && action.type === 'answer' && this.duelQuestion) {
       const duel = this.duels.find((d) => d.players.includes(playerId));
       if (!duel || duel.answers.has(playerId)) return;
       if (!Number.isInteger(action.choice) || action.choice < 0 || action.choice > 3) return;
@@ -336,7 +389,7 @@ export class ElevenGame extends GameModule<Settings> {
   skip() {
     if (this.phase === 'pick') this.closePicks();
     else if (this.phase === 'reveal') this.duels.length ? this.startDuels() : this.resolve();
-    else if (this.phase === 'duel') this.resolveDuels();
+    else if (this.phase === 'duel') this.duelStage === 'open' ? this.toChoiceStage() : this.resolveDuels();
     else if (this.phase === 'resolve') this.nextSlot();
     else this.ctx.finish();
   }
@@ -360,18 +413,27 @@ export class ElevenGame extends GameModule<Settings> {
       me: {
         choice: this.choices.get(playerId) ?? null,
         duelChoice: myDuel?.answers.get(playerId)?.choice ?? null,
+        duelFeedback: this.duelFeedback.get(playerId) ?? null,
       },
+      duelStage: this.duelStage,
       choices: this.revealed,
       duelQuestion: this.duelQuestion
-        ? { question: this.duelQuestion.question, choices: this.duelQuestion.choices, correctIndex: showAnswers ? this.duelQuestion.answer : null }
+        ? {
+            question: this.duelQuestion.question,
+            // Pendant la phase libre, les propositions restent cachées
+            choices: this.phase === 'duel' && this.duelStage === 'open' ? [] : this.duelQuestion.choices,
+            correctIndex: showAnswers ? this.duelQuestion.answer : null,
+          }
         : null,
       duels: this.duels.map((d) => ({
         footballer: d.footballer,
         players: d.players,
         answered: [...d.answers.keys()],
+        found: d.openFound,
         answers: showAnswers ? Object.fromEntries(d.players.map((id) => [id, d.answers.get(id)?.choice ?? null])) : null,
         winner: showAnswers ? d.winner : null,
         byChance: showAnswers && d.byChance,
+        byKeyboard: showAnswers && d.byKeyboard,
       })),
       outcomes: this.outcomes,
       results: this.results,

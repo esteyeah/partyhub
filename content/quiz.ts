@@ -232,4 +232,20 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { category: 'culture', theme: 'foot', question: 'Quel défenseur a marqué un doublé pour la France en demi-finale du Mondial 1998 ?', choices: ['Marcel Desailly', 'Laurent Blanc', 'Lilian Thuram', 'Bixente Lizarazu'], answer: 2 },
   { category: 'culture', theme: 'foot', question: 'Quel joueur est le meilleur buteur de l’histoire de la Ligue des champions ?', choices: ['Lionel Messi', 'Cristiano Ronaldo', 'Robert Lewandowski', 'Karim Benzema'], answer: 1 },
   { category: 'culture', theme: 'foot', question: 'Qui était le gardien titulaire de la France en finale de l’Euro 2016 ?', choices: ['Steve Mandanda', 'Hugo Lloris', 'Benoît Costil', 'Alphonse Areola'], answer: 1 },
+
+  // ───── Buts mémorables
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Zlatan Ibrahimović a-t-il marqué son retourné de 30 mètres en 2012 ?', choices: ['L’Angleterre', 'L’Italie', 'Le Danemark', 'Les Pays-Bas'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Benjamin Pavard a-t-il marqué sa reprise de volée au Mondial 2018 ?', choices: ['L’Uruguay', 'L’Argentine', 'La Belgique', 'La Croatie'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Gareth Bale a-t-il marqué un retourné en finale de la Ligue des champions 2018 ?', choices: ['Juventus', 'Liverpool', 'Atlético Madrid', 'Bayern Munich'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Cristiano Ronaldo a-t-il marqué son célèbre retourné en Ligue des champions en 2018 ?', choices: ['Juventus', 'PSG', 'Bayern Munich', 'Liverpool'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Robin van Persie a-t-il marqué sa tête plongeante au Mondial 2014 ?', choices: ['L’Argentine', 'L’Espagne', 'Le Brésil', 'Le Mexique'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Wayne Rooney a-t-il marqué son retourné lors du derby de 2011 ?', choices: ['Liverpool', 'Manchester City', 'Chelsea', 'Arsenal'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Zinédine Zidane a-t-il marqué sa volée en finale de la Ligue des champions 2002 ?', choices: ['Bayer Leverkusen', 'Valence', 'Bayern Munich', 'Juventus'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Dimitri Payet a-t-il marqué le but de la victoire en match d’ouverture de l’Euro 2016 ?', choices: ['L’Albanie', 'La Roumanie', 'La Suisse', 'L’Islande'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Kylian Mbappé a-t-il marqué un doublé en huitième de finale du Mondial 2018 ?', choices: ['L’Uruguay', 'L’Argentine', 'Le Danemark', 'Le Pérou'], answer: 1 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Lionel Messi a-t-il marqué son slalom « à la Maradona » en Coupe du Roi 2007 ?', choices: ['Getafe', 'Séville', 'Valence', 'Espanyol'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quelle équipe Zlatan Ibrahimović a-t-il marqué une talonnade aérienne à l’Euro 2004 ?', choices: ['L’Italie', 'Le Danemark', 'La Bulgarie', 'Les Pays-Bas'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Olivier Giroud a-t-il marqué son « coup du scorpion » en 2017 ?', choices: ['Crystal Palace', 'Everton', 'Tottenham', 'Southampton'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Sergio Agüero a-t-il marqué le but du titre à la 94e minute en 2012 ?', choices: ['QPR', 'Sunderland', 'Newcastle', 'Manchester United'], answer: 0 },
+  { category: 'culture', theme: 'foot', question: 'Contre quel club Sergio Ramos a-t-il égalisé à la 93e minute en finale de la Ligue des champions 2014 ?', choices: ['Atlético Madrid', 'Juventus', 'Borussia Dortmund', 'Bayern Munich'], answer: 0 },
 ];

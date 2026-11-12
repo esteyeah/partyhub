@@ -238,6 +238,10 @@ export interface ElevenDuel {
   winner: string | null;
   /** Personne n'a trouvé : tirage au sort */
   byChance: boolean;
+  /** Joueurs ayant trouvé au clavier pendant la phase libre */
+  found: string[];
+  /** Le gagnant a trouvé au clavier */
+  byKeyboard: boolean;
 }
 
 export interface ElevenTeamResult {
@@ -264,7 +268,13 @@ export interface ElevenView {
   teams: Record<string, ElevenTeam>;
   /** Joueurs ayant fait leur choix pour ce poste */
   picked: string[];
-  me: { choice: string | null; duelChoice: number | null };
+  me: {
+    choice: string | null;
+    duelChoice: number | null;
+    duelFeedback: { type: 'close' | 'wrong' | 'found'; text: string; id: number } | null;
+  };
+  /** Duel : d'abord réponse libre au clavier (open), puis 4 propositions (choice) */
+  duelStage: 'open' | 'choice';
   /** Choix de chacun, dévoilés après la phase de choix */
   choices: Record<string, string | null> | null;
   duelQuestion: { question: string; choices: string[]; correctIndex: number | null } | null;
