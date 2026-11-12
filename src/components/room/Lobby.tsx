@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GAME_CATALOG, GAME_IDS, defaultSettings, type SettingField } from '@shared/catalog';
 import type { GameId, PlaylistItem, SettingValue } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
@@ -268,7 +268,7 @@ function PlaylistRow({
 function describe(f: SettingField, v: SettingValue | undefined): string {
   if (f.type === 'select') return f.options.find((o) => o.value === v)?.label ?? String(v);
   if (f.type === 'boolean') return `${f.label} : ${v ? 'oui' : 'non'}`;
-  return `${v} ${f.label.toLowerCase()}`;
+  return `${f.label} : ${v}`;
 }
 
 function SettingInput({ field, value, onChange }: { field: SettingField; value: SettingValue | undefined; onChange: (v: SettingValue) => void }) {
@@ -285,15 +285,7 @@ function SettingInput({ field, value, onChange }: { field: SettingField; value: 
           ))}
         </select>
       ) : field.type === 'number' ? (
-        <div className="flex items-center gap-1">
-          <button type="button" className="rounded-lg bg-white/5 px-2 py-1.5 text-sm hover:bg-white/10" onClick={() => onChange(Math.max(field.min, Number(value) - 1))}>
-            −
-          </button>
-          <span className="flex-1 text-center font-mono font-bold">{String(value)}</span>
-          <button type="button" className="rounded-lg bg-white/5 px-2 py-1.5 text-sm hover:bg-white/10" onClick={() => onChange(Math.min(field.max, Number(value) + 1))}>
-            +
-          </button>
-        </div>
+        <NumberSetting field={field} value={Number(value ?? field.default)} onChange={onChange} />
       ) : (
         <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />
       )}
@@ -314,5 +306,37 @@ function IconBtn({ children, onClick, disabled, label, danger }: { children: Rea
     >
       {children}
     </button>
+  );
+}
+
+/** Champ numérique : boutons −/+ (selon le pas) et saisie libre, validée en quittant le champ ou avec Entrée. */
+function NumberSetting({ field, value, onChange }: { field: Extract<SettingField, { type: 'number' }>; value: number; onChange: (v: SettingValue) => void }) {
+  const [draft, setDraft] = useState(String(value));
+  useEffect(() => setDraft(String(value)), [value]);
+  const step = field.step ?? 1;
+  const clamp = (n: number) => Math.min(field.max, Math.max(field.min, Math.round(n)));
+  const commit = () => {
+    const n = Number(draft.replace(/\s/g, '').replace(',', '.'));
+    if (Number.isFinite(n)) onChange(clamp(n));
+    else setDraft(String(value));
+  };
+  return (
+    <div className="flex items-center gap-1">
+      <button type="button" className="rounded-lg bg-white/5 px-2 py-1.5 text-sm hover:bg-white/10" onClick={() => onChange(clamp(value - step))}>
+        −
+      </button>
+      <input
+        inputMode="numeric"
+        className="w-full min-w-0 flex-1 rounded-lg bg-transparent px-1 py-1 text-center font-mono font-bold outline-none focus:bg-white/5"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => e.key === 'Enter' && (e.currentTarget as HTMLInputElement).blur()}
+        aria-label={field.label}
+      />
+      <button type="button" className="rounded-lg bg-white/5 px-2 py-1.5 text-sm hover:bg-white/10" onClick={() => onChange(clamp(value + step))}>
+        +
+      </button>
+    </div>
   );
 }

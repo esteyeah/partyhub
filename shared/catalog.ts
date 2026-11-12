@@ -10,7 +10,7 @@ import type { GameId, GameSettings, SettingValue } from './types';
  */
 
 export type SettingField =
-  | { key: string; label: string; type: 'number'; min: number; max: number; step?: number; default: number }
+  | { key: string; label: string; type: 'number'; min: number; max: number; step?: number; default: number; suffix?: string }
   | { key: string; label: string; type: 'select'; options: { value: string; label: string }[]; default: string }
   | { key: string; label: string; type: 'boolean'; default: boolean };
 
@@ -167,10 +167,12 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'choices', label: 'Choix / poste', type: 'number', min: 3, max: 5, default: 4 },
       {
         key: 'budget',
-        label: 'Budget',
-        type: 'select',
-        options: [150, 200, 250, 300, 400, 500].map((v) => ({ value: String(v), label: `${v} M€` })),
-        default: '300',
+        label: 'Budget (M€)',
+        type: 'number',
+        min: 50,
+        max: 3000,
+        step: 50,
+        default: 300,
       },
       {
         key: 'formation',
