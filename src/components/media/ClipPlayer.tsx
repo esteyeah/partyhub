@@ -34,10 +34,29 @@ export function loadYouTubeApi(): Promise<any> {
  * Lecteur d'extrait "anti-spoiler" : joue `clip` de `start` à `end`, puis se fige
  * derrière un cache. Le joueur ne peut ni cliquer sur la vidéo ni avancer.
  */
-export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se passer ?', portrait = false }: { clip: Clip; endedLabel?: string; portrait?: boolean }) {
+export function ClipPlayer({
+  clip,
+  endedLabel = '⏸ Coupé ! Que va-t-il se passer ?',
+  portrait = false,
+  paused = false,
+  pausedLabel = '⏸ Vidéo stoppée : votez !',
+}: {
+  clip: Clip;
+  endedLabel?: string;
+  portrait?: boolean;
+  /** Met la vidéo en pause / la relance sans la recharger (mode arbitre) */
+  paused?: boolean;
+  pausedLabel?: string;
+}) {
   const [ended, setEnded] = useState(false);
   const [needsClick, setNeedsClick] = useState(false);
   const play = useRef<() => void>(() => {});
+  const pause = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    if (paused) pause.current();
+    else play.current();
+  }, [paused]);
   const key = clip.type === 'youtube' ? `${clip.id}-${clip.start}-${clip.end}` : `${clip.src}-${clip.start}-${clip.end}`;
 
   useEffect(() => {
@@ -48,9 +67,14 @@ export function ClipPlayer({ clip, endedLabel = '⏸ Coupé ! Que va-t-il se pas
   return (
     <div className={`relative w-full overflow-hidden rounded-2xl bg-black ${portrait ? 'aspect-[540/760]' : 'aspect-video'}`}>
       {clip.type === 'youtube' ? (
-        <YouTubeClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} />
+        <YouTubeClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
       ) : (
-        <FileClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} />
+        <FileClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
+      )}
+      {paused && !ended && (
+        <div className="absolute inset-x-0 top-3 flex justify-center px-3">
+          <span className="rounded-xl bg-black/80 px-3 py-1.5 text-center text-sm font-black sm:text-base">{pausedLabel}</span>
+        </div>
       )}
       {/* Empêche toute interaction avec le lecteur (pas de scrub, pas de titre cliquable) */}
       <div className="absolute inset-0" />
@@ -86,9 +110,10 @@ interface InnerProps<C> {
   onEnded: () => void;
   onBlocked: (b: boolean) => void;
   playRef: React.MutableRefObject<() => void>;
+  pauseRef: React.MutableRefObject<() => void>;
 }
 
-function YouTubeClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<Clip, { type: 'youtube' }>>) {
+function YouTubeClip({ clip, onEnded, onBlocked, playRef, pauseRef }: InnerProps<Extract<Clip, { type: 'youtube' }>>) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -121,6 +146,7 @@ function YouTubeClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<C
         events: {
           onReady: (e: any) => {
             playRef.current = () => e.target.playVideo();
+            pauseRef.current = () => e.target.pauseVideo();
             e.target.seekTo(clip.start, true);
             e.target.playVideo();
             blockedTimer = setTimeout(() => {
@@ -163,7 +189,7 @@ function YouTubeClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<C
   return <div ref={host} className="absolute inset-0 [&_iframe]:h-full [&_iframe]:w-full" />;
 }
 
-function FileClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<Clip, { type: 'file' }>>) {
+function FileClip({ clip, onEnded, onBlocked, playRef, pauseRef }: InnerProps<Extract<Clip, { type: 'file' }>>) {
   const ref = useRef<HTMLVideoElement>(null);
   const done = useRef(false);
 
@@ -171,6 +197,7 @@ function FileClip({ clip, onEnded, onBlocked, playRef }: InnerProps<Extract<Clip
     const v = ref.current;
     if (!v) return;
     playRef.current = () => void v.play();
+    pauseRef.current = () => v.pause();
     const start = () => {
       v.currentTime = clip.start;
       v.play().catch(() => onBlocked(true));

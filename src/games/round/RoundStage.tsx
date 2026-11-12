@@ -72,7 +72,7 @@ export function RoundStage<P, X>({
           <div className="p-5 sm:p-6">{view.prompt && renderPrompt(view.prompt, view)}</div>
         </div>
 
-        {view.input?.kind === 'choice' && <ChoiceInput view={view} />}
+        {view.input?.kind === 'choice' && <ChoiceInput view={view} isHost={room.hostId === you} />}
         {view.input?.kind === 'text' && <TextInput view={view} />}
         {isReveal && <RevealPanel view={view} players={room.players} extra={renderReveal?.(view)} />}
       </div>
@@ -99,17 +99,31 @@ export function RoundStage<P, X>({
 
 /* ------------------------------------------------------------------ */
 
-function ChoiceInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
+function ChoiceInput<P, X>({ view, isHost }: { view: RoundGameView<P, X>; isHost: boolean }) {
   if (view.input?.kind !== 'choice') return null;
   const { choices, layout } = view.input;
   const reveal = view.reveal;
   const mine = view.me.choice;
+  // Mode arbitre : pendant la révélation, seul l'hôte clique (pour donner la bonne réponse)
+  const judging = view.phase === 'judge';
+  const hostJudging = judging && isHost;
+  const voteClosed = view.phase !== 'question';
   const total = reveal?.stats?.reduce((a, b) => a + b, 0) ?? 0;
 
   if (layout === 'ladder') {
     return (
       <div className="panel p-4">
-        <p className="mb-3 text-center text-sm text-zinc-400">{reveal ? 'Le vrai rang était…' : mine !== null ? 'Vote enregistré ✅' : 'Quel est son rang ?'}</p>
+        <p className={`mb-3 text-center text-sm ${hostJudging ? 'font-bold text-amber-300' : 'text-zinc-400'}`}>
+          {reveal
+            ? 'Le vrai rang était…'
+            : hostJudging
+              ? '🧑‍⚖️ Regarde la révélation et clique sur le VRAI rang'
+              : judging
+                ? '🎬 Révélation… l’hôte valide le vrai rang'
+                : mine !== null
+                  ? 'Vote enregistré ✅'
+                  : 'Quel est son rang ?'}
+        </p>
         <div className="flex flex-wrap justify-center gap-2">
           {choices.map((c, i) => {
             const isCorrect = reveal?.correctIndex === i;
@@ -118,9 +132,9 @@ function ChoiceInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
             return (
               <button
                 key={c}
-                disabled={!!reveal || mine !== null}
-                onClick={() => sendAction({ type: 'answer', choice: i })}
-                className={`relative min-w-24 rounded-2xl border px-4 py-3 text-sm font-bold transition ${
+                disabled={hostJudging ? false : !!reveal || mine !== null || voteClosed}
+                onClick={() => sendAction(hostJudging ? { type: 'judge', choice: i } : { type: 'answer', choice: i })}
+                className={`relative min-w-24 rounded-2xl border px-4 py-3 text-sm font-bold transition ${hostJudging ? 'ring-1 ring-amber-400/40 hover:bg-amber-500/20 ' : ''}${
                   isCorrect
                     ? 'border-emerald-400 bg-emerald-500/25 text-emerald-100 scale-105'
                     : near
@@ -155,7 +169,7 @@ function ChoiceInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: dim ? 0.35 : 1, y: 0, scale: isCorrect ? 1.02 : 1 }}
             transition={{ delay: reveal ? 0 : i * 0.06 }}
-            disabled={!!reveal || mine !== null}
+            disabled={!!reveal || mine !== null || voteClosed}
             onClick={() => sendAction({ type: 'answer', choice: i })}
             className={`relative flex min-h-20 items-center gap-3 overflow-hidden rounded-2xl px-5 py-4 text-left text-lg font-bold text-white shadow-lg transition ${s.bg} ${
               !reveal && mine === null ? `${s.hover} hover:-translate-y-0.5 active:scale-95` : ''

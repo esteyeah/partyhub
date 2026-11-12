@@ -64,7 +64,7 @@ export function parseYouTubeUrl(input: string): { id: string; start: number | nu
 
 const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().replace(/\s+/g, ' ').slice(0, max) : '');
 
-function parseClip(raw: unknown): { id: string; start: number; end: number } | string {
+function parseClip(raw: unknown, maxSeconds = MAX_CLIP_SECONDS): { id: string; start: number; end: number } | string {
   const c = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const id = typeof c.id === 'string' ? c.id : '';
   if (!/^[\w-]{11}$/.test(id)) return 'Lien YouTube invalide.';
@@ -72,7 +72,7 @@ function parseClip(raw: unknown): { id: string; start: number; end: number } | s
   const end = parseTime(c.end);
   if (start === null || end === null) return 'Indique le début et la fin de l’extrait.';
   if (end <= start + 2) return 'L’extrait doit durer au moins 3 secondes.';
-  if (end - start > MAX_CLIP_SECONDS) return `L’extrait ne doit pas dépasser ${MAX_CLIP_SECONDS} secondes.`;
+  if (end - start > maxSeconds) return `L’extrait ne doit pas dépasser ${maxSeconds} secondes.`;
   return { id, start: Math.round(start), end: Math.round(end) };
 }
 
@@ -80,13 +80,22 @@ export function parseRankClip(raw: unknown): RankClip | string {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const game = r.game as RankGame;
   if (!(game in RANK_LADDERS)) return 'Choisis le jeu.';
+  const judged = r.judged === true;
   const rank = text(r.rank, 40);
-  if (!(RANK_LADDERS[game].ranks as readonly string[]).includes(rank)) return 'Choisis le rang réel du joueur.';
-  const clip = parseClip(r.clip);
+  if (!judged && !(RANK_LADDERS[game].ranks as readonly string[]).includes(rank)) return 'Choisis le rang réel du joueur (ou « l’hôte arbitrera »).';
+  let clip: { id: string; start: number; end: number } | string;
+  if (judged) {
+    // Mode arbitre : la vidéo se joue jusqu'à ce que l'hôte la stoppe, la fin est facultative
+    const c = (r.clip && typeof r.clip === 'object' ? r.clip : {}) as Record<string, unknown>;
+    const start = parseTime(c.start) ?? 0;
+    const end = parseTime(c.end);
+    clip = parseClip({ id: c.id, start, end: end !== null && end > start + 2 ? end : start + MAX_CLIP_SECONDS }, 600);
+  } else clip = parseClip(r.clip);
   if (typeof clip === 'string') return clip;
   return {
     game,
-    rank,
+    ...(judged ? { judged: true } : { rank }),
+    ...(r.pistol === true ? { pistol: true } : {}),
     clip: { type: 'youtube', ...clip },
     context: text(r.context, 80) || undefined,
     source: text(r.source, 120) || undefined,

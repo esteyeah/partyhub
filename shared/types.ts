@@ -84,7 +84,7 @@ export type Clip =
 /* Vue générique des jeux "à manches" (Quiz, Blind Test, Vidéo, Rang)  */
 /* ------------------------------------------------------------------ */
 
-export type RoundPhase = 'loading' | 'intro' | 'question' | 'reveal';
+export type RoundPhase = 'loading' | 'intro' | 'question' | 'judge' | 'reveal';
 
 export type RoundInput =
   | { kind: 'choice'; choices: string[]; layout: 'grid' | 'ladder' }
@@ -124,6 +124,10 @@ export interface RoundGameView<P = unknown, X = unknown> {
     found: string[];
     feedback: { type: 'close' | 'wrong' | 'found'; text: string; id: number } | null;
   };
+  /** Mode arbitre : la réponse n'est pas connue, l'hôte la choisit après la révélation */
+  judged?: boolean;
+  /** Mode arbitre : l'hôte a stoppé la vidéo (vote en cours) */
+  frozen?: boolean;
   reveal: {
     correctIndex: number | null;
     answer: string;
@@ -272,4 +276,8 @@ export type AnyGameView = RoundGameView | ElevenView;
 export type GameAction =
   | { type: 'answer'; choice: number }
   | { type: 'guess'; text: string }
-  | { type: 'pick'; footballerId: string };
+  | { type: 'pick'; footballerId: string }
+  /** Hôte, mode arbitre : stopper la vidéo avant la révélation */
+  | { type: 'freeze' }
+  /** Hôte, mode arbitre : indiquer la bonne réponse */
+  | { type: 'judge'; choice: number };

@@ -1,5 +1,3 @@
-import { RANK_CLIPS } from '@content/rank';
-import { customCounts } from '../customContent';
 import type { GameAvailability, GameId, GameSettings } from '@shared/types';
 import { BlindTestGame } from './blindtest/BlindTestGame';
 import { ElevenGame } from './eleven/ElevenGame';
@@ -26,13 +24,7 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
     create: (ctx, s) => new VideoGame(ctx, s as never),
     availability: always, // vidéos Rocket League + mèmes intégrés
   },
-  rank: {
-    create: (ctx, s) => new RankGame(ctx, s as never),
-    availability: () =>
-      RANK_CLIPS.length + customCounts().rank
-        ? { available: true }
-        : { available: false, reason: 'Ajoute des clips depuis l’espace admin' },
-  },
+  rank: { create: (ctx, s) => new RankGame(ctx, s as never), availability: always }, // clips YouTube intégrés + admin
   eleven: { create: (ctx, s) => new ElevenGame(ctx, s as never), availability: always },
 };
 

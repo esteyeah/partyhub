@@ -12,11 +12,13 @@ interface Draft {
   id?: string;
   game: RankGame;
   rank: string;
+  judged: boolean;
+  pistol: boolean;
   context: string;
   source: string;
   clip: ClipDraft;
 }
-const EMPTY: Draft = { game: 'valorant', rank: '', context: '', source: '', clip: EMPTY_CLIP };
+const EMPTY: Draft = { game: 'rocket', rank: '', judged: false, pistol: false, context: '', source: '', clip: EMPTY_CLIP };
 const keyOf = (c: CustomRankClip) => `${c.clip.type === 'youtube' ? c.clip.id : ''}-${c.clip.start}`;
 
 export function RankTab({ ctx }: { ctx: AdminContext }) {
@@ -26,7 +28,7 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseRankClip({ game: d.game, rank: d.rank, context: d.context, source: d.source, clip: draftToClip(d.clip) });
+    const parsed = parseRankClip({ game: d.game, rank: d.rank, judged: d.judged, pistol: (d.game === 'cs2' || d.game === 'premier') && d.pistol, context: d.context, source: d.source, clip: draftToClip(d.clip) });
     if (typeof parsed === 'string') return s.setError(parsed);
     const existing = d.id ? s.list.find((x) => x.id === d.id) : undefined;
     const next = existing ? s.list.map((x) => (x.id === existing.id ? { ...existing, ...parsed } : x)) : [...s.list, { ...parsed, id: newQuestionIdForClip(), createdAt: Date.now() }];
@@ -77,14 +79,32 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
               <button
                 key={r}
                 type="button"
-                onClick={() => setD({ ...d, rank: r })}
-                className={`rounded-xl px-3 py-1.5 text-sm font-semibold ${d.rank === r ? 'bg-emerald-500 text-white' : 'bg-white/5 text-zinc-300 hover:bg-white/10'}`}
+                onClick={() => setD({ ...d, rank: r, judged: false })}
+                className={`rounded-xl px-3 py-1.5 text-sm font-semibold ${!d.judged && d.rank === r ? 'bg-emerald-500 text-white' : 'bg-white/5 text-zinc-300 hover:bg-white/10'}`}
               >
                 {r}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setD({ ...d, rank: '', judged: true })}
+              className={`rounded-xl px-3 py-1.5 text-sm font-semibold ${d.judged ? 'bg-amber-500 text-black' : 'bg-amber-500/10 text-amber-200 hover:bg-amber-500/20'}`}
+            >
+              🧑‍⚖️ Je ne sais pas : l’hôte arbitrera
+            </button>
           </div>
+          {d.judged && (
+            <p className="mt-2 text-xs text-amber-200/80">
+              Pour une vidéo qui révèle elle-même le rang : pendant la partie, l’hôte stoppe la vidéo avant la révélation, puis clique sur le vrai rang. La fin est facultative.
+            </p>
+          )}
         </div>
+        {(d.game === 'cs2' || d.game === 'premier') && (
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <input type="checkbox" checked={d.pistol} onChange={(e) => setD({ ...d, pistol: e.target.checked })} className="h-4 w-4 accent-fuchsia-500" />
+            🔫 Round pistolet (pour le mode « rounds pistolet uniquement »)
+          </label>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="label" htmlFor="rk-context">
@@ -120,7 +140,8 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
                 <div className="min-w-0 flex-1">
                   <div className="text-xs text-zinc-500">{RANK_LADDERS[c.game].name}</div>
                   <div className="font-semibold">
-                    Rang : <span className="text-emerald-300">{c.rank}</span>
+                    Rang : <span className="text-emerald-300">{c.judged ? 'arbitré par l’hôte' : c.rank}</span>
+                    {c.pistol && <span className="text-amber-300"> · 🔫 pistolet</span>}
                     {c.context && <span className="text-zinc-400"> · {c.context}</span>}
                   </div>
                   <div className="font-mono text-xs text-zinc-500">
@@ -130,7 +151,7 @@ export function RankTab({ ctx }: { ctx: AdminContext }) {
                 <RowActions
                   onEdit={() => {
                     if (c.clip.type !== 'youtube') return;
-                    setD({ id: c.id, game: c.game, rank: c.rank, context: c.context ?? '', source: c.source ?? '', clip: clipToDraft(c.clip) });
+                    setD({ id: c.id, game: c.game, rank: c.rank ?? '', judged: !!c.judged, pistol: !!c.pistol, context: c.context ?? '', source: c.source ?? '', clip: clipToDraft(c.clip) });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   onDelete={() => remove(c)}

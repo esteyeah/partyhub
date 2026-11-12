@@ -8,7 +8,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🧠 **Quiz Culture G & Énigmes** | ✅ jouable | 162 questions (dont foot, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 35 titres, extraits récupérés via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 87 footballeurs + joueurs « surprise » |
-| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable dès qu’un clip est ajouté | clips YouTube ajoutés via `/admin` |
+| 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ jouable | 21 vidéos « guess the rank » Rocket League & CS (mode arbitre) + tes clips via `/admin` ; mode « CS rounds pistolet » |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 30 vidéos Rocket League générées + 20 répliques cultes « Complète la phrase » + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
@@ -160,6 +160,26 @@ python tools/rl/make_clips.py DOSSIER_DE_REPLAYS --out public/clips/rl --manifes
 ```
 
 Les 30 vidéos fournies ont été générées à partir des replays de test publics du projet [boxcars](https://github.com/nickbabcock/boxcars) (licence MIT). Tes propres replays se trouvent dans `Documents/My Games/Rocket League/TAGame/Demos`.
+
+---
+
+## 🧑‍⚖️ Devine le rang : mode arbitre
+
+Les vidéos « guess the rank » (Rankdle…) révèlent elles-mêmes le rang à la fin. En mode arbitre, la vidéo se joue depuis le début ; l’hôte appuie sur **⏸ STOP** avant la révélation, tout le monde vote, la vidéo reprend, puis l’hôte clique sur le vrai rang affiché. Dans l’admin, choisis « 🧑‍⚖️ l’hôte arbitrera » pour ajouter ce type de vidéo sans connaître le rang.
+
+## 🔫 Clips de tes propres matchs CS2
+
+`tools/cs/highlights.py` lit une démo CS2 (`.dem`) et prépare les clips d’un joueur : meilleurs rounds (multi-kills), **rounds pistolet**, et son **vrai rang Premier** (lu dans la démo, c’est la bonne réponse du jeu). Il génère pour chaque clip la commande à coller dans la console de CS2 pour le filmer **sans interface ni pseudos**.
+
+```bash
+pip install demoparser2
+```
+
+```bash
+python tools/cs/highlights.py match.dem --player esteyeah8
+```
+
+Ensuite : filme chaque clip (Xbox Game Bar `Win + Alt + R` ou OBS), mets-le sur YouTube en non répertorié et ajoute-le dans `/admin` → Devine le rang → « CS2 Premier », en cochant « Round pistolet » si besoin.
 
 ---
 

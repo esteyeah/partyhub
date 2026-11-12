@@ -191,6 +191,7 @@ export class Room {
       players: () =>
         [...this.players.values()].map((p) => ({ id: p.id, nickname: p.nickname, connected: !!p.socket })),
       nickname: (id) => this.players.get(id)?.nickname ?? '???',
+      isHost: (id) => id === this.hostId,
       addScore: (id, points) => {
         const p = this.players.get(id);
         if (p) p.score += Math.round(points);

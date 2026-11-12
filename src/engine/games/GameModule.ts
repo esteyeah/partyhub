@@ -11,6 +11,7 @@ export interface GameContext {
   /** Joueurs actuellement dans le salon */
   players(): GamePlayer[];
   nickname(playerId: string): string;
+  isHost(playerId: string): boolean;
   /** Ajoute des points au score global du joueur */
   addScore(playerId: string, points: number): void;
   /** Demande une resynchronisation des clients (regroupée automatiquement) */

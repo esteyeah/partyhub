@@ -23,7 +23,15 @@ export interface RoundSpec<P, X> {
   extra?: X;
   /** Durée du reveal (ex : plus longue pour rejouer la fin d'une vidéo) */
   revealMs?: number;
+  /**
+   * Mode arbitre : la bonne réponse n'est pas connue à l'avance (ex : la vidéo révèle le rang).
+   * L'hôte stoppe la vidéo, tout le monde vote, la révélation est jouée, puis l'hôte choisit la réponse.
+   */
+  judged?: boolean;
 }
+
+const FREEZE_VOTE_MS = 12000;
+const JUDGE_MS = 90000;
 
 interface PlayerRoundState {
   choice: number | null;
@@ -67,6 +75,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   private feed: FeedItem[] = [];
   private feedId = 0;
   private message?: string;
+  private frozen = false;
 
   /** Charge et tire au sort le contenu de la partie. */
   protected abstract prepare(): Promise<Item[]> | Item[];
@@ -121,6 +130,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
     this.results = [];
     this.stats = null;
     this.feed = [];
+    this.frozen = false;
     this.phase = 'intro';
     this.endsAt = this.now() + this.introMs;
     this.setTimer(this.introMs, () => this.startQuestion());
@@ -158,6 +168,24 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   }
 
   onAction(playerId: string, action: GameAction) {
+    if (this.spec?.judged && this.ctx.isHost(playerId)) {
+      if (action.type === 'freeze' && this.phase === 'question' && !this.frozen) {
+        // L'hôte stoppe la vidéo avant la révélation : derniers votes, puis révélation
+        this.frozen = true;
+        this.clearTimers();
+        this.endsAt = this.now() + FREEZE_VOTE_MS;
+        this.setTimer(FREEZE_VOTE_MS, () => this.startJudge());
+        this.ctx.sync();
+        return;
+      }
+      if (action.type === 'judge' && this.phase === 'judge' && this.spec.input.kind === 'choice') {
+        if (!Number.isInteger(action.choice) || action.choice < 0 || action.choice >= this.spec.input.choices.length) return;
+        this.spec.correctIndex = action.choice;
+        this.spec.answer = this.spec.input.choices[action.choice];
+        this.reveal();
+        return;
+      }
+    }
     if (this.phase !== 'question' || !this.spec) return;
     const item = this.items[this.index];
     const ms = this.now() - this.startedAt;
@@ -206,8 +234,13 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
 
     const active = this.ctx.players().filter((p) => p.connected);
     if (active.length && active.every((p) => this.isDone(p.id))) {
-      this.clearTimers();
-      this.setTimer(600, () => this.reveal());
+      if (!this.spec.judged) {
+        this.clearTimers();
+        this.setTimer(600, () => this.reveal());
+      } else if (this.frozen) {
+        this.clearTimers();
+        this.setTimer(600, () => this.startJudge());
+      }
     }
     this.ctx.sync();
   }
@@ -216,10 +249,33 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
     this.feed = [...this.feed, { id: ++this.feedId, text }].slice(-6);
   }
 
-  private reveal() {
+  /** Mode arbitre : la vidéo reprend (révélation) et l'hôte choisit la bonne réponse */
+  private startJudge() {
     if (!this.spec || this.phase !== 'question') return;
     this.clearTimers();
+    this.phase = 'judge';
+    this.frozen = false;
+    this.endsAt = this.now() + JUDGE_MS;
+    this.setTimer(JUDGE_MS, () => this.reveal());
+    this.ctx.sync();
+  }
+
+  private reveal() {
+    if (!this.spec || (this.phase !== 'question' && this.phase !== 'judge')) return;
+    this.clearTimers();
     this.phase = 'reveal';
+
+    if (this.spec.judged) {
+      // Les points ne peuvent être calculés qu'une fois la réponse connue
+      const item = this.items[this.index];
+      for (const st of this.states.values()) {
+        if (st.choice === null) continue;
+        const score = this.spec.correctIndex === undefined ? { points: 0, correct: false } : this.scoreChoice(item, this.spec, st.choice, st.choiceMs);
+        st.points = score.points;
+        st.correct = score.correct;
+      }
+      if (this.spec.correctIndex === undefined) this.spec.answer = 'Non arbitré';
+    }
 
     if (this.spec.input.kind === 'choice') {
       this.stats = this.spec.input.choices.map(() => 0);
@@ -247,7 +303,8 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
 
   skip() {
     if (this.phase === 'intro') this.startQuestion();
-    else if (this.phase === 'question') this.reveal();
+    else if (this.phase === 'question') this.spec?.judged ? this.startJudge() : this.reveal();
+    else if (this.phase === 'judge') this.reveal();
     else if (this.phase === 'reveal') this.nextRound();
   }
 
@@ -261,7 +318,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       else progress[p.id] = s.found.size ? 'partial' : 'waiting';
     }
     const me = this.states.get(playerId);
-    const showQuestion = this.phase === 'question' || this.phase === 'reveal';
+    const showQuestion = this.phase === 'question' || this.phase === 'judge' || this.phase === 'reveal';
 
     return {
       kind: 'round',
@@ -270,7 +327,18 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       round: Math.max(1, this.index + 1),
       totalRounds: this.items.length,
       endsAt: this.endsAt,
-      durationMs: this.phase === 'intro' ? this.introMs : this.phase === 'reveal' ? spec?.revealMs ?? this.revealMs : spec?.durationMs ?? 0,
+      durationMs:
+        this.phase === 'intro'
+          ? this.introMs
+          : this.phase === 'reveal'
+            ? spec?.revealMs ?? this.revealMs
+            : this.phase === 'judge'
+              ? JUDGE_MS
+              : this.frozen
+                ? FREEZE_VOTE_MS
+                : spec?.durationMs ?? 0,
+      judged: !!spec?.judged,
+      frozen: this.frozen,
       prompt: showQuestion ? spec?.prompt ?? null : null,
       input: showQuestion ? spec?.input ?? null : null,
       progress,
