@@ -126,6 +126,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
           { value: 'all', label: '🎲 Tous les clips' },
           { value: 'cs2', label: '🔫 Counter-Strike' },
           { value: 'cs2-pistol', label: '🔫 CS — rounds pistolet uniquement' },
+          { value: 'rocket', label: '🚗 Rocket League' },
         ],
         default: 'all',
       },
