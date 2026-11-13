@@ -4,6 +4,7 @@ import { customCounts } from '../customContent';
 import { BlindTestGame } from './blindtest/BlindTestGame';
 import { ElevenGame } from './eleven/ElevenGame';
 import type { GameContext, GameModule } from './GameModule';
+import { PixelGame } from './pixel/PixelGame';
 import { QuizGame } from './quiz/QuizGame';
 import { RankGame } from './rank/RankGame';
 import { VideoGame } from './video/VideoGame';
@@ -34,6 +35,7 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
         ? { available: true }
         : { available: false, reason: 'Ajoute des clips depuis l’espace admin' },
   },
+  pixel: { create: (ctx, s) => new PixelGame(ctx, s as never), availability: always },
   eleven: { create: (ctx, s) => new ElevenGame(ctx, s as never), availability: always },
 };
 

@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -178,6 +178,15 @@ export interface RankPrompt {
 }
 export interface RankExtra {
   source?: string;
+}
+
+export interface PixelPrompt {
+  image: string;
+  category: 'celeb' | 'game' | 'film';
+  categoryLabel: string;
+}
+export interface PixelExtra {
+  image: string;
 }
 
 /* ------------------------------------------------------------------ */

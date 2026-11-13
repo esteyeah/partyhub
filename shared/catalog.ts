@@ -111,6 +111,41 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'time', label: 'Temps de vote', type: 'select', options: timeOptions([10, 15, 20]), default: '15' },
     ],
   },
+  pixel: {
+    id: 'pixel',
+    name: 'Devine l’image',
+    emoji: '🔍',
+    tagline: 'Célébrités, jaquettes de jeux & affiches de films',
+    description:
+      'L’image démarre floue et très zoomée, puis se défloute et dézoome petit à petit. Trouve qui ou ce que c’est le plus tôt possible : plus l’image est floue, plus ça rapporte.',
+    gradient: 'from-teal-500 to-emerald-600',
+    settings: [
+      {
+        key: 'mode',
+        label: 'Mode',
+        type: 'select',
+        options: [
+          { value: 'libre', label: '⌨️ Réponse libre' },
+          { value: 'qcm', label: '🔘 QCM (4 choix)' },
+        ],
+        default: 'libre',
+      },
+      {
+        key: 'category',
+        label: 'Images',
+        type: 'select',
+        options: [
+          { value: 'mix', label: '🎲 Mélange' },
+          { value: 'celeb', label: '⭐ Célébrités' },
+          { value: 'game', label: '🎮 Jaquettes de jeux vidéo' },
+          { value: 'film', label: '🎬 Affiches de films' },
+        ],
+        default: 'mix',
+      },
+      { key: 'rounds', label: 'Images', type: 'number', min: 3, max: 25, default: 10 },
+      { key: 'time', label: 'Temps / image', type: 'select', options: timeOptions([20, 30, 45]), default: '30' },
+    ],
+  },
   rank: {
     id: 'rank',
     name: 'Devine le Rang',
