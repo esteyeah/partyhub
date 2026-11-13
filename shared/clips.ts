@@ -19,6 +19,8 @@ export interface CustomVideoQuestion extends VideoQuestion {
 export const LOCAL_RANK_KEY = 'partyhub:local-rank-clips';
 export const LOCAL_VIDEO_KEY = 'partyhub:local-video-clips';
 export const MAX_CLIP_SECONDS = 120;
+/** Durée max d'une « vidéo entière » (Devine le rang) */
+export const FULL_VIDEO_SECONDS = 900;
 
 /* ---------------- YouTube ---------------- */
 
@@ -90,6 +92,11 @@ export function parseRankClip(raw: unknown): RankClip | string {
     const start = parseTime(c.start) ?? 0;
     const end = parseTime(c.end);
     clip = parseClip({ id: c.id, start, end: end !== null && end > start + 2 ? end : start + MAX_CLIP_SECONDS }, 600);
+  } else if (r.full === true) {
+    // Vidéo entière : jouée jusqu'au bout (la manche s'arrête dès que tout le monde a voté)
+    const c = (r.clip && typeof r.clip === 'object' ? r.clip : {}) as Record<string, unknown>;
+    const start = parseTime(c.start) ?? 0;
+    clip = parseClip({ id: c.id, start, end: start + FULL_VIDEO_SECONDS }, FULL_VIDEO_SECONDS);
   } else clip = parseClip(r.clip);
   if (typeof clip === 'string') return clip;
   const rawMask = Number(((r.clip ?? {}) as Record<string, unknown>).maskBottom);
@@ -98,6 +105,7 @@ export function parseRankClip(raw: unknown): RankClip | string {
     game,
     ...(judged ? { judged: true } : { rank }),
     ...(r.pistol === true ? { pistol: true } : {}),
+    ...(r.full === true ? { full: true } : {}),
     clip: { type: 'youtube', ...clip, ...(maskBottom ? { maskBottom } : {}) },
     context: text(r.context, 80) || undefined,
     source: text(r.source, 120) || undefined,

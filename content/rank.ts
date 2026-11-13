@@ -33,6 +33,8 @@ export interface RankClip {
   judged?: boolean;
   /** Round pistolet (CS) : utilisé par le mode « rounds pistolet uniquement » */
   pistol?: boolean;
+  /** Vidéo entière : jouée jusqu’au bout, la manche se termine quand tout le monde a voté */
+  full?: boolean;
   context?: string;
   source?: string;
 }
