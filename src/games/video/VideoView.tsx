@@ -45,7 +45,7 @@ export function VideoView({ view, room, you }: GameViewProps<RoundGameView<Video
       }}
       renderReveal={(v) => (
         <div className="mb-4 rounded-2xl bg-emerald-500/10 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-300/80">{v.prompt?.quote ? 'La réplique' : 'La suite'}</div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-300/80">{v.prompt?.quote && v.prompt.question === 'Complète la réplique' ? 'La réplique' : 'La suite'}</div>
           <div className="text-lg font-bold">{v.reveal!.answer}</div>
           {v.reveal!.extra?.explanation && <div className="mt-1 text-sm text-zinc-300">{v.reveal!.extra.explanation}</div>}
         </div>

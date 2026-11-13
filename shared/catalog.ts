@@ -101,7 +101,9 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
         options: [
           { value: 'mix', label: '🎲 Vidéos + mèmes' },
           { value: 'videos', label: '🎬 Vidéos' },
-          { value: 'memes', label: '💬 Complète la phrase' },
+          { value: 'memes', label: '💬 Répliques + suites de films' },
+          { value: 'quotes', label: '💬 Complète la phrase' },
+          { value: 'sequels', label: '🎞️ Quelle est la suite ? (films)' },
         ],
         default: 'mix',
       },

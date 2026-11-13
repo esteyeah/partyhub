@@ -14,7 +14,11 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
 
   protected async prepare() {
     const videos: Item[] = this.settings.source === 'memes' ? [] : [...VIDEO_QUESTIONS, ...(await loadCustomVideoQuestions())];
-    const memes: Item[] = this.settings.source === 'videos' ? [] : MEMES;
+    const memes: Item[] =
+      this.settings.source === 'videos' ? []
+      : this.settings.source === 'sequels' ? MEMES.filter((m) => m.kind === 'sequel')
+      : this.settings.source === 'quotes' ? MEMES.filter((m) => m.kind !== 'sequel')
+      : MEMES;
     if (this.settings.source !== 'mix') return shuffle([...videos, ...memes]).slice(0, this.settings.rounds);
     // Mélange : autant de vidéos que de mèmes (si possible), puis on alterne
     const half = Math.ceil(this.settings.rounds / 2);
@@ -27,12 +31,12 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
     if (isMeme(q)) {
       const order = shuffle(q.choices.map((_, i) => i));
       return {
-        prompt: { quote: { text: q.text, source: q.source }, question: 'Complète la réplique' },
+        prompt: { quote: { text: q.text, source: q.source }, question: q.kind === 'sequel' ? 'Quel film vient ensuite ?' : 'Complète la réplique' },
         input: { kind: 'choice', choices: order.map((i) => q.choices[i]), layout: 'grid' },
         durationMs: Number(this.settings.time) * 1000,
         correctIndex: order.indexOf(q.answer),
         answer: q.choices[q.answer],
-        extra: { fullQuote: q.text.replace('…', q.choices[q.answer]) },
+        extra: { fullQuote: q.text.replace('…', q.kind === 'sequel' ? `« ${q.choices[q.answer]} »` : q.choices[q.answer]) },
       };
     }
     const clipSeconds = Math.max(0, q.clip.end - q.clip.start);
