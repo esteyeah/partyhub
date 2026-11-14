@@ -35,31 +35,66 @@ const MID_CHANCE = 0.35;
 const MID_MIN = 74;
 const MID_MAX = 80;
 
-const FORMATIONS: Record<string, [number, number, number]> = {
-  '4-3-3': [4, 3, 3],
-  '4-4-2': [4, 4, 2],
-  '3-5-2': [3, 5, 2],
+/** Ligne du terrain d'un poste détaillé (ordre du draft : gardien → défense → milieu → attaque) */
+const LINE: Record<string, FootPos> = {
+  GB: 'GK', DG: 'DEF', DC: 'DEF', DD: 'DEF',
+  MDC: 'MID', MC: 'MID', MOC: 'MID', MG: 'MID', MD: 'MID',
+  AG: 'ATT', AD: 'ATT', BU: 'ATT',
 };
 
-const LABELS: Record<FootPos, Record<number, string[]>> = {
-  GK: { 1: ['GB'] },
-  DEF: { 3: ['DC', 'DC', 'DC'], 4: ['DG', 'DC', 'DC', 'DD'] },
-  MID: { 3: ['MC', 'MDC', 'MC'], 4: ['MG', 'MC', 'MC', 'MD'], 5: ['MG', 'MC', 'MDC', 'MC', 'MD'] },
-  ATT: { 2: ['BU', 'BU'], 3: ['AG', 'BU', 'AD'] },
+/** Formations : chaque poste avec sa position sur le terrain (x, y en %) */
+const FORMATIONS: Record<string, [label: string, x: number, y: number][]> = {
+  '4-3-3': [
+    ['DG', 18, 64], ['DC', 39, 69], ['DC', 61, 69], ['DD', 82, 64],
+    ['MC', 27, 43], ['MDC', 50, 50], ['MC', 73, 43],
+    ['AG', 22, 18], ['BU', 50, 13], ['AD', 78, 18],
+  ],
+  '4-3-3-moc': [
+    ['DG', 18, 64], ['DC', 39, 69], ['DC', 61, 69], ['DD', 82, 64],
+    ['MDC', 50, 52], ['MC', 28, 41], ['MOC', 72, 36],
+    ['AG', 22, 18], ['BU', 50, 13], ['AD', 78, 18],
+  ],
+  '4-2-3-1': [
+    ['DG', 18, 66], ['DC', 39, 71], ['DC', 61, 71], ['DD', 82, 66],
+    ['MDC', 36, 52], ['MDC', 64, 52],
+    ['MG', 18, 33], ['MOC', 50, 34], ['MD', 82, 33],
+    ['BU', 50, 13],
+  ],
+  '4-4-2': [
+    ['DG', 18, 64], ['DC', 39, 69], ['DC', 61, 69], ['DD', 82, 64],
+    ['MG', 16, 40], ['MC', 38, 44], ['MC', 62, 44], ['MD', 84, 40],
+    ['BU', 36, 15], ['BU', 64, 15],
+  ],
+  '4-4-2-losange': [
+    ['DG', 18, 66], ['DC', 39, 71], ['DC', 61, 71], ['DD', 82, 66],
+    ['MDC', 50, 54], ['MC', 28, 43], ['MC', 72, 43], ['MOC', 50, 32],
+    ['BU', 36, 14], ['BU', 64, 14],
+  ],
+  '4-5-1': [
+    ['DG', 18, 64], ['DC', 39, 69], ['DC', 61, 69], ['DD', 82, 64],
+    ['MG', 14, 36], ['MC', 33, 42], ['MDC', 50, 50], ['MC', 67, 42], ['MD', 86, 36],
+    ['BU', 50, 14],
+  ],
+  '3-5-2': [
+    ['DC', 28, 68], ['DC', 50, 71], ['DC', 72, 68],
+    ['MG', 12, 40], ['MC', 32, 44], ['MDC', 50, 52], ['MC', 68, 44], ['MD', 88, 40],
+    ['BU', 36, 15], ['BU', 64, 15],
+  ],
+  '3-4-3': [
+    ['DC', 28, 68], ['DC', 50, 71], ['DC', 72, 68],
+    ['MG', 14, 42], ['MC', 38, 46], ['MC', 62, 46], ['MD', 86, 42],
+    ['AG', 22, 18], ['BU', 50, 13], ['AD', 78, 18],
+  ],
+  '5-3-2': [
+    ['DG', 10, 58], ['DC', 30, 69], ['DC', 50, 72], ['DC', 70, 69], ['DD', 90, 58],
+    ['MC', 28, 42], ['MDC', 50, 48], ['MC', 72, 42],
+    ['BU', 36, 15], ['BU', 64, 15],
+  ],
 };
 
-/** Postes dans l'ordre du draft : gardien → défense → milieu → attaque */
 export function buildSlots(formation: string): ElevenSlot[] {
-  const [d, m, a] = FORMATIONS[formation] ?? FORMATIONS['4-3-3'];
-  const rows: [FootPos, number, number][] = [['GK', 1, 88], ['DEF', d, 68], ['MID', m, 42], ['ATT', a, 16]];
-  const slots: ElevenSlot[] = [];
-  for (const [pos, n, y] of rows) {
-    for (let i = 0; i < n; i++) {
-      const curve = n >= 4 && (i === 0 || i === n - 1) ? -4 : 0;
-      slots.push({ pos, label: LABELS[pos][n]?.[i] ?? pos, x: ((i + 1) / (n + 1)) * 100, y: y + curve });
-    }
-  }
-  return slots;
+  const rows = FORMATIONS[formation] ?? FORMATIONS['4-3-3'];
+  return [['GB', 50, 88] as [string, number, number], ...rows].map(([label, x, y]) => ({ pos: LINE[label], label, x, y }));
 }
 
 

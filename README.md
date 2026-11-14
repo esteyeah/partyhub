@@ -5,7 +5,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 
 | Jeu | Statut | Contenu fourni |
 | --- | --- | --- |
-| 🧠 **Quiz Culture G & Énigmes** (énigmes en réponse libre) | ✅ jouable | 249 questions (dont foot, WWE, Pixar, Malcolm, Koh-Lanta, rap FR, calcul mental, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
+| 🧠 **Quiz Culture G & Énigmes** (QCM ou réponse libre partout ; énigmes toujours au clavier) | ✅ jouable | 249 questions (dont foot, WWE, Pixar, Malcolm, Koh-Lanta, rap FR, calcul mental, séries, catch, YouTube FR, jeux vidéo, CS:GO, Palmashow…) + les tiennes via `/admin` |
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 222 titres (69 francophones, 153 internationaux), extraits via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
@@ -141,6 +141,7 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
 - **Devine le Rang** : 100 pts rang exact, 50 pts à un rang près, 0 sinon.
 - **Compose ton 11** (draft) :
   1. Poste par poste (gardien → défense → milieu → attaque), 3 à 5 footballeurs sont proposés, du plus cher au moins cher.
+  - Formations : 4-3-3 (MDC · 2 MC), 4-3-3 (MDC · MC · MOC), 4-2-3-1, 4-4-2 à plat, 4-4-2 losange, 4-5-1, 3-5-2, 3-4-3, 5-3-2.
   2. Chacun choisit en secret dans la limite de son budget (réglable : 150 à 500 M€). Pas de choix à temps → le moins cher abordable ; plus assez d’argent → remplaçant gratuit.
   3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
   4. Le perdant reçoit un **joueur surprise gratuit** au même poste : 50 % un joueur en fin de carrière ou célèbre pour ses ratés (Germain, Mitroglou, Bendtner…), 35 % un joueur correct, 15 % une star qui n’était pas proposée.

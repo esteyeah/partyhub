@@ -33,9 +33,19 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
     name: 'Quiz Culture G',
     emoji: '🧠',
     tagline: 'Culture générale, énigmes & pièges',
-    description: 'QCM rapide : plus tu réponds vite, plus tu marques. Les stats du salon s’affichent après chaque question.',
+    description: 'QCM ou réponse libre au clavier (fautes tolérées) : plus tu réponds vite, plus tu marques. Les stats du salon s’affichent après chaque question.',
     gradient: 'from-violet-500 to-indigo-600',
     settings: [
+      {
+        key: 'mode',
+        label: 'Réponses',
+        type: 'select',
+        options: [
+          { value: 'qcm', label: '🔘 QCM (énigmes au clavier)' },
+          { value: 'libre', label: '⌨️ Réponse libre partout' },
+        ],
+        default: 'qcm',
+      },
       { key: 'rounds', label: 'Questions', type: 'number', min: 3, max: 25, default: 10 },
       { key: 'time', label: 'Temps / question', type: 'select', options: timeOptions([10, 15, 20, 30]), default: '20' },
       {
@@ -215,9 +225,15 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
         label: 'Formation',
         type: 'select',
         options: [
-          { value: '4-3-3', label: '4-3-3' },
-          { value: '4-4-2', label: '4-4-2' },
+          { value: '4-3-3', label: '4-3-3 (MDC · 2 MC)' },
+          { value: '4-3-3-moc', label: '4-3-3 (MDC · MC · MOC)' },
+          { value: '4-2-3-1', label: '4-2-3-1' },
+          { value: '4-4-2', label: '4-4-2 à plat' },
+          { value: '4-4-2-losange', label: '4-4-2 losange' },
+          { value: '4-5-1', label: '4-5-1' },
           { value: '3-5-2', label: '3-5-2' },
+          { value: '3-4-3', label: '3-4-3' },
+          { value: '5-3-2', label: '5-3-2' },
         ],
         default: '4-3-3',
       },

@@ -15,7 +15,10 @@ const CATEGORY_LABELS: Record<QuizQuestion['category'], string> = {
 /** Temps minimum pour une énigme (réponse libre au clavier) */
 const RIDDLE_MIN_MS = 30_000;
 
-type Settings = { rounds: number; time: string; category: string };
+type Settings = { rounds: number; time: string; category: string; mode?: string };
+
+/** Temps minimum en mode réponse libre (il faut le temps de taper) */
+const FREE_MIN_MS = 20_000;
 
 /**
  * Quiz : QCM pour la culture G et les pièges, RÉPONSE LIBRE au clavier pour les énigmes
@@ -35,11 +38,11 @@ export class QuizGame extends RoundGame<QuizQuestion, QuizPrompt, QuizExtra, Set
   protected buildRound(q: QuizQuestion): RoundSpec<QuizPrompt, QuizExtra> {
     const prompt = { category: q.category, categoryLabel: CATEGORY_LABELS[q.category], question: q.question };
     const durationMs = Number(this.settings.time) * 1000;
-    if (q.category === 'enigme') {
+    if (q.category === 'enigme' || this.settings.mode === 'libre') {
       return {
         prompt,
         input: { kind: 'text', placeholder: 'Ta réponse…', keys: [{ key: 'answer', label: 'Réponse' }] },
-        durationMs: Math.max(durationMs, RIDDLE_MIN_MS),
+        durationMs: Math.max(durationMs, q.category === 'enigme' ? RIDDLE_MIN_MS : FREE_MIN_MS),
         answer: q.choices[q.answer],
         extra: { explanation: q.explanation },
       };
@@ -60,7 +63,9 @@ export class QuizGame extends RoundGame<QuizQuestion, QuizPrompt, QuizExtra, Set
     const answer = q.choices[q.answer];
     const others = new Set(q.choices.filter((_, i) => i !== q.answer).flatMap((c) => normalize(c).split(' ')));
     const words = normalize(answer).split(' ').filter((w) => w.length >= 4 && !others.has(w));
-    return [answer, ...(q.accept ?? []), ...words];
+    // « 1 998 » ↔ « 1998 », « 180° » ↔ « 180 »
+    const compact = answer.replace(/[\s°%]/g, '');
+    return [answer, compact, ...(q.accept ?? []), ...words];
   }
 
   protected matchText(q: QuizQuestion, guess: string, remaining: string[]) {
