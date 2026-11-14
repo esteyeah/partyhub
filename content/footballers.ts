@@ -321,7 +321,7 @@ const ROWS: Row[] = [
   ['Lucas Paquetá', 'BRA', 'West Ham', 'Premier League', 81, 'MOC/MC'],
   ['Nico Paz', 'ARG', 'Como', 'Serie A', 80, 'MOC'],
   ['Maghnes Akliouche', 'FRA', 'PSG', 'Ligue 1', 79, 'MOC/AD'],
-  ['Eliesse Ben Seghir', 'MAR', 'Sans club', 'Libre', 78, 'MOC/AG'],
+  ['Eliesse Ben Seghir', 'MAR', 'Leverkusen', 'Bundesliga', 78, 'MOC/AG'],
   ['Ilan Kebbal', 'FRA', 'Paris FC', 'Ligue 1', 77, 'MOC/AG'],
   ['Martin Baturina', 'CRO', 'Como', 'Serie A', 77, 'MOC/MC'],
   ['Anthony Gordon', 'ENG', 'FC Barcelone', 'Liga', 82, 'AG'],
