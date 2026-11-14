@@ -30,6 +30,10 @@ const RESOLVE_MS = 5500;
 const FINAL_MS = 30000;
 const STAR_CHANCE = 0.15;
 const STAR_RATING = 88;
+/** Joueur « correct » : ni star ni raté */
+const MID_CHANCE = 0.35;
+const MID_MIN = 74;
+const MID_MAX = 80;
 
 const FORMATIONS: Record<string, [number, number, number]> = {
   '4-3-3': [4, 3, 3],
@@ -167,13 +171,20 @@ export class ElevenGame extends GameModule<Settings> {
   }
 
   /** Joueur surprise pour le perdant d'un duel : une star (15 %) ou un joueur raté, au bon poste */
-  private surprise(slot: ElevenSlot): { footballer: Footballer; star: boolean } {
-    if (Math.random() < STAR_CHANCE) {
-      const offered = new Set(this.offers.map((o) => o.id));
-      const stars = this.themePool().filter((p) => fitsSlot(slot.label, p) && p.rating >= STAR_RATING && !this.owned.has(p.id) && !offered.has(p.id));
-      if (stars.length) return { footballer: stars[Math.floor(Math.random() * stars.length)], star: true };
+  private surprise(slot: ElevenSlot): { footballer: Footballer; kind: 'surprise-star' | 'surprise-mid' | 'surprise-flop' } {
+    const offered = new Set(this.offers.map((o) => o.id));
+    const free = (p: Footballer) => fitsSlot(slot.label, p) && !this.owned.has(p.id) && !offered.has(p.id);
+    const roll = Math.random();
+    if (roll < STAR_CHANCE) {
+      const stars = this.themePool().filter((p) => free(p) && p.rating >= STAR_RATING);
+      if (stars.length) return { footballer: stars[Math.floor(Math.random() * stars.length)], kind: 'surprise-star' };
+    } else if (roll < STAR_CHANCE + MID_CHANCE) {
+      const inRange = (p: Footballer) => free(p) && p.rating >= MID_MIN && p.rating <= MID_MAX;
+      let mids = this.themePool().filter(inRange);
+      if (!mids.length) mids = FOOTBALLERS.filter(inRange);
+      if (mids.length) return { footballer: mids[Math.floor(Math.random() * mids.length)], kind: 'surprise-mid' };
     }
-    return { footballer: this.surpriseFlop(slot), star: false };
+    return { footballer: this.surpriseFlop(slot), kind: 'surprise-flop' };
   }
 
   private pickDuelQuestion() {
@@ -303,7 +314,7 @@ export class ElevenGame extends GameModule<Settings> {
       for (const pid of d.players) {
         if (pid === d.winner) continue;
         const s = this.surprise(slot);
-        give(pid, s.footballer, s.star ? 'surprise-star' : 'surprise-flop', 0);
+        give(pid, s.footballer, s.kind, 0);
       }
     }
     this.outcomes = outcomes;

@@ -13,6 +13,7 @@ const CATEGORY_LABELS: Record<PixelCategory, string> = {
   celeb: '⭐ Célébrité',
   game: '🎮 Jaquette de jeu vidéo',
   film: '🎬 Affiche de film',
+  serie: '📺 Affiche de série',
 };
 
 /**

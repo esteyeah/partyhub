@@ -1,10 +1,10 @@
 /**
- * « Devine l'image » : célébrités, jaquettes de jeux vidéo et affiches de films.
+ * « Devine l'image » : célébrités, jaquettes de jeux vidéo, affiches de films et de séries.
  * L'image est récupérée au lancement de la partie depuis Wikipédia (en anglais, car c'est là
  * que se trouvent les affiches et jaquettes) grâce au titre de l'article `wiki`.
  * Si une image est introuvable, l'élément est simplement ignoré.
  */
-export type PixelCategory = 'celeb' | 'game' | 'film';
+export type PixelCategory = 'celeb' | 'game' | 'film' | 'serie';
 
 export interface PixelItem {
   /** Réponse affichée (en français) */
@@ -18,6 +18,7 @@ export interface PixelItem {
 
 const celeb = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'celeb', aliases });
 const game = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'game', aliases });
+const serie = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'serie', aliases });
 const film = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'film', aliases });
 
 export const PIXEL_ITEMS: PixelItem[] = [
@@ -157,4 +158,50 @@ export const PIXEL_ITEMS: PixelItem[] = [
   film('Le Masque de Zorro', 'The Mask of Zorro', ['Zorro', 'The Mask of Zorro']),
   film('Gladiator', 'Gladiator (2000 film)'),
   film('Fight Club', 'Fight Club'),
+
+  // — Affiches de séries —
+  serie('La Casa de Papel', 'Money Heist', ['Casa de Papel', 'Money Heist']),
+  serie('Desperate Housewives', 'Desperate Housewives'),
+  serie('Breaking Bad', 'Breaking Bad'),
+  serie('Game of Thrones', 'Game of Thrones', ['GOT']),
+  serie('Stranger Things', 'Stranger Things'),
+  serie('Friends', 'Friends'),
+  serie('How I Met Your Mother', 'How I Met Your Mother', ['HIMYM']),
+  serie('The Office', 'The Office (American TV series)', ['Office']),
+  serie('Prison Break', 'Prison Break'),
+  serie('The Walking Dead', 'The Walking Dead (TV series)', ['Walking Dead']),
+  serie('Peaky Blinders', 'Peaky Blinders (TV series)', ['Peaky']),
+  serie('Squid Game', 'Squid Game'),
+  serie('Lupin', 'Lupin (French TV series)'),
+  serie('Malcolm', 'Malcolm in the Middle', ['Malcolm in the Middle']),
+  serie('Les Simpson', 'The Simpsons', ['Simpson', 'The Simpsons']),
+  serie('Dr House', 'House (TV series)', ['House']),
+  serie('Grey’s Anatomy', "Grey's Anatomy", ['Greys Anatomy']),
+  serie('The Big Bang Theory', 'The Big Bang Theory', ['Big Bang Theory']),
+  serie('Lost', 'Lost (TV series)', ['Lost les disparus']),
+  serie('Dexter', 'Dexter (TV series)'),
+  serie('Sherlock', 'Sherlock (TV series)'),
+  serie('The Witcher', 'The Witcher (TV series)', ['Witcher']),
+  serie('Mercredi', 'Wednesday (TV series)', ['Wednesday']),
+  serie('Euphoria', 'Euphoria (American TV series)'),
+  serie('The Crown', 'The Crown (TV series)', ['Crown']),
+  serie('Narcos', 'Narcos'),
+  serie('Vikings', 'Vikings (2013 TV series)'),
+  serie('Élite', 'Elite (TV series)', ['Elite']),
+  serie('Lucifer', 'Lucifer (TV series)'),
+  serie('The Mandalorian', 'The Mandalorian', ['Mandalorian']),
+  serie('The Boys', 'The Boys (TV series)', ['Boys']),
+  serie('One Piece', 'One Piece (2023 TV series)'),
+  serie('Arcane', 'Arcane (TV series)'),
+  serie('Kaamelott', 'Kaamelott'),
+  serie('Scrubs', 'Scrubs (TV series)'),
+  serie('Brooklyn Nine-Nine', 'Brooklyn Nine-Nine', ['Brooklyn 99', 'B99']),
+  serie('Sex Education', 'Sex Education (TV series)'),
+  serie('The Last of Us (série)', 'The Last of Us (TV series)', ['The Last of Us']),
+  serie('Emily in Paris', 'Emily in Paris'),
+  serie('Gossip Girl', 'Gossip Girl'),
+  serie('Ma famille d’abord', 'My Wife and Kids', ['My Wife and Kids', 'Ma famille d abord']),
+  serie('Le Prince de Bel-Air', 'The Fresh Prince of Bel-Air', ['Prince de Bel Air', 'Fresh Prince']),
+  serie('Dix pour cent', 'Call My Agent!', ['10 pour cent', 'Call My Agent']),
+  serie('Le Bureau des légendes', 'The Bureau (TV series)', ['Bureau des légendes']),
 ];

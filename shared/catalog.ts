@@ -115,7 +115,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
     id: 'pixel',
     name: 'Devine l’image',
     emoji: '🔍',
-    tagline: 'Célébrités, jaquettes de jeux & affiches de films',
+    tagline: 'Célébrités, jeux vidéo, films & séries',
     description:
       'L’image démarre floue et très zoomée, puis se défloute et dézoome petit à petit. Trouve qui ou ce que c’est le plus tôt possible : plus l’image est floue, plus ça rapporte.',
     gradient: 'from-teal-500 to-emerald-600',
@@ -139,6 +139,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
           { value: 'celeb', label: '⭐ Célébrités' },
           { value: 'game', label: '🎮 Jaquettes de jeux vidéo' },
           { value: 'film', label: '🎬 Affiches de films' },
+          { value: 'serie', label: '📺 Affiches de séries' },
         ],
         default: 'mix',
       },

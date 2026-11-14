@@ -20,11 +20,13 @@ function BlurredImage({ prompt, view }: { prompt: PixelPrompt; view: RoundGameVi
   const remaining = useRemaining(view.phase === 'question' ? view.endsAt : null);
   const [failed, setFailed] = useState(false);
   const clear = view.phase === 'reveal' || view.me.found.includes('answer');
-  // 0 → 1 au fil du chrono ; l'image est nette à 90 % du temps
+  // 0 → 1 au fil du chrono. Le zoom recule un peu plus vite (fini à 85 % du temps),
+  // le flou dure un peu plus longtemps (net à 95 %, et décroît plus lentement)
   const t = view.phase === 'question' && view.durationMs ? 1 - remaining / view.durationMs : 0;
-  const q = clear ? 1 : Math.min(1, t / 0.9);
-  const blur = 26 * Math.pow(1 - q, 1.6);
-  const scale = 1 + 3.2 * Math.pow(1 - q, 1.3);
+  const qZoom = clear ? 1 : Math.min(1, t / 0.85);
+  const qBlur = clear ? 1 : Math.min(1, t / 0.95);
+  const blur = 26 * Math.pow(1 - qBlur, 1.35);
+  const scale = 1 + 3.2 * Math.pow(1 - qZoom, 1.3);
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl bg-black">

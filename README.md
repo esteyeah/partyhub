@@ -9,7 +9,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🎵 **Blind Test** (QCM ou réponse libre tolérante aux fautes) | ✅ jouable | 222 titres (69 francophones, 153 internationaux), extraits via l’API iTunes |
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
-| 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 131 images : célébrités, jaquettes de jeux vidéo, affiches de films (récupérées sur Wikipédia au lancement) |
+| 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 175 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries (récupérées sur Wikipédia au lancement) |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 87 répliques et mèmes « Complète la phrase », 48 « Quelle est la suite ? » (sagas de films) + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
@@ -143,9 +143,9 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
   1. Poste par poste (gardien → défense → milieu → attaque), 3 à 5 footballeurs sont proposés, du plus cher au moins cher.
   2. Chacun choisit en secret dans la limite de son budget (réglable : 150 à 500 M€). Pas de choix à temps → le moins cher abordable ; plus assez d’argent → remplaçant gratuit.
   3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
-  4. Le perdant reçoit un **joueur surprise gratuit** au même poste : 85 % du temps un joueur en fin de carrière ou célèbre pour ses ratés (Germain, Mitroglou, Bendtner…), 15 % une star (note ≥ 88) qui n’était pas proposée.
+  4. Le perdant reçoit un **joueur surprise gratuit** au même poste : 50 % un joueur en fin de carrière ou célèbre pour ses ratés (Germain, Mitroglou, Bendtner…), 35 % un joueur correct, 15 % une star qui n’était pas proposée.
   - Chaque joueur n’est proposé qu’aux postes qu’il occupe réellement (rôles façon Transfermarkt) ; le prix dépend de la note (≈ 4 M€ à 72, 20 M€ à 80, 120 M€ à 90).
-  5. À la fin : note = moyenne des 11 ; points = note × 30, +500 pour le meilleur 11.
+  5. À la fin : points selon la force moyenne des 11 (les notes restent cachées pendant la partie), +500 pour le meilleur 11.
 
 ---
 

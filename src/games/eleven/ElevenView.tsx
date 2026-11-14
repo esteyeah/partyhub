@@ -247,6 +247,7 @@ const HOW_LABEL: Record<ElevenOutcome['how'], { text: string; tone: string }> = 
   duel: { text: '🏆 Remporte le duel', tone: 'text-amber-300' },
   'surprise-star': { text: '🎁 Surprise : une PÉPITE !', tone: 'text-fuchsia-300' },
   'surprise-flop': { text: '🎁 Surprise… aïe 🥴', tone: 'text-rose-300' },
+  'surprise-mid': { text: '🎁 Surprise : un joueur correct 🙂', tone: 'text-sky-300' },
   broke: { text: '💸 Remplaçant gratuit', tone: 'text-rose-300' },
 };
 
@@ -310,7 +311,7 @@ function Final({ view, players, you }: { view: View; players: Map<string, Player
       <div className="panel flex items-center justify-between gap-4 p-5">
         <div>
           <h2 className="text-2xl font-black">Les compos sont terminées ⚽</h2>
-          <p className="text-sm text-zinc-400">Note = moyenne des 11 joueurs. Points = note × 30, +500 pour le meilleur 11.</p>
+          <p className="text-sm text-zinc-400">Les points dépendent de la force de tes 11 joueurs, +500 pour le meilleur 11.</p>
         </div>
         <TimerRing endsAt={view.endsAt} durationMs={view.durationMs} size={52} />
       </div>
@@ -336,8 +337,8 @@ function Final({ view, players, you }: { view: View; players: Map<string, Player
                   <div className="text-xs text-zinc-500">{r.spent} M€ dépensés</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono text-3xl font-black text-gradient">{r.note}</div>
-                  <div className="font-mono text-xs font-bold text-emerald-300">+{r.points} pts</div>
+                  <div className="font-mono text-3xl font-black text-gradient">+{r.points}</div>
+                  <div className="font-mono text-xs font-bold text-emerald-300">pts</div>
                 </div>
               </div>
               <div className="px-4 pb-4">
@@ -382,8 +383,7 @@ function FootCard({
     >
       <div className="flex w-full items-start justify-between">
         <div className="text-left leading-none">
-          <div className={`font-mono font-black ${small ? 'text-2xl' : 'text-3xl'}`}>{f.rating}</div>
-          <div className="text-[10px] font-bold opacity-70">{f.roles?.[0] ?? f.pos}</div>
+          <div className={`font-black ${small ? 'text-lg' : 'text-2xl'}`}>{f.roles?.[0] ?? f.pos}</div>
         </div>
         <span className={small ? 'text-lg' : 'text-2xl'}>{f.flag}</span>
       </div>
@@ -414,7 +414,7 @@ function Pitch({ slots, picks, current, compact }: { slots: ElevenSlot[]; picks:
         return (
           <div key={i} className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: `${s.x}%`, top: `${s.y}%` }}>
             {f ? (
-              <span className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b font-mono text-xs font-black shadow ${cardTone(f)}`}>{f.rating}</span>
+              <span className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b text-[9px] font-black shadow ${cardTone(f)}`}>{s.label}</span>
             ) : (
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-lg border-2 border-dashed text-[9px] font-bold ${
@@ -439,22 +439,20 @@ function TeamsSummary({ view, players, you }: { view: View; players: PlayerPubli
     .map((p) => {
       const t = view.teams[p.id];
       const filled = t?.picks.filter(Boolean) as Footballer[] | undefined;
-      const avg = filled?.length ? filled.reduce((s, f) => s + f.rating, 0) / filled.length : 0;
-      return { p, avg, count: filled?.length ?? 0, spent: t?.spent ?? 0 };
+      return { p, count: filled?.length ?? 0, spent: t?.spent ?? 0 };
     })
-    .sort((a, b) => b.avg - a.avg);
+    .sort((a, b) => b.count - a.count || a.spent - b.spent);
   return (
     <div className="panel p-4">
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Équipes adverses</h3>
       <ul className="space-y-1.5">
-        {rows.map(({ p, avg, count, spent }) => (
+        {rows.map(({ p, count, spent }) => (
           <li key={p.id} className={`flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm ${p.id === you ? 'bg-white/[0.05]' : ''}`}>
             <Avatar player={p} size="xs" />
             <span className="flex-1 truncate">{p.nickname}</span>
             <span className="font-mono text-xs text-zinc-500">
               {count}/{view.slots.length} · {view.budget - spent} M€
             </span>
-            <span className="w-10 text-right font-mono font-bold">{avg ? avg.toFixed(1) : '–'}</span>
           </li>
         ))}
       </ul>

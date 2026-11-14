@@ -182,7 +182,7 @@ export interface RankExtra {
 
 export interface PixelPrompt {
   image: string;
-  category: 'celeb' | 'game' | 'film';
+  category: 'celeb' | 'game' | 'film' | 'serie';
   categoryLabel: string;
 }
 export interface PixelExtra {
@@ -228,7 +228,7 @@ export interface ElevenTeam {
 }
 
 /** Comment un footballeur a été obtenu */
-export type ElevenHow = 'pick' | 'duel' | 'auto' | 'surprise-star' | 'surprise-flop' | 'broke';
+export type ElevenHow = 'pick' | 'duel' | 'auto' | 'surprise-star' | 'surprise-mid' | 'surprise-flop' | 'broke';
 
 export interface ElevenOutcome {
   playerId: string;
