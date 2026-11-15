@@ -397,9 +397,9 @@ export const WHO_ITEMS: WhoItem[] = [
   p('Soprano', [], [
     'Je suis né le 14 janvier 1979.',
     'J’ai grandi dans les quartiers nord de Marseille.',
-    'J’ai fait partie du groupe Psy 4 de la Rime.',
-    'J’ai des origines comoriennes.',
     'J’ai été coach dans The Voice Kids.',
+    'J’ai des origines comoriennes.',
+    'J’ai fait partie du groupe Psy 4 de la Rime.',
     'Je suis un chanteur marseillais connu pour « Cosmo » et « En feu ».',
   ]),
   p('Yannick Noah', ['Noah'], [
