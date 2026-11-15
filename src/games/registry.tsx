@@ -2,6 +2,7 @@ import type { GameId } from '@shared/types';
 import { BlindTestView } from './blindtest/BlindTestView';
 import { ElevenView } from './eleven/ElevenView';
 import { PixelView } from './pixel/PixelView';
+import { WhoAmIView } from './whoami/WhoAmIView';
 import { QuizView } from './quiz/QuizView';
 import { RankView } from './rank/RankView';
 import type { GameViewComponent } from './types';
@@ -17,5 +18,6 @@ export const GAME_VIEWS: Record<GameId, GameViewComponent> = {
   video: VideoView,
   rank: RankView,
   pixel: PixelView,
+  whoami: WhoAmIView,
   eleven: ElevenView,
 };

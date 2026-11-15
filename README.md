@@ -10,6 +10,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
 | 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 175 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries (récupérées sur Wikipédia au lancement) |
+| 🕵️ **Qui suis-je ?** (indices de plus en plus évidents) | ✅ jouable | 48 personnalités, personnages de fiction et œuvres |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 87 répliques et mèmes « Complète la phrase », 48 « Quelle est la suite ? » (sagas de films) + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.

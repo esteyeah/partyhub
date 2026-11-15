@@ -157,6 +157,31 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'time', label: 'Temps / image', type: 'select', options: timeOptions([20, 30, 45]), default: '30' },
     ],
   },
+  whoami: {
+    id: 'whoami',
+    name: 'Qui suis-je ?',
+    emoji: '🕵️',
+    tagline: 'Trouve la personnalité, le personnage ou l’œuvre',
+    description:
+      'Les indices tombent un par un, du plus vague (date de naissance…) au plus évident. Tape ta réponse dès que tu as trouvé : moins il a fallu d’indices, plus ça rapporte.',
+    gradient: 'from-amber-500 to-orange-600',
+    settings: [
+      {
+        key: 'category',
+        label: 'Thème',
+        type: 'select',
+        options: [
+          { value: 'mix', label: '🎲 Mélange' },
+          { value: 'perso', label: '⭐ Personnalités' },
+          { value: 'fiction', label: '🦸 Personnages de fiction' },
+          { value: 'oeuvre', label: '🎨 Œuvres' },
+        ],
+        default: 'mix',
+      },
+      { key: 'rounds', label: 'Manches', type: 'number', min: 3, max: 20, default: 8 },
+      { key: 'time', label: 'Temps / indice', type: 'select', options: timeOptions([6, 8, 10, 12]), default: '8' },
+    ],
+  },
   rank: {
     id: 'rank',
     name: 'Devine le Rang',

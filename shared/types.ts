@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -185,6 +185,14 @@ export interface PixelPrompt {
   category: 'celeb' | 'game' | 'film' | 'serie';
   categoryLabel: string;
 }
+export interface WhoPrompt {
+  categoryLabel: string;
+  clues: string[];
+  /** Intervalle entre deux indices */
+  clueMs: number;
+}
+export type WhoExtra = Record<string, never>;
+
 export interface PixelExtra {
   image: string;
 }
