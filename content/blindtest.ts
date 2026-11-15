@@ -6,7 +6,7 @@
 export interface BlindTrack {
   title: string;
   artist: string;
-  tags: ('fr' | 'inter' | 'retro')[];
+  tags: ('fr' | 'inter' | 'retro' | 'hard')[];
   /** Autres réponses acceptées (feat., surnoms…) */
   titleAliases?: string[];
   artistAliases?: string[];
@@ -243,4 +243,51 @@ export const BLIND_TRACKS: BlindTrack[] = [
   { title: 'Despechá', artist: 'Rosalía', artistAliases: ['Rosalia'], tags: ['inter'] },
   { title: 'Tusa', artist: 'Karol G', tags: ['inter'] },
   { title: 'Gasolina', artist: 'Daddy Yankee', tags: ['inter', 'retro'] },
+  // 🔥 Plus difficiles
+  { title: 'Le Sud', artist: 'Nino Ferrer', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Les Démons de minuit', artist: 'Images', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Le Lac Majeur', artist: 'Mort Shuman', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Pour un flirt', artist: 'Michel Delpech', tags: ['fr', 'retro', 'hard'] },
+  { title: 'La Groupie du pianiste', artist: 'Michel Berger', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Nuit de folie', artist: 'Début de Soirée', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Tombé du ciel', artist: 'Jacques Higelin', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Né quelque part', artist: 'Maxime Le Forestier', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Le Bal masqué', artist: 'La Compagnie Créole', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Bouge de là', artist: 'MC Solaar', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Petit frère', artist: 'IAM', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Tout le bonheur du monde', artist: 'Sinsemilia', tags: ['fr', 'retro', 'hard'] },
+  { title: 'La Tribu de Dana', artist: 'Manau', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Belle-Île-en-Mer, Marie-Galante', artist: 'Laurent Voulzy', titleAliases: ['Belle-Île-en-Mer'], tags: ['fr', 'retro', 'hard'] },
+  { title: 'Jeune et con', artist: 'Saez', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Les Passantes', artist: 'Georges Brassens', tags: ['fr', 'retro', 'hard'] },
+  { title: 'La Corrida', artist: 'Francis Cabrel', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Respire', artist: 'Mickey 3D', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Le vent nous portera', artist: 'Noir Désir', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Dis-moi', artist: 'BB Brunes', tags: ['fr', 'hard'] },
+  { title: 'Lettre à France', artist: 'Michel Polnareff', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Sous le vent', artist: 'Garou', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Femme Like U', artist: 'K-Maro', tags: ['fr', 'retro', 'hard'] },
+  { title: 'L’Encre de tes yeux', artist: 'Francis Cabrel', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Foule sentimentale', artist: 'Alain Souchon', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Fais-moi une place', artist: 'Julien Clerc', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Il est cinq heures, Paris s’éveille', artist: 'Jacques Dutronc', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Tainted Love', artist: 'Soft Cell', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Heroes', artist: 'David Bowie', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Bitter Sweet Symphony', artist: 'The Verve', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Karma Police', artist: 'Radiohead', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Under the Bridge', artist: 'Red Hot Chili Peppers', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Electric Feel', artist: 'MGMT', tags: ['inter', 'hard'] },
+  { title: 'Pumped Up Kicks', artist: 'Foster the People', tags: ['inter', 'hard'] },
+  { title: 'The Less I Know the Better', artist: 'Tame Impala', tags: ['inter', 'hard'] },
+  { title: 'Ho Hey', artist: 'The Lumineers', tags: ['inter', 'hard'] },
+  { title: 'Riptide', artist: 'Vance Joy', tags: ['inter', 'hard'] },
+  { title: 'Sweet Dreams (Are Made of This)', artist: 'Eurythmics', titleAliases: ['Sweet Dreams'], tags: ['inter', 'retro', 'hard'] },
+  { title: 'Losing My Religion', artist: 'R.E.M.', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Zombie', artist: 'The Cranberries', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Creep', artist: 'Radiohead', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Midnight City', artist: 'M83', tags: ['inter', 'hard'] },
+  { title: 'Teardrop', artist: 'Massive Attack', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Song 2', artist: 'Blur', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Common People', artist: 'Pulp', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Breathe', artist: 'The Prodigy', tags: ['inter', 'retro', 'hard'] },
 ];
