@@ -39,6 +39,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Franck Dubosc', ['Dubosc'], [
     'Je suis né en 1963 en Normandie.',
+    'J’ai commencé ma carrière avec des petits rôles à la télévision.',
     'J’ai joué des spectacles comme « Pour toi public » et « Romantique ».',
     'Je suis humoriste et acteur.',
     'J’ai réalisé le film « Tout le monde debout » en 2018.',
@@ -69,6 +70,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Domingo', [], [
     'Je suis un créateur de contenu français.',
+    'J’ai commencé par des vidéos sur YouTube.',
     'Mon vrai nom est Pierre-Alexis Bizot.',
     'Je suis streamer sur Twitch.',
     'J’anime l’émission « Popcorn ».',
@@ -96,6 +98,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Zinédine Zidane', ['Zidane', 'Zizou'], [
     'Je suis né le 23 juin 1972.',
+    'J’ai quatre fils qui ont tous été footballeurs.',
     'Je suis né à Marseille, dans le quartier de la Castellane.',
     'J’ai joué à Cannes, Bordeaux, la Juventus et le Real Madrid.',
     'J’ai gagné le Ballon d’Or en 1998.',
@@ -104,6 +107,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Kylian Mbappé', ['Mbappé', 'Mbappe'], [
     'Je suis né le 20 décembre 1998.',
+    'Mon petit frère joue aussi au football.',
     'J’ai grandi à Bondy.',
     'J’ai été formé à Monaco.',
     'J’ai été champion du monde en 2018.',
@@ -120,6 +124,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Céline Dion', ['Celine Dion'], [
     'Je suis née le 30 mars 1968.',
+    'Je suis la plus jeune d’une famille de 14 enfants.',
     'Je viens du Québec.',
     'J’ai gagné l’Eurovision en 1988 en représentant la Suisse.',
     'J’ai chanté sur la tour Eiffel à la cérémonie d’ouverture des JO de Paris 2024.',
@@ -127,6 +132,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Napoléon Bonaparte', ['Napoléon', 'Napoleon', 'Bonaparte'], [
     'Je suis né en 1769.',
+    'J’ai étudié à l’école militaire de Brienne.',
     'Je suis né à Ajaccio.',
     'J’ai gagné la bataille d’Austerlitz.',
     'Je me suis sacré empereur des Français en 1804.',
@@ -148,6 +154,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Squeezie', ['Lucas Hauchard'], [
     'Je suis né le 27 janvier 1996.',
+    'J’ai commencé à publier des vidéos alors que j’étais encore au lycée.',
     'Mon vrai nom est Lucas Hauchard.',
     'J’ai commencé par des vidéos de jeux vidéo.',
     'J’organise le GP Explorer, une course automobile entre vidéastes.',
@@ -162,6 +169,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Michael Jordan', ['Jordan', 'MJ'], [
     'Je suis né en 1963 à Brooklyn.',
+    'J’ai joué pour l’université de Caroline du Nord.',
     'J’ai joué au baseball pendant une saison.',
     'J’ai joué avec des personnages des Looney Tunes dans un film.',
     'J’ai gagné 6 titres NBA avec les Chicago Bulls.',
@@ -169,6 +177,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Usain Bolt', ['Bolt'], [
     'Je suis né en 1986.',
+    'Plus jeune, je jouais au cricket et au football.',
     'Je viens de Jamaïque.',
     'J’ai remporté 8 médailles d’or olympiques.',
     'Ma pose de célébration imite un éclair.',
@@ -178,6 +187,7 @@ export const WHO_ITEMS: WhoItem[] = [
   // — Personnages de fiction —
   f('Barney Stinson', ['Barney'], [
     'Je suis un personnage d’une série américaine diffusée de 2005 à 2014.',
+    'J’ai un demi-frère et j’ai longtemps cherché qui était mon père.',
     'Je travaille chez GNB, mais personne ne sait vraiment ce que je fais.',
     'J’ai écrit un « Playbook » plein de techniques de drague.',
     'Mon expression favorite est « Suit up ! ».',
@@ -185,6 +195,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Walter White', ['Heisenberg', 'Walt'], [
     'J’habite à Albuquerque, au Nouveau-Mexique.',
+    'Je fête mes 50 ans au début de mon histoire.',
     'J’étais professeur de chimie au lycée.',
     'J’apprends que j’ai un cancer du poumon.',
     'Je me fais appeler Heisenberg.',
@@ -199,6 +210,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Scooby-Doo', ['Scooby', 'Scooby Doo'], [
     'Je suis né en 1969 dans un dessin animé.',
+    'Mon nom aurait été inspiré par une chanson de Frank Sinatra.',
     'Je suis un dogue allemand.',
     'Je voyage dans une camionnette appelée la Mystery Machine.',
     'Mon meilleur ami s’appelle Sammy.',
@@ -206,6 +218,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Iron Man', ['Tony Stark', 'Ironman'], [
     'Je suis apparu dans un comic en 1963.',
+    'J’ai hérité de l’entreprise de mon père.',
     'Je suis un génie, milliardaire et playboy.',
     'J’ai une source d’énergie dans la poitrine.',
     'Robert Downey Jr. m’a joué au cinéma.',
@@ -213,6 +226,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Spider-Man', ['Spiderman', 'Peter Parker'], [
     'J’habite dans le Queens, à New York.',
+    'Je travaille comme photographe pour un journal.',
     'Mon oncle Ben m’a appris qu’un grand pouvoir implique de grandes responsabilités.',
     'Tobey Maguire, Andrew Garfield et Tom Holland m’ont joué au cinéma.',
     'J’ai été mordu par une araignée.',
@@ -227,6 +241,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Ulysse', ['Odysseus', 'Ulysses'], [
     'Je suis un héros de la mythologie grecque.',
+    'Mon voyage de retour à la maison dure dix ans.',
     'Je suis roi d’Ithaque.',
     'Ma femme Pénélope m’attend pendant 20 ans.',
     'J’ai aveuglé le cyclope Polyphème.',
@@ -249,6 +264,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Harry Potter', ['Harry'], [
     'Je suis né un 31 juillet.',
+    'Je suis orphelin et j’ai grandi chez mon oncle et ma tante.',
     'J’ai grandi dans un placard sous l’escalier.',
     'J’ai une cicatrice en forme d’éclair sur le front.',
     'Je suis élève à Poudlard.',
@@ -263,6 +279,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Mario', ['Super Mario'], [
     'Je suis apparu en 1981 dans un jeu d’arcade.',
+    'Mon nom viendrait du propriétaire d’un entrepôt américain.',
     'Je suis plombier.',
     'J’ai une casquette rouge et une moustache.',
     'Mon frère s’appelle Luigi.',
@@ -270,6 +287,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Dark Vador', ['Darth Vader', 'Vador', 'Anakin Skywalker'], [
     'Je suis apparu au cinéma en 1977.',
+    'Enfant, j’étais esclave sur une planète désertique.',
     'Je respire bruyamment.',
     'Je porte un casque et une armure noirs.',
     'Je m’appelais Anakin Skywalker.',
@@ -277,6 +295,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Astérix', ['Asterix'], [
     'Je suis né en 1959 dans un journal.',
+    'Comme tous les hommes de mon village, mon nom finit de la même façon.',
     'Je vis en 50 avant Jésus-Christ.',
     'Je suis petit, mais très malin.',
     'Mon meilleur ami livre des menhirs.',
@@ -284,6 +303,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('James Bond', ['Bond', '007'], [
     'Je suis né sous la plume de Ian Fleming.',
+    'Je suis orphelin et j’ai des racines écossaises.',
     'Je travaille pour le MI6.',
     'J’aime mon martini « au shaker, pas à la cuillère ».',
     'Sean Connery, Pierce Brosnan et Daniel Craig m’ont joué.',
@@ -291,6 +311,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Bob l’éponge', ['Bob leponge', 'SpongeBob', 'Bob'], [
     'Je suis apparu à la télévision en 1999.',
+    'Je travaille comme cuisinier.',
     'Je travaille au Crabe Croustillant.',
     'J’habite dans un ananas sous la mer.',
     'Mon meilleur ami Patrick est une étoile de mer.',
@@ -314,6 +335,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Minecraft', [], [
     'Je suis un jeu vidéo sorti au début des années 2010.',
+    'J’ai d’abord été développé par une seule personne.',
     'J’ai été créé par un Suédois surnommé « Notch ».',
     'Microsoft m’a racheté en 2014.',
     'Je suis le jeu vidéo le plus vendu de l’histoire.',
@@ -349,6 +371,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Tetris', [], [
     'Je suis un jeu vidéo créé en 1984.',
+    'J’ai été créé sur un ordinateur de recherche.',
     'J’ai été inventé en Union soviétique par Alexeï Pajitnov.',
     'J’ai été un énorme succès sur la Game Boy.',
     'On doit compléter des lignes pour les faire disparaître.',
@@ -364,6 +387,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Thriller', [], [
     'Je suis un album sorti en 1982.',
+    'J’ai permis à mon auteur de gagner 8 Grammy Awards en une seule soirée.',
     'Je suis l’album le plus vendu de l’histoire.',
     'Mon clip de 14 minutes a révolutionné le genre.',
     'Des zombies dansent dans ce clip.',
@@ -372,8 +396,9 @@ export const WHO_ITEMS: WhoItem[] = [
   // — Ajouts —
   p('Soprano', [], [
     'Je suis né le 14 janvier 1979.',
-    'J’ai des origines comoriennes.',
+    'J’ai grandi dans les quartiers nord de Marseille.',
     'J’ai fait partie du groupe Psy 4 de la Rime.',
+    'J’ai des origines comoriennes.',
     'J’ai été coach dans The Voice Kids.',
     'Je suis un chanteur marseillais connu pour « Cosmo » et « En feu ».',
   ]),
@@ -414,6 +439,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Lionel Messi', ['Messi', 'Leo Messi'], [
     'Je suis né le 24 juin 1987 à Rosario.',
+    'Je suis gaucher.',
     'J’ai rejoint un club européen à 13 ans pour soigner un problème de croissance.',
     'J’ai gagné 8 Ballons d’Or.',
     'J’ai gagné la Coupe du monde 2022.',
@@ -421,6 +447,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Cristiano Ronaldo', ['Ronaldo', 'CR7'], [
     'Je suis né le 5 février 1985.',
+    'Mon deuxième prénom vient d’un président américain.',
     'Je viens de l’île de Madère.',
     'J’ai joué au Sporting, à Manchester United, au Real Madrid et à la Juventus.',
     'Je suis le meilleur buteur de l’histoire du football.',
@@ -449,6 +476,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Antoine Dupont', ['Dupont'], [
     'Je suis né le 15 novembre 1996 à Lannemezan.',
+    'Je viens des Hautes-Pyrénées.',
     'Je joue au Stade toulousain.',
     'J’ai été élu meilleur joueur du monde en 2021.',
     'J’ai été champion olympique de rugby à 7 en 2024.',
@@ -463,6 +491,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Omar Sy', ['Sy'], [
     'Je suis né le 20 janvier 1978 à Trappes.',
+    'J’ai commencé à la radio, sur Radio Nova.',
     'J’ai formé un duo comique avec Fred Testot.',
     'J’ai reçu le César du meilleur acteur en 2012.',
     'J’ai joué Assane Diop dans une série Netflix.',
@@ -477,6 +506,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Gims', ['Maître Gims', 'Maitre Gims'], [
     'Je suis né le 6 mai 1986 à Kinshasa.',
+    'Je suis arrivé en France à l’âge de 2 ans.',
     'J’ai fait partie de la Sexion d’Assaut.',
     'Je porte presque toujours des lunettes de soleil.',
     'Mon premier album solo s’appelle « Subliminal ».',
@@ -498,6 +528,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Johnny Hallyday', ['Johnny', 'Hallyday'], [
     'Je suis né le 15 juin 1943 à Paris.',
+    'Enfant, j’ai été élevé par ma tante dans le milieu du spectacle.',
     'Mon vrai nom est Jean-Philippe Smet.',
     'J’ai vendu plus de 100 millions de disques.',
     'Je suis mort en 2017 et des centaines de milliers de personnes m’ont rendu hommage.',
@@ -505,6 +536,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Elon Musk', ['Musk'], [
     'Je suis né le 28 juin 1971 à Pretoria.',
+    'J’ai vendu mon premier jeu vidéo à 12 ans.',
     'J’ai cofondé PayPal.',
     'Je dirige une entreprise qui envoie des fusées dans l’espace.',
     'J’ai racheté Twitter en 2022 et je l’ai renommé X.',
@@ -519,6 +551,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Inoxtag', ['Inox'], [
     'Je suis né en 2002.',
+    'J’ai commencé à faire des vidéos avant mes 15 ans.',
     'Mon vrai prénom est Inès.',
     'Je suis youtubeur et streamer.',
     'J’ai gravi l’Everest sans expérience de la montagne.',
@@ -554,6 +587,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   p('Gotaga', [], [
     'Je suis un joueur et streamer français.',
+    'J’ai commencé la compétition en ligne très jeune.',
     'Mon vrai nom est Corentin Houssein.',
     'J’ai été champion du monde de Call of Duty.',
     'J’ai cofondé le club d’e-sport Gentle Mates avec Squeezie.',
@@ -568,6 +602,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Tintin', [], [
     'Je suis né en 1929 dans un journal belge.',
+    'Je ne vieillis jamais et on ne me connaît pas de famille.',
     'Je suis reporter, mais on me voit rarement écrire.',
     'J’ai une houppe célèbre.',
     'Mon ami capitaine jure « Mille sabords ! ».',
@@ -575,6 +610,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Don Quichotte', ['Don Quijote', 'Quichotte'], [
     'Je suis né sous la plume d’un écrivain espagnol en 1605.',
+    'Je suis un vieil hidalgo de la Manche.',
     'Je lis tellement de romans que je me crois chevalier.',
     'Mon cheval s’appelle Rossinante et j’aime Dulcinée.',
     'Mon écuyer s’appelle Sancho Panza.',
@@ -582,6 +618,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Le Petit Prince', ['Petit Prince'], [
     'Je suis né en 1943.',
+    'Je suis blond et je porte une longue écharpe.',
     'Je viens de l’astéroïde B 612.',
     'J’y prends soin d’une rose.',
     'Un renard m’a appris à apprivoiser.',
@@ -589,6 +626,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Shrek', [], [
     'Je suis apparu au cinéma en 2001.',
+    'Mon histoire vient d’un album pour enfants de William Steig.',
     'Je vis seul dans un marais.',
     'Un âne bavard me suit partout.',
     'Je suis tombé amoureux de la princesse Fiona.',
@@ -603,6 +641,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Batman', ['Bruce Wayne'], [
     'Je suis apparu dans un comic en 1939.',
+    'Je suis orphelin et immensément riche.',
     'Mes parents ont été tués devant moi quand j’étais enfant.',
     'Mon majordome s’appelle Alfred.',
     'Je protège Gotham City.',
@@ -610,6 +649,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Kratos', [], [
     'Je suis un héros de jeu vidéo apparu en 2005.',
+    'J’ai servi le dieu de la guerre.',
     'Je suis un guerrier spartiate.',
     'Ma peau est couverte de cendres blanches.',
     'Mon fils s’appelle Atreus.',
@@ -617,6 +657,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Link', [], [
     'Je suis un héros de jeu vidéo apparu en 1986.',
+    'Dans mes premières aventures, j’étais gaucher.',
     'Je porte une tunique verte et un bonnet.',
     'Je manie l’Épée de légende.',
     'Je protège le royaume d’Hyrule.',
@@ -624,6 +665,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Pikachu', [], [
     'Je suis apparu en 1996.',
+    'Mon nom vient d’onomatopées japonaises.',
     'Je suis jaune avec des joues rouges.',
     'Je refuse de rentrer dans ma Poké Ball.',
     'Mon dresseur s’appelle Sacha.',
@@ -631,6 +673,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Michael Scott', ['Michael'], [
     'Je suis un personnage de série américaine.',
+    'Je suis persuadé d’être le patron le plus drôle du monde.',
     'Je dirige une agence dans une entreprise de papier.',
     'Je travaille à Scranton, en Pennsylvanie.',
     'Je dis souvent « That’s what she said ».',
@@ -645,6 +688,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Le Joker', ['Joker'], [
     'Je suis apparu dans un comic en 1940.',
+    'Mes origines n’ont jamais vraiment été fixées.',
     'Mon sourire est inquiétant.',
     'Jack Nicholson, Heath Ledger et Joaquin Phoenix m’ont joué.',
     'J’ai les cheveux verts et le visage blanc.',
@@ -687,6 +731,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   f('Jon Snow', ['Jon'], [
     'Je suis un personnage de romans et de série.',
+    'J’ai été élevé avec les enfants d’un seigneur du Nord.',
     'On me croit bâtard.',
     'J’ai rejoint la Garde de nuit sur le Mur.',
     '« Tu ne sais rien »… m’a-t-on souvent dit.',
@@ -694,6 +739,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Gangnam Style', ['Gangnam'], [
     'Je suis une chanson sortie en 2012.',
+    'Je suis une chanson satirique.',
     'Mon chanteur est sud-coréen.',
     'J’ai été la première vidéo à dépasser le milliard de vues sur YouTube.',
     'Ma danse imite un cavalier sur son cheval.',
@@ -715,6 +761,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Rocket League', [], [
     'Je suis un jeu vidéo sorti en 2015.',
+    'Je suis la suite d’un jeu au nom très long sorti en 2008.',
     'J’ai été développé par le studio Psyonix.',
     'Epic Games m’a racheté en 2019.',
     'Je suis devenu gratuit en 2020.',
@@ -750,6 +797,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Fortnite', [], [
     'Je suis un jeu vidéo sorti en 2017.',
+    'J’ai d’abord été un jeu de survie en coopération contre des monstres.',
     'J’ai été développé par Epic Games.',
     'Mes joueurs sautent d’un bus volant.',
     'Des célébrités y ont donné des concerts virtuels.',
@@ -757,6 +805,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('GTA V', ['GTA 5', 'Grand Theft Auto V', 'GTA'], [
     'Je suis un jeu vidéo sorti en 2013.',
+    'Mon développement aurait coûté plus de 250 millions de dollars.',
     'J’ai été développé par Rockstar Games.',
     'Mon histoire se passe à Los Santos.',
     'On y incarne Michael, Franklin et Trevor.',
@@ -778,6 +827,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Bienvenue chez les Ch’tis', ['Les Chtis', 'Bienvenue chez les Chtis', 'Chtis'], [
     'Je suis un film sorti en 2008.',
+    'Je suis une comédie sur les préjugés entre régions.',
     'J’ai attiré plus de 20 millions de spectateurs.',
     'Un directeur de poste est muté à Bergues.',
     'Kad Merad y découvre le patois.',
@@ -792,6 +842,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('La Nuit étoilée', ['Nuit étoilée', 'Starry Night'], [
     'Je suis une œuvre de 1889.',
+    'Je suis une peinture à l’huile post-impressionniste.',
     'J’ai été peinte depuis un asile à Saint-Rémy-de-Provence.',
     'Je suis exposée au MoMA à New York.',
     'On y voit un ciel tourbillonnant et un cyprès.',
@@ -806,6 +857,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Squid Game', [], [
     'Je suis une série sortie en 2021.',
+    'Mon créateur a mis plus de 10 ans à trouver quelqu’un pour me produire.',
     'Je viens de Corée du Sud.',
     'Mes joueurs portent des survêtements verts.',
     'Le perdant d’« Un, deux, trois, soleil » est éliminé… définitivement.',
@@ -834,6 +886,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('Dragon Ball', ['Dragon Ball Z', 'DBZ'], [
     'Je suis une œuvre japonaise lancée en 1984.',
+    'Je m’inspire d’un roman chinois classique, « La Pérégrination vers l’Ouest ».',
     'Mon auteur s’appelle Akira Toriyama.',
     'Mes héros se transforment en Super Saiyan.',
     'On y cherche 7 boules magiques.',
@@ -841,6 +894,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]),
   o('One Piece', [], [
     'Je suis une œuvre japonaise lancée en 1997.',
+    'Je ne suis toujours pas terminé après plus de 25 ans.',
     'Mon auteur s’appelle Eiichiro Oda.',
     'Mon héros a mangé un fruit qui le rend élastique.',
     'Son équipage cherche un trésor légendaire.',
@@ -975,6 +1029,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...p('Freddie Mercury', ['Mercury', 'Freddie'], [
     'Je suis né en 1946 à Zanzibar.',
+    'J’ai passé une partie de mon enfance en Inde.',
     'Mon vrai nom est Farrokh Bulsara.',
     'J’ai étudié le graphisme et j’ai dessiné le logo de mon groupe.',
     'Mon concert au Live Aid de 1985 est légendaire.',
@@ -982,6 +1037,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...p('Coluche', [], [
     'Je suis né en 1944 à Paris.',
+    'J’ai grandi à Montrouge, dans une famille modeste.',
     'Mon vrai nom est Michel Colucci.',
     'J’ai été candidat à l’élection présidentielle de 1981.',
     'Je portais une salopette rayée et un nez rouge.',
@@ -989,6 +1045,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...p('s1mple', ['Simple', 'Oleksandr Kostyliev'], [
     'Je suis né en 1997 en Ukraine.',
+    'J’ai commencé ma carrière très jeune et j’étais réputé pour mon fort caractère.',
     'Mon vrai nom est Oleksandr Kostyliev.',
     'J’ai joué chez Natus Vincere (NAVI).',
     'J’ai gagné le Major de Stockholm en 2021.',
@@ -996,6 +1053,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...p('Faker', [], [
     'Je suis né en 1996 en Corée du Sud.',
+    'J’ai commencé ma carrière professionnelle en 2013.',
     'Mon vrai nom est Lee Sang-hyeok.',
     'J’ai passé toute ma carrière dans la même équipe, T1.',
     'J’ai gagné le championnat du monde à plusieurs reprises.',
@@ -1038,6 +1096,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...f('Gaston Lagaffe', ['Gaston'], [
     'Je suis né en 1957 dans le journal Spirou.',
+    'Je suis d’abord apparu en traversant les pages d’un journal, sans histoire.',
     'Mon auteur s’appelle André Franquin.',
     'J’ai une mouette rieuse et un chat dingue.',
     'Je travaille aux éditions Dupuis, mais surtout je fais la sieste.',
@@ -1059,6 +1118,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...f('Saul Goodman', ['Saul', 'Jimmy McGill'], [
     'Je suis un personnage de série américaine.',
+    'Je viens de Cicero, dans l’Illinois.',
     'Mon vrai nom est Jimmy McGill.',
     'Je suis avocat à Albuquerque.',
     'Mes publicités sont très voyantes.',
@@ -1080,6 +1140,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...f('Geralt de Riv', ['Geralt', 'Geralt of Rivia'], [
     'Je suis né sous la plume d’Andrzej Sapkowski.',
+    'J’ai subi des mutations pendant mon enfance.',
     'J’ai les cheveux blancs et des yeux de chat.',
     'Je porte deux épées : une d’acier, une d’argent.',
     'Henry Cavill m’a joué dans une série Netflix.',
@@ -1171,6 +1232,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   { ...o('Dark Souls', [], [
     'Je suis un jeu vidéo sorti en 2011.',
+    'Je suis l’héritier spirituel d’un jeu sorti sur PS3 en 2009.',
     'J’ai été développé par FromSoftware.',
     'Mon slogan était « Prepare to Die ».',
     'Je suis réputé pour ma difficulté.',
@@ -1206,6 +1268,7 @@ export const WHO_ITEMS: WhoItem[] = [
   ]), hard: true },
   p('Mister V', ['MisterV'], [
     'Je suis né en 1993 à Grenoble.',
+    'J’ai grandi en Isère.',
     'Mon vrai nom est Yvick Letexier.',
     'Je me suis fait connaître avec des sketchs sur YouTube.',
     'J’ai lancé ma propre marque de pizzas.',

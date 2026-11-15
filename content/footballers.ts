@@ -82,7 +82,7 @@ const ROWS: Row[] = [
   ['Malo Gusto', 'FRA', 'Chelsea', 'Premier League', 80, 'DD'],
   ['Diogo Dalot', 'POR', 'Manchester United', 'Premier League', 80, 'DD/DG'],
   ['Noussair Mazraoui', 'MAR', 'Manchester United', 'Premier League', 80, 'DD/DG'],
-  ['Benjamin Pavard', 'FRA', 'Marseille', 'Ligue 1', 80, 'DD/DC'],
+  ['Benjamin Pavard', 'FRA', 'Inter', 'Serie A', 80, 'DD/DC'],
   ['Vanderson', 'BRA', 'Monaco', 'Ligue 1', 79, 'DD'],
   ['Kyle Walker', 'ENG', 'Burnley', 'Premier League', 78, 'DD'],
   ['Jonathan Clauss', 'FRA', 'Nice', 'Ligue 1', 78, 'DD/MD'],
@@ -122,7 +122,7 @@ const ROWS: Row[] = [
   ['Leonardo Balerdi', 'ARG', 'AS Roma', 'Serie A', 80, 'DC'],
   ['Sergio Ramos', 'ESP', 'Monterrey', 'Liga MX', 80, 'DC'],
   ['Leny Yoro', 'FRA', 'Manchester United', 'Premier League', 79, 'DC'],
-  ['Jean-Clair Todibo', 'FRA', 'West Ham', 'Premier League', 79, 'DC'],
+  ['Jean-Clair Todibo', 'FRA', 'Lens', 'Ligue 1', 79, 'DC'],
   ['Mohamed Simakan', 'FRA', 'Al-Nassr', 'Saudi Pro League', 79, 'DC/DD'],
   ['Joachim Andersen', 'DEN', 'Fulham', 'Premier League', 79, 'DC'],
 
@@ -277,7 +277,7 @@ const ROWS: Row[] = [
   ['Robert Sánchez', 'ESP', 'Chelsea', 'Premier League', 79, 'GB'],
   ['Matvey Safonov', 'RUS', 'PSG', 'Ligue 1', 78, 'GB'],
   ['Alban Lafont', 'FRA', 'Nantes', 'Ligue 1', 77, 'GB'],
-  ['Robin Risser', 'FRA', 'Lens', 'Ligue 1', 74, 'GB'],
+  ['Robin Risser', 'FRA', 'Lens', 'Ligue 1', 79, 'GB'],
   ['Rayan Aït-Nouri', 'ALG', 'Manchester City', 'Premier League', 80, 'DG'],
   ['Antonee Robinson', 'USA', 'Fulham', 'Premier League', 80, 'DG'],
   ['Destiny Udogie', 'ITA', 'Tottenham', 'Premier League', 79, 'DG'],
@@ -310,7 +310,7 @@ const ROWS: Row[] = [
   ['Joelinton', 'BRA', 'Newcastle', 'Premier League', 81, 'MC/AG'],
   ['Pape Matar Sarr', 'SEN', 'Tottenham', 'Premier League', 79, 'MC'],
   ['Corentin Tolisso', 'FRA', 'Lyon', 'Ligue 1', 78, 'MC/MOC'],
-  ['Lamine Camara', 'SEN', 'Monaco', 'Ligue 1', 78, 'MC/MDC'],
+  ['Lamine Camara', 'SEN', 'Monaco', 'Ligue 1', 80, 'MC/MDC'],
   ['Andrey Santos', 'BRA', 'Manchester United', 'Premier League', 78, 'MC/MDC'],
   ['Christian Eriksen', 'DEN', 'Wolfsburg', 'Bundesliga', 77, 'MC/MOC'],
   ['Jordan Henderson', 'ENG', 'Brentford', 'Premier League', 77, 'MC/MDC'],
@@ -322,7 +322,7 @@ const ROWS: Row[] = [
   ['Nico Paz', 'ARG', 'Como', 'Serie A', 80, 'MOC'],
   ['Maghnes Akliouche', 'FRA', 'PSG', 'Ligue 1', 79, 'MOC/AD'],
   ['Eliesse Ben Seghir', 'MAR', 'Leverkusen', 'Bundesliga', 78, 'MOC/AG'],
-  ['Ilan Kebbal', 'FRA', 'Paris FC', 'Ligue 1', 77, 'MOC/AG'],
+  ['Ilan Kebbal', 'FRA', 'Paris FC', 'Ligue 1', 80, 'MOC/AG'],
   ['Martin Baturina', 'CRO', 'Como', 'Serie A', 77, 'MOC/MC'],
   ['Anthony Gordon', 'ENG', 'FC Barcelone', 'Liga', 82, 'AG'],
   ['Amine Gouiri', 'ALG', 'Marseille', 'Ligue 1', 79, 'AG/BU'],
@@ -374,7 +374,7 @@ const ROWS: Row[] = [
   ['Dominik Greif', 'SVK', 'Lyon', 'Ligue 1', 76, 'GB'],
   ['Philipp Köhn', 'SUI', 'Monaco', 'Ligue 1', 76, 'GB'],
   ['Berke Özer', 'TUR', 'Lille', 'Ligue 1', 75, 'GB'],
-  ['Mike Penders', 'BEL', 'Strasbourg', 'Ligue 1', 74, 'GB'],
+  ['Mike Penders', 'BEL', 'Chelsea', 'Premier League', 74, 'GB'],
   ['Kevin Trapp', 'GER', 'Paris FC', 'Ligue 1', 77, 'GB'],
   ['Quentin Merlin', 'FRA', 'Rennes', 'Ligue 1', 76, 'DG'],
   ['Bradley Locko', 'FRA', 'Brest', 'Ligue 1', 75, 'DG'],
@@ -395,7 +395,21 @@ const ROWS: Row[] = [
   ['Ernest Nuamah', 'GHA', 'Lyon', 'Ligue 1', 75, 'AD'],
   ['Takumi Minamino', 'JPN', 'Monaco', 'Ligue 1', 79, 'MOC/AG'],
   ['Rémy Cabella', 'FRA', 'Lille', 'Ligue 1', 75, 'MOC'],
-  ['Florian Thauvin', 'FRA', 'Lens', 'Ligue 1', 78, 'AD'],
+  // Ligue 1 : joueurs en plus
+  ['Filip Jørgensen', 'DEN', 'Strasbourg', 'Ligue 1', 76, 'GB'],
+  ['Dilane Bakwa', 'FRA', 'Lille', 'Ligue 1', 77, 'AD/AG'],
+  ['Charlie Cresswell', 'ENG', 'Rennes', 'Ligue 1', 76, 'DC'],
+  ['Gessime Yassine', 'MAR', 'Strasbourg', 'Ligue 1', 76, 'MOC/AG'],
+  ['Maxime Lopez', 'FRA', 'Paris FC', 'Ligue 1', 77, 'MC/MOC'],
+  ['Moses Simon', 'NGA', 'Paris FC', 'Ligue 1', 77, 'AG'],
+  ['Pablo Pagis', 'FRA', 'Paris FC', 'Ligue 1', 75, 'AG/BU'],
+  ['Jonathan Ikoné', 'FRA', 'Paris FC', 'Ligue 1', 76, 'AD/AG'],
+  ['Kevin Danois', 'FRA', 'Auxerre', 'Ligue 1', 74, 'MC/MDC'],
+  ['Emerson Palmieri', 'ITA', 'Marseille', 'Ligue 1', 77, 'DG'],
+  ['Nabil Bentaleb', 'ALG', 'Lille', 'Ligue 1', 76, 'MDC/MC'],
+  ['Arsène Kouassi', 'CIV', 'Lorient', 'Ligue 1', 73, 'DG/DD'],
+  ['Matthieu Udol', 'FRA', 'Lens', 'Ligue 1', 76, 'DG'],
+  ['Florian Thauvin', 'FRA', 'Lens', 'Ligue 1', 82, 'AD'],
   ['Wesley Saïd', 'FRA', 'Lens', 'Ligue 1', 76, 'AG'],
   ['Ludovic Blas', 'FRA', 'Rennes', 'Ligue 1', 77, 'MOC/AD'],
   ['Joaquín Panichelli', 'ARG', 'Strasbourg', 'Ligue 1', 75, 'BU'],
@@ -824,6 +838,19 @@ const BIRTH_YEARS: Record<string, number> = {
   'Ernest Nuamah': 2003,
   'Takumi Minamino': 1995,
   'Rémy Cabella': 1990,
+  'Filip Jørgensen': 2002,
+  'Dilane Bakwa': 2002,
+  'Charlie Cresswell': 2002,
+  'Gessime Yassine': 2005,
+  'Maxime Lopez': 1997,
+  'Moses Simon': 1995,
+  'Pablo Pagis': 2003,
+  'Jonathan Ikoné': 1998,
+  'Kevin Danois': 2004,
+  'Emerson Palmieri': 1994,
+  'Nabil Bentaleb': 1994,
+  'Arsène Kouassi': 2005,
+  'Matthieu Udol': 1996,
   'Florian Thauvin': 1993,
   'Wesley Saïd': 1995,
   'Ludovic Blas': 1997,
@@ -1373,6 +1400,15 @@ export const ageFactor = (age?: number) =>
   age === undefined ? 1 : age <= 21 ? 1.3 : age <= 24 ? 1.15 : age <= 28 ? 1 : age <= 30 ? 0.9 : age <= 32 ? 0.8 : age <= 34 ? 0.7 : 0.6;
 
 /** Prix (M€) : d'abord la note (~3 M€ à 70, ~20 M€ à 80, ~120 M€ à 90), puis l'âge */
+/** Prix imposés (proches de la valeur Transfermarkt) */
+const PRICE_OVERRIDES: Record<string, number> = {
+  'Robin Risser': 30,
+  'Matvey Safonov': 30,
+  'Ilan Kebbal': 25,
+  'Lamine Camara': 35,
+  'Florian Thauvin': 18,
+};
+
 export const priceFor = (rating: number, age?: number) => Math.max(1, Math.round(3 * Math.exp((rating - 70) * 0.185) * ageFactor(age)));
 
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -1392,7 +1428,7 @@ function toFootballer([name, nat, club, league, rating, roles]: Row, surprise = 
     league,
     rating,
     age,
-    price: surprise ? 0 : priceFor(rating, age),
+    price: surprise ? 0 : PRICE_OVERRIDES[name] ?? priceFor(rating, age),
   };
 }
 

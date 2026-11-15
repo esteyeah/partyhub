@@ -106,6 +106,16 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
     gradient: 'from-amber-500 to-orange-600',
     settings: [
       {
+        key: 'mode',
+        label: 'Réponses',
+        type: 'select',
+        options: [
+          { value: 'qcm', label: '🔘 QCM (4 choix)' },
+          { value: 'libre', label: '⌨️ Réponse libre' },
+        ],
+        default: 'qcm',
+      },
+      {
         key: 'source',
         label: 'Contenu',
         type: 'select',
