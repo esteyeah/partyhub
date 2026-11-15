@@ -290,4 +290,6 @@ export const BLIND_TRACKS: BlindTrack[] = [
   { title: 'Song 2', artist: 'Blur', tags: ['inter', 'retro', 'hard'] },
   { title: 'Common People', artist: 'Pulp', tags: ['inter', 'retro', 'hard'] },
   { title: 'Breathe', artist: 'The Prodigy', tags: ['inter', 'retro', 'hard'] },
+  { title: 'Lumière', artist: 'Mister V', tags: ['fr'] },
+  { title: 'Phénomène', artist: 'Mister V', tags: ['fr'] },
 ];

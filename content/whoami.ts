@@ -1204,4 +1204,18 @@ export const WHO_ITEMS: WhoItem[] = [
     'On y fait du tennis, du golf et du bowling.',
     'Je suis le jeu de sport de la Wii.',
   ]), hard: true },
+  p('Mister V', ['MisterV'], [
+    'Je suis né en 1993 à Grenoble.',
+    'Mon vrai nom est Yvick Letexier.',
+    'Je me suis fait connaître avec des sketchs sur YouTube.',
+    'J’ai lancé ma propre marque de pizzas.',
+    'Je suis youtubeur, humoriste et rappeur, auteur de l’album « MVP ».',
+  ]),
+  f('Agent 47', ['47', 'Hitman'], [
+    'Je suis apparu dans un jeu vidéo en 2000.',
+    'J’ai été créé par un studio danois.',
+    'Je suis un clone conçu pour être parfait.',
+    'Je porte un costume noir, une cravate rouge et j’ai un code-barres derrière le crâne.',
+    'Je suis le tueur à gages chauve de la série Hitman.',
+  ]),
 ];
