@@ -149,7 +149,7 @@ Le plus simple pour les clips est l’espace `/admin` ; `content/rank.ts` et `co
   - Formations : 4-3-3 (MDC · 2 MC), 4-3-3 (MDC · MC · MOC), 4-2-3-1, 4-4-2 à plat, 4-4-2 losange, 4-5-1, 3-5-2, 3-4-3, 5-3-2.
   2. Chacun choisit en secret dans la limite de son budget (réglable : 150 à 500 M€). Pas de choix à temps → le moins cher abordable ; plus assez d’argent → remplaçant gratuit.
   3. Les choix sont dévoilés. Si plusieurs joueurs ont pris le même footballeur : **duel** sur une question foot, le plus rapide à bien répondre l’emporte (tirage au sort si personne ne trouve).
-  4. Le perdant reçoit un **joueur surprise** au même poste : 50 % un joueur en fin de carrière ou célèbre pour ses ratés (Germain, Mitroglou, Bendtner…, gratuit), 35 % un joueur correct, 15 % une star non proposée. Les surprises « correct » et « star » se payent à leur prix (seulement si le budget le permet, sinon c’est un raté gratuit). On peut voir l’équipe et le budget restant de chaque adversaire.
+  4. Le perdant reçoit un **joueur surprise** au même poste : 68 % un joueur en fin de carrière ou célèbre pour ses ratés (41 possibles : Germain, Mitroglou, Bendtner, Balotelli…, gratuit), 25 % un joueur correct, 7 % une star (note ≥ 86) non proposée. Les surprises « correct » et « star » se payent à leur prix (seulement si le budget le permet, sinon c’est un raté gratuit). On peut voir l’équipe et le budget restant de chaque adversaire.
   - Chaque joueur n’est proposé qu’aux postes qu’il occupe réellement (rôles façon Transfermarkt) ; le prix dépend de la note (≈ 4 M€ à 72, 20 M€ à 80, 120 M€ à 90).
   5. À la fin : points selon la force moyenne des 11 (les notes restent cachées pendant la partie), +500 pour le meilleur 11.
 

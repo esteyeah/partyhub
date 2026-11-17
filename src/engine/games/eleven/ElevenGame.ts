@@ -28,10 +28,10 @@ const DUEL_MS = 12000;
 const OPEN_MS = 20000;
 const RESOLVE_MS = 5500;
 const FINAL_MS = 30000;
-const STAR_CHANCE = 0.15;
-const STAR_RATING = 88;
+const STAR_CHANCE = 0.07;
+const STAR_RATING = 86;
 /** Joueur « correct » : ni star ni raté */
-const MID_CHANCE = 0.35;
+const MID_CHANCE = 0.25;
 const MID_MIN = 74;
 const MID_MAX = 80;
 
