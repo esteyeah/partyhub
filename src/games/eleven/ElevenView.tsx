@@ -312,7 +312,7 @@ function ResolvePhase({ view, players }: { view: View; players: Map<string, Play
   );
 }
 
-function Final({ view, players, you }: { view: View; players: Map<string, PlayerPublic>; you: string }) {
+export function Final({ view, players, you }: { view: View; players: Map<string, PlayerPublic>; you: string }) {
   return (
     <div className="space-y-4">
       <div className="panel flex items-center justify-between gap-4 p-5">
@@ -363,7 +363,7 @@ function Final({ view, players, you }: { view: View; players: Map<string, Player
 /* Composants                                                          */
 /* ------------------------------------------------------------------ */
 
-function FootCard({
+export function FootCard({
   f,
   selected,
   disabled,
@@ -409,7 +409,7 @@ function EmptyCard({ text }: { text: string }) {
   return <div className="flex h-36 items-center justify-center rounded-2xl border-2 border-dashed border-white/15 p-3 text-center text-sm text-zinc-500">{text}</div>;
 }
 
-function Pitch({ slots, picks, current, compact }: { slots: ElevenSlot[]; picks: (Footballer | null)[]; current?: number; compact?: boolean }) {
+export function Pitch({ slots, picks, current, compact }: { slots: ElevenSlot[]; picks: (Footballer | null)[]; current?: number; compact?: boolean }) {
   return (
     <div className="pitch relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-emerald-300/10">
       <div className="pointer-events-none absolute inset-2 rounded-xl border border-white/15" />

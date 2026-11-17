@@ -393,7 +393,74 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       },
       { key: 'time', label: 'Temps / poste', type: 'select', options: timeOptions([15, 20, 30]), default: '20' },
     ],
+  },  auction: {
+    id: 'auction',
+    name: 'Mercato aux enchères',
+    emoji: '💸',
+    tagline: 'Compose ton 11 en achetant aux enchères',
+    description:
+      'Poste par poste, autant de footballeurs que de joueurs sont mis aux enchères. Enchères secrètes (la plus haute offre gagne) ou à tour de rôle (on surenchérit ou on passe). Gère ton budget !',
+    gradient: 'from-emerald-500 to-lime-600',
+    settings: [
+      {
+        key: 'mode',
+        label: 'Enchères',
+        type: 'select',
+        options: [
+          { value: 'sealed', label: '🤫 Secrètes (une offre chacun)' },
+          { value: 'open', label: '🔨 À tour de rôle' },
+        ],
+        default: 'sealed',
+      },
+      {
+        key: 'theme',
+        label: 'Thème',
+        type: 'select',
+        options: [
+          { value: 'all', label: '🌍 Tous les joueurs' },
+          { value: 'ligue1', label: '🇫🇷 Ligue 1' },
+          { value: 'premier', label: '🏴 Premier League' },
+          { value: 'liga', label: '🇪🇸 Liga' },
+          { value: 'seriea', label: '🇮🇹 Serie A' },
+          { value: 'bundesliga', label: '🇩🇪 Bundesliga' },
+          { value: 'ucl', label: '⭐ Ligue des champions' },
+          { value: 'france', label: '🐓 Équipe de France' },
+          { value: 'pepites', label: '🌱 Pépites (≤ 23 ans)' },
+          { value: 'veterans', label: '🧓 Vétérans (≥ 32 ans)' },
+          { value: 'retraites', label: '👴 Spéciale retraités' },
+        ],
+        default: 'all',
+      },
+      {
+        key: 'budget',
+        label: 'Budget (M€)',
+        type: 'number',
+        min: 50,
+        max: 3000,
+        step: 50,
+        default: 300,
+      },
+      {
+        key: 'formation',
+        label: 'Formation',
+        type: 'select',
+        options: [
+          { value: '4-3-3', label: '4-3-3 (MDC · 2 MC)' },
+          { value: '4-3-3-moc', label: '4-3-3 (MDC · MC · MOC)' },
+          { value: '4-2-3-1', label: '4-2-3-1' },
+          { value: '4-4-2', label: '4-4-2 à plat' },
+          { value: '4-4-2-losange', label: '4-4-2 losange' },
+          { value: '4-5-1', label: '4-5-1' },
+          { value: '3-5-2', label: '3-5-2' },
+          { value: '3-4-3', label: '3-4-3' },
+          { value: '5-3-2', label: '5-3-2' },
+        ],
+        default: '4-3-3',
+      },
+      { key: 'time', label: 'Temps / offre secrète', type: 'select', options: timeOptions([10, 15, 20, 30]), default: '15' },
+    ],
   },
+
 };
 
 export const GAME_IDS = Object.keys(GAME_CATALOG) as GameId[];

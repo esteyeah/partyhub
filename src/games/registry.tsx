@@ -7,6 +7,7 @@ import { MovieTitleView } from './movietitle/MovieTitleView';
 import { BlindYearView } from './blindyear/BlindYearView';
 import { DatesView } from './dates/DatesView';
 import { MixView } from './mix/MixView';
+import { AuctionView } from './auction/AuctionView';
 import { QuizView } from './quiz/QuizView';
 import { RankView } from './rank/RankView';
 import type { GameViewComponent } from './types';
@@ -27,5 +28,6 @@ export const GAME_VIEWS: Record<GameId, GameViewComponent> = {
   blindyear: BlindYearView,
   dates: DatesView,
   mix: MixView,
+  auction: AuctionView,
   eleven: ElevenView,
 };

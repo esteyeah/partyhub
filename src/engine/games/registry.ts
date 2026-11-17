@@ -10,6 +10,7 @@ import { MovieTitleGame } from './movietitle/MovieTitleGame';
 import { BlindYearGame } from './blindyear/BlindYearGame';
 import { DatesGame } from './dates/DatesGame';
 import { MixGame } from './mix/MixGame';
+import { AuctionGame } from './auction/AuctionGame';
 import { QuizGame } from './quiz/QuizGame';
 import { RankGame } from './rank/RankGame';
 import { VideoGame } from './video/VideoGame';
@@ -46,6 +47,7 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
   blindyear: { create: (ctx, s) => new BlindYearGame(ctx, s as never), availability: always },
   dates: { create: (ctx, s) => new DatesGame(ctx, s as never), availability: always },
   mix: { create: (ctx, s) => new MixGame(ctx, s as never), availability: always },
+  auction: { create: (ctx, s) => new AuctionGame(ctx, s as never), availability: always },
   eleven: { create: (ctx, s) => new ElevenGame(ctx, s as never), availability: always },
 };
 

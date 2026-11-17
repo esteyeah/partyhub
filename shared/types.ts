@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'auction' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -340,7 +340,47 @@ export interface ElevenView {
   results: ElevenTeamResult[] | null;
 }
 
-export type AnyGameView = RoundGameView | ElevenView;
+/* ------------------------------------------------------------------ */
+/* Mercato aux enchères                                                */
+/* ------------------------------------------------------------------ */
+
+export interface AuctionSale {
+  footballer: Footballer;
+  winner: string;
+  price: number;
+  /** Mode secret : les offres de chacun, dévoilées après la vente */
+  bids: Record<string, number> | null;
+}
+
+export interface AuctionView {
+  kind: 'auction';
+  gameId: 'auction';
+  mode: 'sealed' | 'open';
+  /** bid : enchères en cours · sold : vente conclue · final : notes */
+  phase: 'bid' | 'sold' | 'final';
+  endsAt: number | null;
+  durationMs: number;
+  formation: string;
+  slots: ElevenSlot[];
+  slotIndex: number;
+  budget: number;
+  teams: Record<string, ElevenTeam>;
+  /** Footballeur mis aux enchères */
+  current: Footballer | null;
+  /** Les autres footballeurs du poste, encore à vendre */
+  upcoming: Footballer[];
+  /** Joueurs qui n'ont pas encore de footballeur à ce poste (ils peuvent enchérir) */
+  bidders: string[];
+  /** Mode secret : joueurs ayant déjà fait une offre */
+  submitted: string[];
+  /** Mode à tour de rôle */
+  open: { price: number; leader: string | null; turn: string | null; out: string[]; minRaise: number } | null;
+  me: { bid: number | null; maxBid: number };
+  lastSale: AuctionSale | null;
+  results: ElevenTeamResult[] | null;
+}
+
+export type AnyGameView = RoundGameView | ElevenView | AuctionView;
 
 /* ------------------------------------------------------------------ */
 /* Actions envoyées par le client                                      */
@@ -352,6 +392,9 @@ export type GameAction =
   /** Réponse chiffrée (ex : une année) */
   | { type: 'number'; value: number }
   | { type: 'pick'; footballerId: string }
+  /** Enchères : offre (montant en M€) ou passer son tour */
+  | { type: 'bid'; amount: number }
+  | { type: 'pass' }
   /** Hôte, mode arbitre : stopper la vidéo avant la révélation */
   | { type: 'freeze' }
   /** Hôte, mode arbitre : indiquer la bonne réponse */
