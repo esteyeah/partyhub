@@ -74,6 +74,7 @@ export function RoundStage<P, X>({
 
         {view.input?.kind === 'choice' && <ChoiceInput view={view} isHost={room.hostId === you} />}
         {view.input?.kind === 'text' && <TextInput view={view} />}
+        {view.input?.kind === 'number' && <NumberInput view={view} />}
         {isReveal && <RevealPanel view={view} players={room.players} extra={renderReveal?.(view)} />}
       </div>
 
@@ -185,6 +186,64 @@ function ChoiceInput<P, X>({ view, isHost }: { view: RoundGameView<P, X>; isHost
           </motion.button>
         );
       })}
+    </div>
+  );
+}
+
+function NumberInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
+  const [text, setText] = useState('');
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    setText('');
+    ref.current?.focus();
+  }, [view.round]);
+  if (view.input?.kind !== 'number') return null;
+  const { min, max, placeholder } = view.input;
+  const value = Number(text);
+  const valid = text.trim() !== '' && Number.isInteger(value) && value >= min && value <= max;
+  const sent = view.me.locked;
+
+  return (
+    <div className="panel p-4">
+      {!view.reveal && !sent ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (valid) sendAction({ type: 'number', value });
+          }}
+          className="flex gap-2"
+        >
+          <input
+            ref={ref}
+            className="input text-center font-mono text-2xl tracking-widest"
+            placeholder={placeholder}
+            inputMode="numeric"
+            maxLength={4}
+            value={text}
+            onChange={(e) => setText(e.target.value.replace(/[^0-9]/g, ''))}
+            autoComplete="off"
+            autoFocus
+          />
+          <button disabled={!valid} className="rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 font-bold disabled:opacity-40">
+            Valider
+          </button>
+        </form>
+      ) : (
+        <p className="text-center text-sm font-semibold text-zinc-300">
+          {view.me.choice !== null ? (
+            <>
+              Ta réponse : <span className="font-mono text-lg text-white">{view.me.choice}</span> 🔒
+            </>
+          ) : (
+            'Pas de réponse'
+          )}
+        </p>
+      )}
+      {!view.reveal && !sent && (
+        <p className="mt-2 text-center text-xs text-zinc-500">
+          Entre {min} et {max} · une seule réponse, plus tu es proche et rapide, plus tu marques
+        </p>
+      )}
     </div>
   );
 }

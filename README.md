@@ -11,6 +11,8 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
 | 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 266 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries (récupérées sur Wikipédia au lancement) |
 | 🕵️ **Qui suis-je ?** (indices de plus en plus évidents) | ✅ jouable | 167 fiches (dont 47 difficiles) : personnalités, personnages de fiction et œuvres |
+| 🎞️ **Devine le film** (titre québécois, espagnol ou anglais → titre français ; QCM ou réponse libre) | ✅ jouable | 71 titres (47 québécois) |
+| 📅 **Blind Test des années** (devine l’année de sortie : précision d’abord, rapidité ensuite) | ✅ jouable | 113 morceaux de 1959 à 2024 |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 87 répliques et mèmes « Complète la phrase », 48 « Quelle est la suite ? » (sagas de films) + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.

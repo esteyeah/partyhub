@@ -87,6 +87,11 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
     return { correct, points: correct ? speedPoints(ms, spec.durationMs) : 0 };
   }
 
+  /** Réponse chiffrée : points selon la valeur proposée (à surcharger par le jeu). */
+  protected scoreNumber(_item: Item, _spec: RoundSpec<P, X>, _value: number, _ms: number): ChoiceScore {
+    return { points: 0, correct: false };
+  }
+
   /** Réponse libre : renvoie les clés trouvées par cette proposition (ou 'close'). */
   protected matchText(_item: Item, _guess: string, _remaining: string[]): { found: string[]; close: boolean } {
     return { found: [], close: false };
@@ -163,7 +168,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   private isDone(playerId: string): boolean {
     const s = this.states.get(playerId);
     if (!s || !this.spec) return false;
-    if (this.spec.input.kind === 'choice') return s.choice !== null;
+    if (this.spec.input.kind === 'choice' || this.spec.input.kind === 'number') return s.choice !== null;
     return this.keys().every((k) => s.found.has(k));
   }
 
@@ -199,6 +204,16 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       s.choiceMs = ms;
       s.label = this.spec.input.choices[action.choice];
       const score = this.scoreChoice(item, this.spec, action.choice, ms);
+      s.points = score.points;
+      s.correct = score.correct;
+    } else if (action.type === 'number' && this.spec.input.kind === 'number') {
+      if (s.choice !== null) return; // réponse verrouillée
+      const v = Math.round(Number(action.value));
+      if (!Number.isFinite(v) || v < this.spec.input.min || v > this.spec.input.max) return;
+      s.choice = v;
+      s.choiceMs = ms;
+      s.label = String(v);
+      const score = this.scoreNumber(item, this.spec, v, ms);
       s.points = score.points;
       s.correct = score.correct;
     } else if (action.type === 'guess' && this.spec.input.kind === 'text') {

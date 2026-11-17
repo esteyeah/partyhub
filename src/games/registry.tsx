@@ -3,6 +3,8 @@ import { BlindTestView } from './blindtest/BlindTestView';
 import { ElevenView } from './eleven/ElevenView';
 import { PixelView } from './pixel/PixelView';
 import { WhoAmIView } from './whoami/WhoAmIView';
+import { MovieTitleView } from './movietitle/MovieTitleView';
+import { BlindYearView } from './blindyear/BlindYearView';
 import { QuizView } from './quiz/QuizView';
 import { RankView } from './rank/RankView';
 import type { GameViewComponent } from './types';
@@ -19,5 +21,7 @@ export const GAME_VIEWS: Record<GameId, GameViewComponent> = {
   rank: RankView,
   pixel: PixelView,
   whoami: WhoAmIView,
+  movietitle: MovieTitleView,
+  blindyear: BlindYearView,
   eleven: ElevenView,
 };

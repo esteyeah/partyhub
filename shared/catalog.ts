@@ -194,6 +194,67 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'time', label: 'Temps / indice', type: 'select', options: timeOptions([6, 8, 10, 12]), default: '8' },
     ],
   },
+  movietitle: {
+    id: 'movietitle',
+    name: 'Devine le film',
+    emoji: '🎞️',
+    tagline: 'Retrouve le film derrière son titre québécois',
+    description:
+      'Un titre de film tel qu’il est sorti au Québec, en Espagne ou en anglais (souvent hilarant) : retrouve le titre du film en France. QCM ou réponse libre.',
+    gradient: 'from-rose-500 to-red-600',
+    settings: [
+      {
+        key: 'mode',
+        label: 'Réponses',
+        type: 'select',
+        options: [
+          { value: 'qcm', label: '🔘 QCM (4 choix)' },
+          { value: 'libre', label: '⌨️ Réponse libre' },
+        ],
+        default: 'qcm',
+      },
+      {
+        key: 'lang',
+        label: 'Titres',
+        type: 'select',
+        options: [
+          { value: 'mix', label: '🎲 Mélange' },
+          { value: 'qc', label: '🇨🇦 Québécois' },
+          { value: 'es', label: '🇪🇸 Espagnols' },
+          { value: 'en', label: '🇬🇧 Anglais (films français)' },
+        ],
+        default: 'mix',
+      },
+      { key: 'rounds', label: 'Films', type: 'number', min: 3, max: 25, default: 10 },
+      { key: 'time', label: 'Temps / film', type: 'select', options: timeOptions([10, 15, 20, 30]), default: '15' },
+    ],
+  },
+  blindyear: {
+    id: 'blindyear',
+    name: 'Blind Test des années',
+    emoji: '📅',
+    tagline: 'Devine l’année de sortie du morceau',
+    description:
+      'Un extrait se lance : tape l’année de sortie. La précision compte avant tout (année exacte = 1100 pts, chaque année d’écart en retire), la rapidité fait le reste.',
+    gradient: 'from-yellow-500 to-amber-600',
+    settings: [
+      {
+        key: 'scope',
+        label: 'Playlist',
+        type: 'select',
+        options: [
+          { value: 'mix', label: '🎲 Mélange' },
+          { value: 'fr', label: '🇫🇷 Francophone' },
+          { value: 'inter', label: '🌎 International' },
+          { value: 'old', label: '📼 Avant 2000' },
+          { value: 'new', label: '📱 Depuis 2000' },
+        ],
+        default: 'mix',
+      },
+      { key: 'rounds', label: 'Extraits', type: 'number', min: 3, max: 20, default: 10 },
+      { key: 'time', label: 'Temps / extrait', type: 'select', options: timeOptions([15, 20, 25, 30]), default: '20' },
+    ],
+  },
   rank: {
     id: 'rank',
     name: 'Devine le Rang',

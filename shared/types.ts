@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -89,7 +89,9 @@ export type RoundPhase = 'loading' | 'intro' | 'question' | 'judge' | 'reveal';
 
 export type RoundInput =
   | { kind: 'choice'; choices: string[]; layout: 'grid' | 'ladder' }
-  | { kind: 'text'; placeholder: string; keys: { key: string; label: string }[] };
+  | { kind: 'text'; placeholder: string; keys: { key: string; label: string }[] }
+  /** Réponse chiffrée (ex : une année) : une seule proposition, verrouillée */
+  | { kind: 'number'; placeholder: string; min: number; max: number };
 
 export type ProgressStatus = 'waiting' | 'answered' | 'partial' | 'done';
 
@@ -192,6 +194,25 @@ export interface WhoPrompt {
   clueMs: number;
 }
 export type WhoExtra = Record<string, never>;
+
+export interface MovieTitlePrompt {
+  foreign: string;
+  flag: string;
+  langLabel: string;
+}
+export interface MovieTitleExtra {
+  year: number;
+}
+
+export interface BlindYearPrompt {
+  audioUrl: string;
+}
+export interface BlindYearExtra {
+  title: string;
+  artist: string;
+  year: number;
+  artwork?: string;
+}
 
 export interface PixelExtra {
   image: string;
@@ -309,6 +330,8 @@ export type AnyGameView = RoundGameView | ElevenView;
 export type GameAction =
   | { type: 'answer'; choice: number }
   | { type: 'guess'; text: string }
+  /** Réponse chiffrée (ex : une année) */
+  | { type: 'number'; value: number }
   | { type: 'pick'; footballerId: string }
   /** Hôte, mode arbitre : stopper la vidéo avant la révélation */
   | { type: 'freeze' }
