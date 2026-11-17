@@ -435,24 +435,37 @@ function Pitch({ slots, picks, current, compact }: { slots: ElevenSlot[]; picks:
 }
 
 function TeamsSummary({ view, players, you }: { view: View; players: PlayerPublic[]; you: string }) {
+  const [open, setOpen] = useState<string | null>(null);
   const rows = players
     .map((p) => {
       const t = view.teams[p.id];
       const filled = t?.picks.filter(Boolean) as Footballer[] | undefined;
-      return { p, count: filled?.length ?? 0, spent: t?.spent ?? 0 };
+      return { p, count: filled?.length ?? 0, spent: t?.spent ?? 0, picks: t?.picks ?? [] };
     })
     .sort((a, b) => b.count - a.count || a.spent - b.spent);
   return (
     <div className="panel p-4">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Équipes adverses</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Équipes · clique pour voir</h3>
       <ul className="space-y-1.5">
-        {rows.map(({ p, count, spent }) => (
-          <li key={p.id} className={`flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm ${p.id === you ? 'bg-white/[0.05]' : ''}`}>
-            <Avatar player={p} size="xs" />
-            <span className="flex-1 truncate">{p.nickname}</span>
-            <span className="font-mono text-xs text-zinc-500">
-              {count}/{view.slots.length} · {view.budget - spent} M€
-            </span>
+        {rows.map(({ p, count, spent, picks }) => (
+          <li key={p.id}>
+            <button
+              type="button"
+              onClick={() => setOpen(open === p.id ? null : p.id)}
+              className={`flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-white/[0.06] ${p.id === you ? 'bg-white/[0.05]' : ''}`}
+            >
+              <Avatar player={p} size="xs" />
+              <span className="flex-1 truncate">{p.nickname}</span>
+              <span className="font-mono text-xs text-zinc-400">
+                {count}/{view.slots.length} · <span className="text-emerald-300">{view.budget - spent} M€</span>
+              </span>
+              <span className="text-xs text-zinc-500">{open === p.id ? '▲' : '▼'}</span>
+            </button>
+            {open === p.id && (
+              <div className="mt-2">
+                <Pitch slots={view.slots} picks={picks} compact />
+              </div>
+            )}
           </li>
         ))}
       </ul>

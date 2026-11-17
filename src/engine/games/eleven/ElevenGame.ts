@@ -206,9 +206,10 @@ export class ElevenGame extends GameModule<Settings> {
   }
 
   /** Joueur surprise pour le perdant d'un duel : une star (15 %) ou un joueur raté, au bon poste */
-  private surprise(slot: ElevenSlot): { footballer: Footballer; kind: 'surprise-star' | 'surprise-mid' | 'surprise-flop' } {
+  private surprise(slot: ElevenSlot, maxPrice = Infinity): { footballer: Footballer; kind: 'surprise-star' | 'surprise-mid' | 'surprise-flop' } {
     const offered = new Set(this.offers.map((o) => o.id));
-    const free = (p: Footballer) => fitsSlot(slot.label, p) && !this.owned.has(p.id) && !offered.has(p.id);
+    // Les surprises « star » et « correct » sont payantes : seulement si le joueur peut se les offrir
+    const free = (p: Footballer) => fitsSlot(slot.label, p) && !this.owned.has(p.id) && !offered.has(p.id) && p.price <= maxPrice;
     const roll = Math.random();
     if (roll < STAR_CHANCE) {
       const stars = this.themePool().filter((p) => free(p) && p.rating >= STAR_RATING);
@@ -348,8 +349,8 @@ export class ElevenGame extends GameModule<Settings> {
     for (const d of this.duels) {
       for (const pid of d.players) {
         if (pid === d.winner) continue;
-        const s = this.surprise(slot);
-        give(pid, s.footballer, s.kind, 0);
+        const s = this.surprise(slot, this.budget - this.team(pid).spent);
+        give(pid, s.footballer, s.kind, s.kind === 'surprise-flop' ? 0 : s.footballer.price);
       }
     }
     this.outcomes = outcomes;
