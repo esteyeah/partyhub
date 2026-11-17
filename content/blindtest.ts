@@ -329,4 +329,9 @@ export const BLIND_TRACKS: BlindTrack[] = [
   { title: 'Without You', artist: 'David Guetta', tags: ['inter'] },
   { title: 'Thrift Shop', artist: 'Macklemore & Ryan Lewis', tags: ['inter'] },
   { title: 'Timber', artist: 'Pitbull', tags: ['inter'] },
+  { title: 'Rise', artist: 'David Guetta', tags: ['inter'] },
+  { title: 'Inaya', artist: 'Psy 4 de la Rime', tags: ['fr', 'hard'] },
+  { title: 'Cocotier', artist: 'TK', tags: ['fr'] },
+  { title: 'La Goffa Lolita', artist: 'La Petite Culotte', tags: ['fr', 'retro', 'hard'] },
+  { title: 'Servie', artist: 'Squeezie', tags: ['fr'] },
 ];

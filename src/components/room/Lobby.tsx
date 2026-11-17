@@ -242,7 +242,12 @@ function PlaylistRow({
           <div className="font-bold">{g.name}</div>
           {!editable && (
             <div className="truncate text-xs text-zinc-500">
-              {g.settings.map((f) => describe(f, item.settings[f.key])).join(' · ')}
+              {[
+                ...g.settings.filter((f) => f.type !== 'boolean').map((f) => describe(f, item.settings[f.key])),
+                ...(g.settings.some((f) => f.type === 'boolean')
+                  ? [`${g.settings.filter((f) => f.type === 'boolean' && (item.settings[f.key] ?? f.default) !== false).length}/${g.settings.filter((f) => f.type === 'boolean').length} jeux`]
+                  : []),
+              ].join(' · ')}
             </div>
           )}
         </div>
@@ -256,9 +261,26 @@ function PlaylistRow({
       </div>
       {editable && (
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {g.settings.map((f) => (
+          {g.settings.filter((f) => f.type !== 'boolean').map((f) => (
             <SettingInput key={f.key} field={f} value={item.settings[f.key]} onChange={(v) => set(f.key, v)} />
           ))}
+        </div>
+      )}
+      {editable && g.settings.some((f) => f.type === 'boolean') && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {g.settings.filter((f) => f.type === 'boolean').map((f) => {
+            const on = (item.settings[f.key] ?? f.default) !== false;
+            return (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => set(f.key, !on)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${on ? 'bg-fuchsia-500/25 text-white ring-1 ring-fuchsia-400/50' : 'bg-white/5 text-zinc-500 line-through'}`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -181,4 +181,5 @@ export const YEAR_TRACKS: YearTrack[] = [
   t('Believer', 'Imagine Dragons', 2017),
   t('Circles', 'Post Malone', 2019),
   t('Tití Me Preguntó', 'Bad Bunny', 2022),
+  t('Servie', 'Squeezie', 2023, true),
 ];

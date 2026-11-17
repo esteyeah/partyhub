@@ -15,7 +15,7 @@ import { RoundGame, type ChoiceScore, type RoundSpec } from '../RoundGame';
 import { VideoGame } from '../video/VideoGame';
 import { WhoAmIGame } from '../whoami/WhoAmIGame';
 
-type Settings = { rounds: number; mode: string };
+type Settings = { rounds: number; mode: string } & Record<string, string | number | boolean>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRoundGame = RoundGame<any, any, any, any>;
 type Ctor = new (ctx: GameContext, settings: never) => AnyRoundGame;
@@ -54,7 +54,10 @@ export class MixGame extends RoundGame<MixItem, MixPrompt, MixExtra, Settings> {
   protected revealMs = 6000;
 
   protected async prepare(): Promise<MixItem[]> {
-    const games = (Object.keys(SUB_GAMES) as GameId[]).filter((g) => g !== 'rank' || RANK_CLIPS.length + customCounts().rank > 0);
+    const available = (Object.keys(SUB_GAMES) as GameId[]).filter((g) => g !== 'rank' || RANK_CLIPS.length + customCounts().rank > 0);
+    // Jeux cochés dans le lobby (tous si aucun)
+    const chosen = available.filter((g) => this.settings[`g_${g}`] !== false);
+    const games = chosen.length ? chosen : available;
     // Tirage du jeu de chaque manche, en évitant de trop répéter le même
     const plan: GameId[] = [];
     while (plan.length < this.settings.rounds) plan.push(...shuffle(games));
