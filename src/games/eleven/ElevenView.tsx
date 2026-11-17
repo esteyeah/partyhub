@@ -90,11 +90,18 @@ export function ElevenView({ view, room, you }: GameViewProps<View>) {
 
 function PickPhase({ view, remaining, players, you }: { view: View; remaining: number; players: PlayerPublic[]; you: string }) {
   const picked = new Set(view.picked);
+  const waiting = view.repick !== null && !view.repick.includes(you);
+  const shown = view.repick ? players.filter((p) => view.repick!.includes(p.id)) : players;
   return (
     <div className="space-y-4">
+      {view.repick && (
+        <p className="rounded-xl bg-amber-500/15 px-4 py-2 text-center text-sm font-semibold text-amber-200">
+          {waiting ? '⏳ Égalité à plusieurs : les perdants du duel rechoisissent parmi les joueurs restants…' : '🔁 Égalité à plusieurs : tu as perdu le duel, rechoisis parmi les joueurs restants !'}
+        </p>
+      )}
       <div className={`grid gap-3 ${view.offers.length >= 5 ? 'grid-cols-2 sm:grid-cols-5' : view.offers.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
         {view.offers.map((f, i) => {
-          const tooExpensive = f.price > remaining;
+          const tooExpensive = f.price > remaining || waiting;
           const selected = view.me.choice === f.id;
           return (
             <motion.div key={f.id} initial={{ opacity: 0, y: 20, rotate: -2 }} animate={{ opacity: 1, y: 0, rotate: 0 }} transition={{ delay: i * 0.07 }}>
@@ -108,7 +115,7 @@ function PickPhase({ view, remaining, players, you }: { view: View; remaining: n
       )}
       <div className="panel flex flex-wrap items-center gap-2 p-3 text-sm">
         <span className="mr-1 text-zinc-500">{view.me.choice ? 'Choix enregistré, tu peux encore changer.' : 'En attente de ton choix…'}</span>
-        {players.map((p) => (
+        {shown.map((p) => (
           <span key={p.id} className={`flex items-center gap-1.5 rounded-lg px-2 py-1 ${p.id === you ? 'bg-white/[0.06]' : 'bg-white/[0.02]'}`}>
             <Avatar player={p} size="xs" />
             {picked.has(p.id) ? '✅' : <span className="text-zinc-600">…</span>}

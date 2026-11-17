@@ -163,6 +163,16 @@ export class ElevenGame extends GameModule<Settings> {
     return this.budget - this.team(playerId).spent;
   }
 
+  /** Égalité à 3 ou plus : les perdants rechoisissent parmi les footballeurs restants */
+  private repickers: Set<string> | null = null;
+  private pendingOutcomes: ElevenOutcome[] = [];
+
+  /** Joueurs qui choisissent pendant la phase en cours (tous, ou seulement ceux qui rechoisissent) */
+  private pickers(): string[] {
+    const all = this.participants();
+    return this.repickers ? all.filter((id) => this.repickers!.has(id)) : all;
+  }
+
   /** Joueurs qui participent au poste en cours */
   private participants(): string[] {
     return this.ctx.players().filter((p) => p.connected || this.teams.has(p.id)).map((p) => p.id);
@@ -189,15 +199,21 @@ export class ElevenGame extends GameModule<Settings> {
     const all = inTheme.length >= n ? inTheme : FOOTBALLERS.filter((p) => fitsSlot(slot.label, p) && !this.owned.has(p.id));
     const fresh = all.filter((p) => !recentlyOffered.includes(p.id));
     const candidates = (fresh.length >= n * 2 ? fresh : all).sort((a, b) => b.rating - a.rating);
+    // Prix étalés : une tête d'affiche, puis des prix qui descendent régulièrement (échelle logarithmique)
     let picked: Footballer[];
     if (candidates.length <= n) picked = candidates;
     else {
-      picked = [];
-      for (let i = 0; i < n; i++) {
-        const from = Math.floor((i * candidates.length) / n);
-        const to = Math.floor(((i + 1) * candidates.length) / n);
-        const bucket = candidates.slice(from, Math.max(to, from + 1));
-        picked.push(bucket[Math.floor(Math.random() * bucket.length)]);
+      const byPrice = [...candidates].sort((a, b) => b.price - a.price);
+      const top = byPrice[Math.floor(Math.random() * Math.max(1, Math.ceil(byPrice.length * 0.15)))];
+      const minPrice = Math.max(1, byPrice[byPrice.length - 1].price);
+      picked = [top];
+      for (let i = 1; i < n; i++) {
+        const target = Math.log(top.price) + (Math.log(minPrice) - Math.log(top.price)) * (i / (n - 1));
+        const near = byPrice
+          .filter((p) => !picked.includes(p))
+          .sort((a, b) => Math.abs(Math.log(a.price) - target) - Math.abs(Math.log(b.price) - target))
+          .slice(0, 4);
+        picked.push(near[Math.floor(Math.random() * near.length)]);
       }
     }
     recentlyOffered.push(...picked.map((p) => p.id));
@@ -249,13 +265,15 @@ export class ElevenGame extends GameModule<Settings> {
     this.duels = [];
     this.duelQuestion = null;
     this.outcomes = null;
+    this.repickers = null;
+    this.pendingOutcomes = [];
     this.setPhase('pick', Number(this.settings.time) * 1000, () => this.closePicks());
   }
 
   private closePicks() {
     if (this.phase !== 'pick') return;
     // Pas de choix à temps : on prend le moins cher abordable, sinon remplaçant gratuit
-    for (const id of this.participants()) {
+    for (const id of this.pickers()) {
       if (this.choices.has(id)) continue;
       const cheapest = this.offers.filter((o) => o.price <= this.remaining(id)).sort((a, b) => a.price - b.price)[0];
       if (cheapest) {
@@ -263,7 +281,7 @@ export class ElevenGame extends GameModule<Settings> {
         this.autoPicked.add(id);
       } else this.broke.add(id);
     }
-    this.revealed = Object.fromEntries(this.participants().map((id) => [id, this.choices.get(id) ?? null]));
+    this.revealed = Object.fromEntries(this.pickers().map((id) => [id, this.choices.get(id) ?? null]));
 
     const groups = new Map<string, string[]>();
     for (const [pid, fid] of this.choices) groups.set(fid, [...(groups.get(fid) ?? []), pid]);
@@ -323,7 +341,7 @@ export class ElevenGame extends GameModule<Settings> {
   }
 
   private resolve() {
-    const outcomes: ElevenOutcome[] = [];
+    const outcomes: ElevenOutcome[] = this.pendingOutcomes;
     const give = (pid: string, footballer: Footballer, how: ElevenOutcome['how'], price: number) => {
       const t = this.team(pid);
       t.picks[this.slotIndex] = footballer;
@@ -333,7 +351,7 @@ export class ElevenGame extends GameModule<Settings> {
     };
     const slot = this.slots[this.slotIndex];
 
-    for (const pid of this.participants()) {
+    for (const pid of this.pickers()) {
       const fid = this.choices.get(pid);
       if (!fid) {
         give(pid, this.surpriseFlop(slot), 'broke', 0); // budget épuisé : remplaçant gratuit
@@ -345,15 +363,39 @@ export class ElevenGame extends GameModule<Settings> {
         give(pid, fb, duel ? 'duel' : this.autoPicked.has(pid) ? 'auto' : 'pick', fb.price);
       }
     }
-    // Les perdants des duels : surprise (après les gagnants, pour ne pas leur piquer une star)
+    // Égalité à 3 ou plus : les perdants rechoisissent parmi les footballeurs restants (s'il en reste d'abordables)
+    const again = new Set<string>();
     for (const d of this.duels) {
+      if (d.players.length < 3) continue;
       for (const pid of d.players) {
         if (pid === d.winner) continue;
+        if (this.offers.some((o) => !this.owned.has(o.id) && o.price <= this.remaining(pid))) again.add(pid);
+      }
+    }
+    // Les perdants des duels à deux : surprise (après les gagnants, pour ne pas leur piquer une star)
+    for (const d of this.duels) {
+      for (const pid of d.players) {
+        if (pid === d.winner || again.has(pid)) continue;
         const s = this.surprise(slot, this.budget - this.team(pid).spent);
         give(pid, s.footballer, s.kind, s.kind === 'surprise-flop' ? 0 : s.footballer.price);
       }
     }
+    if (again.size) {
+      this.pendingOutcomes = outcomes;
+      this.repickers = again;
+      this.offers = this.offers.filter((o) => !this.owned.has(o.id));
+      for (const pid of again) this.choices.delete(pid);
+      this.autoPicked.clear();
+      this.broke.clear();
+      this.revealed = null;
+      this.duels = [];
+      this.duelQuestion = null;
+      this.outcomes = null;
+      this.setPhase('pick', Number(this.settings.time) * 1000, () => this.closePicks());
+      return;
+    }
     this.outcomes = outcomes;
+    this.repickers = null;
     this.setPhase('resolve', RESOLVE_MS, () => this.nextSlot());
   }
 
@@ -392,10 +434,10 @@ export class ElevenGame extends GameModule<Settings> {
   onAction(playerId: string, action: GameAction) {
     if (this.phase === 'pick' && action.type === 'pick') {
       const fb = this.offers.find((o) => o.id === action.footballerId);
-      if (!fb || fb.price > this.remaining(playerId)) return;
+      if (!fb || fb.price > this.remaining(playerId) || !this.pickers().includes(playerId)) return;
       this.team(playerId);
       this.choices.set(playerId, fb.id);
-      const everyone = this.participants().filter((id) => this.ctx.players().find((p) => p.id === id)?.connected);
+      const everyone = this.pickers().filter((id) => this.ctx.players().find((p) => p.id === id)?.connected);
       if (everyone.length && everyone.every((id) => this.choices.has(id))) {
         this.clearTimers();
         this.setTimer(700, () => this.closePicks());
@@ -456,7 +498,8 @@ export class ElevenGame extends GameModule<Settings> {
       budget: this.budget,
       offers: this.offers,
       teams: Object.fromEntries(this.teams),
-      picked: [...this.choices.keys()],
+      picked: [...this.choices.keys()].filter((id) => !this.repickers || this.repickers.has(id)),
+      repick: this.repickers ? [...this.repickers] : null,
       me: {
         choice: this.choices.get(playerId) ?? null,
         duelChoice: myDuel?.answers.get(playerId)?.choice ?? null,

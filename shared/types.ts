@@ -323,6 +323,8 @@ export interface ElevenView {
   teams: Record<string, ElevenTeam>;
   /** Joueurs ayant fait leur choix pour ce poste */
   picked: string[];
+  /** Égalité à 3 ou plus : joueurs qui rechoisissent parmi les footballeurs restants (null sinon) */
+  repick: string[] | null;
   me: {
     choice: string | null;
     duelChoice: number | null;

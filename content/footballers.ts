@@ -569,7 +569,12 @@ const ROWS: Row[] = [
   ['Tim Kleindienst', 'GER', 'Mönchengladbach', 'Bundesliga', 78, 'BU'],
   ['Ermedin Demirović', 'BIH', 'Stuttgart', 'Bundesliga', 79, 'BU'],
   ['Andrej Kramarić', 'CRO', 'Hoffenheim', 'Bundesliga', 78, 'BU/MOC'],
-  ['Layvin Kurzawa', 'FRA', 'Sans club', 'Libre', 75, 'DG'],
+  ['Layvin Kurzawa', 'FRA', 'Sans club', 'Libre', 77, 'DG'],
+  ['Benjamin Mendy', 'FRA', 'Sans club', 'Libre', 75, 'DG'],
+  ['Alexandre Pato', 'BRA', 'Sans club', 'Libre', 74, 'BU'],
+  ['Mario Balotelli', 'ITA', 'Sans club', 'Libre', 75, 'BU'],
+  ['Jérôme Boateng', 'GER', 'Sans club', 'Libre', 76, 'DC'],
+  ['Danny Drinkwater', 'ENG', 'Sans club', 'Libre', 74, 'MDC/MC'],
   // Milieux défensifs de Bundesliga (le thème en manquait)
   ['Aleix García', 'ESP', 'Leverkusen', 'Bundesliga', 79, 'MDC/MC'],
   ['Atakan Karazor', 'GER', 'Stuttgart', 'Bundesliga', 77, 'MDC'],
@@ -791,22 +796,25 @@ const SURPRISE_ROWS: Row[] = [
   ['Gaël Kakuta', 'FRA', 'Fin de carrière', 'Libre', 68, 'AG/AD/MOC'],
   ['Massimo Taibi', 'ITA', 'Retraité', 'Retraité', 58, 'GB'],
   ['Scott Carson', 'ENG', 'Fin de carrière', 'Libre', 62, 'GB'],
-  ['Jérôme Boateng', 'GER', 'Fin de carrière', 'Libre', 66, 'DC'],
-  ['Benjamin Mendy', 'FRA', 'Fin de carrière', 'Libre', 62, 'DG'],
   ['Alberto Moreno', 'ESP', 'Fin de carrière', 'Libre', 64, 'DG'],
   ['Jordan Amavi', 'FRA', 'Fin de carrière', 'Libre', 64, 'DG'],
   ['Davide Zappacosta', 'ITA', 'Fin de carrière', 'Libre', 66, 'DD'],
   ['Bouna Sarr', 'SEN', 'Fin de carrière', 'Libre', 63, 'DD'],
-  ['Danny Drinkwater', 'ENG', 'Retraité', 'Retraité', 60, 'MDC/MC'],
   ['Abou Diaby', 'FRA', 'Retraité', 'Retraité', 60, 'MC/MDC'],
   ['Clément Grenier', 'FRA', 'Fin de carrière', 'Libre', 64, 'MC/MOC'],
   ['Kevin Strootman', 'NED', 'Fin de carrière', 'Libre', 64, 'MC/MDC'],
   ['Royston Drenthe', 'NED', 'Retraité', 'Retraité', 57, 'MG/AG'],
   ['Bebé', 'POR', 'Fin de carrière', 'Libre', 58, 'AD/AG'],
-  ['Mario Balotelli', 'ITA', 'Fin de carrière', 'Libre', 64, 'BU'],
-  ['Alexandre Pato', 'BRA', 'Fin de carrière', 'Libre', 62, 'BU'],
   ['Darío Benedetto', 'ARG', 'Fin de carrière', 'Libre', 65, 'BU'],
   ['Kevin Gameiro', 'FRA', 'Fin de carrière', 'Libre', 66, 'BU'],
+  ['Ashley Fletcher', 'ENG', 'Fin de carrière', 'Libre', 57, 'BU'],
+  ['Paolo De Ceglie', 'ITA', 'Retraité', 'Retraité', 59, 'DG'],
+  ['Grégory Sertic', 'FRA', 'Retraité', 'Retraité', 59, 'MDC'],
+  ['Karim Rekik', 'NED', 'Fin de carrière', 'Libre', 60, 'DC'],
+  ['Paco Alcácer', 'ESP', 'Fin de carrière', 'Libre', 62, 'BU'],
+  ['Antony', 'BRA', 'Betis', 'Liga', 64, 'AD'],
+  ['Mykhailo Mudryk', 'UKR', 'Tottenham', 'Premier League', 62, 'AG'],
+  ['Axel Disasi', 'FRA', 'Chelsea', 'Premier League', 65, 'DC/DD'],
   ['Hatem Ben Arfa', 'FRA', 'Retraité', 'Retraité', 76, 'AD/AG/MOC'],
 ];
 
@@ -1404,6 +1412,11 @@ const BIRTH_YEARS: Record<string, number> = {
   'Adnan Januzaj': 1995,
   'Gaël Kakuta': 1991,
   'Hatem Ben Arfa': 1987,
+  'Danny Drinkwater': 1990,
+  'Jérôme Boateng': 1988,
+  'Mario Balotelli': 1990,
+  'Alexandre Pato': 1989,
+  'Benjamin Mendy': 1994,
 };
 
 /* ------------------------------------------------------------------ */
@@ -1425,6 +1438,8 @@ const PRICE_OVERRIDES: Record<string, number> = {
   'Ilan Kebbal': 25,
   'Lamine Camara': 35,
   'Florian Thauvin': 18,
+  'Lionel Messi': 60,
+  'Layvin Kurzawa': 12,
 };
 
 export const priceFor = (rating: number, age?: number) => Math.max(1, Math.round(3 * Math.exp((rating - 70) * 0.185) * ageFactor(age)));
