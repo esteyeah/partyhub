@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -212,6 +212,23 @@ export interface BlindYearExtra {
   artist: string;
   year: number;
   artwork?: string;
+}
+
+export interface DatesPrompt {
+  text: string;
+  catLabel: string;
+}
+export interface DatesExtra {
+  year: number;
+}
+
+/** Méli-mélo : une manche d'un autre jeu, emballée */
+export interface MixPrompt {
+  game: GameId;
+  inner: unknown;
+}
+export interface MixExtra {
+  inner: unknown;
 }
 
 export interface PixelExtra {

@@ -255,6 +255,53 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'time', label: 'Temps / extrait', type: 'select', options: timeOptions([15, 20, 25, 30]), default: '20' },
     ],
   },
+  dates: {
+    id: 'dates',
+    name: 'Devine la date',
+    emoji: '🏛️',
+    tagline: 'En quelle année ? Histoire & culture',
+    description:
+      'Un événement historique ou culturel : tape l’année. Barème tolérant (chaque année d’écart retire 10 %), la rapidité compte un peu.',
+    gradient: 'from-sky-500 to-blue-600',
+    settings: [
+      {
+        key: 'cat',
+        label: 'Thème',
+        type: 'select',
+        options: [
+          { value: 'mix', label: '🎲 Mélange' },
+          { value: 'histoire', label: '🏛️ Histoire' },
+          { value: 'culture', label: '🎭 Culture' },
+        ],
+        default: 'mix',
+      },
+      { key: 'rounds', label: 'Dates', type: 'number', min: 3, max: 25, default: 10 },
+      { key: 'time', label: 'Temps / date', type: 'select', options: timeOptions([15, 20, 30]), default: '20' },
+    ],
+  },
+  mix: {
+    id: 'mix',
+    name: 'Méli-mélo',
+    emoji: '🎲',
+    tagline: 'Un peu de tous les jeux, dans le désordre',
+    description:
+      'Des manches piochées au hasard dans tous les jeux (quiz, blind tests, vidéos, images, Qui suis-je, films, dates…). Compose ton 11 n’en fait pas partie.',
+    gradient: 'from-fuchsia-500 to-violet-600',
+    settings: [
+      { key: 'rounds', label: 'Questions', type: 'number', min: 5, max: 50, default: 20 },
+      {
+        key: 'mode',
+        label: 'Réponses',
+        type: 'select',
+        options: [
+          { value: 'qcm', label: '🔘 QCM quand c’est possible' },
+          { value: 'libre', label: '⌨️ Réponse libre quand c’est possible' },
+          { value: 'mixte', label: '🎲 Au hasard' },
+        ],
+        default: 'qcm',
+      },
+    ],
+  },
   rank: {
     id: 'rank',
     name: 'Devine le Rang',

@@ -64,7 +64,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   protected revealMs = 6000;
 
   protected items: Item[] = [];
-  private index = -1;
+  protected index = -1;
   private phase: RoundPhase = 'loading';
   private endsAt: number | null = null;
   private startedAt = 0;
