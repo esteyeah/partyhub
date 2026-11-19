@@ -352,4 +352,6 @@ export const BLIND_TRACKS: BlindTrack[] = [
   { title: 'Get the Party Started', artist: 'P!nk', tags: ['inter', 'retro'] },
   { title: 'Raise Your Glass', artist: 'P!nk', tags: ['inter'] },
   { title: 'Just Give Me a Reason', artist: 'P!nk', tags: ['inter'] },
+  { title: 'Andale', artist: 'Sadek', tags: ['fr'] },
+  { title: 'Tiki Taka', artist: 'Vacra', tags: ['fr'] },
 ];

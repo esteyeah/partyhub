@@ -206,4 +206,8 @@ export const YEAR_TRACKS: YearTrack[] = [
   t('The Hills', 'The Weeknd', 2015),
   t('Get the Party Started', 'P!nk', 2001),
   t('Raise Your Glass', 'P!nk', 2010),
+  t('Andale', 'Sadek', 2016, true),
+  t('Tiki Taka', 'Vacra', 2022, true),
+  t('Just Give Me a Reason', 'P!nk', 2012),
+  t('Émotif', 'PLK', 2018, true),
 ];
