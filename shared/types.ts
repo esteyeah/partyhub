@@ -184,7 +184,7 @@ export interface RankExtra {
 
 export interface PixelPrompt {
   image: string;
-  category: 'celeb' | 'game' | 'film' | 'serie';
+  category: 'celeb' | 'game' | 'film' | 'serie' | 'meme';
   categoryLabel: string;
 }
 export interface WhoPrompt {
@@ -233,6 +233,7 @@ export interface MixExtra {
 
 export interface PixelExtra {
   image: string;
+  caption?: string;
 }
 
 /* ------------------------------------------------------------------ */

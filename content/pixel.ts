@@ -4,7 +4,7 @@
  * que se trouvent les affiches et jaquettes) grâce au titre de l'article `wiki`.
  * Si une image est introuvable, l'élément est simplement ignoré.
  */
-export type PixelCategory = 'celeb' | 'game' | 'film' | 'serie';
+export type PixelCategory = 'celeb' | 'game' | 'film' | 'serie' | 'meme';
 
 export interface PixelItem {
   /** Réponse affichée (en français) */
@@ -14,11 +14,14 @@ export interface PixelItem {
   cat: PixelCategory;
   /** Autres réponses acceptées (nom de famille, titre original…) */
   aliases?: string[];
+  /** Mèmes : la réplique ou le contexte, affiché à la révélation */
+  caption?: string;
 }
 
 const celeb = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'celeb', aliases });
 const game = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'game', aliases });
 const serie = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'serie', aliases });
+const meme = (name: string, wiki: string, aliases: string[] = [], caption?: string): PixelItem => ({ name, wiki, cat: 'meme', aliases, caption });
 const film = (name: string, wiki: string, aliases: string[] = []): PixelItem => ({ name, wiki, cat: 'film', aliases });
 
 export const PIXEL_ITEMS: PixelItem[] = [
@@ -296,4 +299,32 @@ export const PIXEL_ITEMS: PixelItem[] = [
   serie('Bref', 'Bref (TV series)'),
   serie('Engrenages', 'Spiral (French TV series)', ['Spiral']),
   serie('Hippocrate', 'Hippocrate (TV series)'),
+  // — Mèmes —
+  meme('Denis Brogniart', 'fr:Denis Brogniart', ['Brogniart', 'Ahhh', 'Ah'], '« Ahhh ! »'),
+  meme('Nabilla', 'fr:Nabilla Benattia', ['Nabilla Benattia', 'Non mais allô', 'Allo'], '« Non mais allô, quoi ! T’es une fille et t’as pas de shampoing ? »'),
+  meme('Jean-Claude Van Damme', 'fr:Jean-Claude Van Damme', ['Van Damme', 'JCVD', 'Aware'], '« Je suis aware » · « Un plus un égale onze »'),
+  meme('Philippe Etchebest', 'fr:Philippe Etchebest', ['Etchebest'], '« C’est pas bon, c’est pas bon ! »'),
+  meme('Franck Ribéry', 'fr:Franck Ribéry', ['Ribéry', 'Ribery', 'La routourne'], '« La routourne va vite tourner »'),
+  meme('Raymond Domenech', 'fr:Raymond Domenech', ['Domenech'], 'La demande en mariage en direct (« épouser Estelle »)'),
+  meme('Thierry Roland', 'fr:Thierry Roland', ['Roland'], '« Après avoir vu ça, on peut mourir tranquille »'),
+  meme('Jacques Chirac', 'fr:Jacques Chirac', ['Chirac'], '« Ça m’en touche une sans faire bouger l’autre »'),
+  meme('Cyril Hanouna', 'fr:Cyril Hanouna', ['Hanouna', 'Baba'], 'Le « Baba » de TPMP'),
+  meme('Jean-Pierre Coffe', 'fr:Jean-Pierre Coffe', ['Coffe'], '« Mais c’est de la merde ! »'),
+  meme('Distracted Boyfriend', 'Distracted boyfriend', ['Copain distrait', 'Le copain distrait']),
+  meme('Hide the Pain Harold', 'András Arató', ['Harold', 'Andras Arato']),
+  meme('Disaster Girl', 'Disaster Girl'),
+  meme('Success Kid', 'Success Kid'),
+  meme('Grumpy Cat', 'Grumpy Cat'),
+  meme('Doge', 'Doge (meme)', ['Shiba', 'Doge meme']),
+  meme('Nyan Cat', 'Nyan Cat'),
+  meme('Trollface', 'Trollface', ['Troll face']),
+  meme('Pepe the Frog', 'Pepe the Frog', ['Pepe']),
+  meme('Woman Yelling at a Cat', 'Woman yelling at a cat', ['Femme qui crie sur un chat', 'Chat à table']),
+  meme('This Is Fine', 'This Is Fine', ['Tout va bien', 'This is fine dog']),
+  meme('Wojak', 'Wojak', ['Feels guy']),
+  meme('Keyboard Cat', 'Keyboard Cat'),
+  meme('Leeroy Jenkins', 'Leeroy Jenkins', ['Leeroy']),
+  meme('Salt Bae', 'Salt Bae', ['Nusret']),
+  meme('Rickroll', 'Rickrolling', ['Rick Astley', 'Never Gonna Give You Up']),
+  meme('Coffin Dance', 'Coffin dance', ['Danse du cercueil', 'Coffin']),
 ];

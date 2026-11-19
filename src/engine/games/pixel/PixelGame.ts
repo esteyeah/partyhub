@@ -13,6 +13,7 @@ const CATEGORY_LABELS: Record<PixelCategory, string> = {
   celeb: '⭐ Célébrité',
   game: '🎮 Jaquette de jeu vidéo',
   film: '🎬 Affiche de film',
+  meme: '😂 Mème',
   serie: '📺 Affiche de série',
 };
 
@@ -43,7 +44,7 @@ export class PixelGame extends RoundGame<Item, PixelPrompt, PixelExtra, Settings
       prompt: { image: item.image, category: item.cat, categoryLabel: CATEGORY_LABELS[item.cat] },
       durationMs,
       answer: item.name,
-      extra: { image: item.image },
+      extra: { image: item.image, caption: item.caption },
     };
     if (this.settings.mode === 'qcm') {
       const others = this.pool.filter((p) => p.cat === item.cat && p.name !== item.name);

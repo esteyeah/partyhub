@@ -10,7 +10,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | ⚽ **Compose ton 11** (draft poste par poste, duels, surprises) | ✅ jouable | 533 footballeurs (saison 2026-27) avec postes précis + 23 joueurs « surprise » ; thèmes Ligue 1, Premier League, Liga, Serie A, Bundesliga, Ligue des champions, Équipe de France, Pépites, Vétérans |
 | 💸 **Mercato aux enchères** (compose ton 11 aux enchères : secrètes ou à tour de rôle) | ✅ jouable | mêmes footballeurs, formations et thèmes que Compose ton 11 |
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
-| 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 266 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries (récupérées sur Wikipédia au lancement) |
+| 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 293 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries, mèmes (récupérées sur Wikipédia au lancement) |
 | 🕵️ **Qui suis-je ?** (indices de plus en plus évidents) | ✅ jouable | 167 fiches (dont 47 difficiles) : personnalités, personnages de fiction et œuvres |
 | 🎞️ **Devine le film** (titre québécois, espagnol ou anglais → titre français ; QCM ou réponse libre) | ✅ jouable | 71 titres (47 québécois) |
 | 📅 **Blind Test des années** (devine l’année de sortie : précision d’abord, rapidité ensuite) | ✅ jouable | 165 morceaux de 1792 à 2024 |
