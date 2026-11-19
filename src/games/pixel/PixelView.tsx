@@ -78,7 +78,6 @@ export function PixelView({ view, room, you }: GameViewProps<RoundGameView<Pixel
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-4 rounded-2xl bg-gradient-to-r from-teal-500/15 to-emerald-500/10 p-4 text-center">
           <div className="text-xs font-semibold uppercase tracking-wider text-teal-300/80">C’était…</div>
           <div className="text-2xl font-black">{v.reveal!.answer}</div>
-          {v.reveal!.extra?.caption && <div className="mt-1 text-sm italic text-zinc-300">{v.reveal!.extra.caption}</div>}
         </motion.div>
       )}
     />

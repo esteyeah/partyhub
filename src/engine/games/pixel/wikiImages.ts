@@ -3,28 +3,9 @@
  * Appel depuis le navigateur de l'hôte (CORS ouvert grâce à `origin=*`), 50 titres par requête.
  * `pilicense=any` : inclut les images non libres (affiches de films, jaquettes de jeux).
  */
-const apiFor = (lang: string) => `https://${lang}.wikipedia.org/w/api.php`;
+const API = 'https://en.wikipedia.org/w/api.php';
 
-/** Titres « fr:Titre » = Wikipédia français ; sans préfixe = anglais */
 export async function resolveWikiImages(titles: string[], size = 900): Promise<Map<string, string>> {
-  const out = new Map<string, string>();
-  const groups = new Map<string, string[]>();
-  for (const t of titles) {
-    const m = /^([a-z]{2}):(.+)$/.exec(t);
-    const lang = m ? m[1] : 'en';
-    groups.set(lang, [...(groups.get(lang) ?? []), t]);
-  }
-  for (const [lang, list] of groups) {
-    const found = await resolveLang(lang, list.map((t) => t.replace(/^[a-z]{2}:/, '')), size);
-    for (const t of list) {
-      const src = found.get(t.replace(/^[a-z]{2}:/, ''));
-      if (src) out.set(t, src);
-    }
-  }
-  return out;
-}
-
-async function resolveLang(lang: string, titles: string[], size: number): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   for (let i = 0; i < titles.length; i += 50) {
     const chunk = titles.slice(i, i + 50);
@@ -41,7 +22,7 @@ async function resolveLang(lang: string, titles: string[], size: number): Promis
       titles: chunk.join('|'),
     });
     try {
-      const res = await fetch(`${apiFor(lang)}?${params}`);
+      const res = await fetch(`${API}?${params}`);
       if (!res.ok) continue;
       const data = await res.json();
       const q = data?.query ?? {};

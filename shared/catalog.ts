@@ -161,7 +161,6 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
           { value: 'game', label: '🎮 Jaquettes de jeux vidéo' },
           { value: 'film', label: '🎬 Affiches de films' },
           { value: 'serie', label: '📺 Affiches de séries' },
-          { value: 'meme', label: '😂 Mèmes' },
         ],
         default: 'mix',
       },
