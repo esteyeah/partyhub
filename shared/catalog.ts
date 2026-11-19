@@ -458,6 +458,8 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
         default: '4-3-3',
       },
       { key: 'time', label: 'Temps / offre secrète', type: 'select', options: timeOptions([10, 15, 20, 30]), default: '15' },
+      { key: 'blind', label: '🙈 À l’aveugle (suivants cachés, ratés possibles)', type: 'boolean', default: false },
+      { key: 'lastPaid', label: '💶 Le dernier footballeur est payant', type: 'boolean', default: false },
     ],
   },
 

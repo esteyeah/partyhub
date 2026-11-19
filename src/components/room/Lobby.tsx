@@ -244,9 +244,9 @@ function PlaylistRow({
             <div className="truncate text-xs text-zinc-500">
               {[
                 ...g.settings.filter((f) => f.type !== 'boolean').map((f) => describe(f, item.settings[f.key])),
-                ...(g.settings.some((f) => f.type === 'boolean')
-                  ? [`${g.settings.filter((f) => f.type === 'boolean' && (item.settings[f.key] ?? f.default) !== false).length}/${g.settings.filter((f) => f.type === 'boolean').length} jeux`]
-                  : []),
+                ...(g.settings.some((f) => f.key.startsWith('g_'))
+                  ? [`${g.settings.filter((f) => f.key.startsWith('g_') && (item.settings[f.key] ?? f.default) !== false).length}/${g.settings.filter((f) => f.key.startsWith('g_')).length} jeux`]
+                  : g.settings.filter((f) => f.type === 'boolean' && item.settings[f.key] === true).map((f) => f.label)),
               ].join(' · ')}
             </div>
           )}

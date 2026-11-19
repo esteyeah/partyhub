@@ -52,6 +52,9 @@ export function AuctionView({ view, room, you }: GameViewProps<View>) {
           </div>
         ) : null}
 
+        {view.blind && view.current && view.phase === 'bid' && (
+          <p className="panel p-3 text-center text-sm text-zinc-400">🙈 À l’aveugle : les footballeurs suivants sont cachés… et ils peuvent être bien pires !</p>
+        )}
         {view.upcoming.length > 0 && (
           <div className="panel p-3">
             <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Ensuite à ce poste</div>

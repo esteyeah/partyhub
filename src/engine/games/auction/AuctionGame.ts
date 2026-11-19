@@ -1,10 +1,10 @@
-import { ELEVEN_THEMES, FOOTBALLERS, fitsSlot } from '@content/footballers';
+import { ELEVEN_THEMES, FOOTBALLERS, SURPRISES, fitsSlot } from '@content/footballers';
 import type { AuctionSale, AuctionView, ElevenSlot, ElevenTeam, ElevenTeamResult, Footballer, GameAction } from '@shared/types';
 import { shuffle } from '../../utils/random';
 import { buildSlots } from '../eleven/ElevenGame';
 import { GameModule } from '../GameModule';
 
-type Settings = { mode: string; budget: string; formation: string; theme: string; time: string };
+type Settings = { mode: string; budget: string; formation: string; theme: string; time: string; blind?: boolean; lastPaid?: boolean };
 
 const SOLD_MS = 4000;
 const FINAL_MS = 30000;
@@ -93,6 +93,17 @@ export class AuctionGame extends GameModule<Settings> {
     const byPrice = shuffle(pool).sort((a, b) => b.price - a.price);
     if (byPrice.length <= n) return byPrice;
     const top = byPrice[Math.floor(Math.random() * Math.max(1, Math.ceil(byPrice.length * 0.15)))];
+    if (this.settings.blind) {
+      // Mode à l'aveugle : après la tête d'affiche, n'importe qui… y compris de vrais ratés
+      const flops = SURPRISES.filter((f) => fitsSlot(slot.label, f) && !this.owned.has(f.id));
+      const rest = shuffle([...byPrice.filter((p) => p !== top).slice(0, 30), ...flops, ...flops, ...flops]);
+      const lot = [top];
+      for (const p of rest) {
+        if (lot.length >= n) break;
+        if (!lot.some((x) => x.name === p.name)) lot.push(p);
+      }
+      return lot;
+    }
     const min = Math.max(1, byPrice[byPrice.length - 1].price);
     const lot = [top];
     for (let i = 1; i < n; i++) {
@@ -119,8 +130,11 @@ export class AuctionGame extends GameModule<Settings> {
     const bidders = this.bidders();
     if (!bidders.length || !this.lot.length) return this.nextSlot();
     this.current = this.lot.shift()!;
-    // Un seul joueur sans footballeur : il le reçoit gratuitement
-    if (bidders.length === 1) return this.sell(bidders[0], 0, null);
+    // Un seul joueur sans footballeur : il le reçoit (gratuitement, ou au prix affiché selon l'option)
+    if (bidders.length === 1) {
+      const price = this.settings.lastPaid ? Math.min(this.current.price, this.remaining(bidders[0])) : 0;
+      return this.sell(bidders[0], price, null);
+    }
     this.bids.clear();
     if (this.mode === 'sealed') {
       this.setPhase('bid', Number(this.settings.time) * 1000, () => this.closeSealed());
@@ -252,7 +266,8 @@ export class AuctionGame extends GameModule<Settings> {
       budget: this.budget,
       teams,
       current: this.current,
-      upcoming: this.lot,
+      upcoming: this.settings.blind ? [] : this.lot,
+      blind: !!this.settings.blind,
       bidders: this.current && this.phase === 'bid' ? this.bidders() : [],
       submitted: this.mode === 'sealed' ? [...this.bids.keys()] : [],
       open:

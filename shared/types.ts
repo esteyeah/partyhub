@@ -367,6 +367,8 @@ export interface AuctionView {
   teams: Record<string, ElevenTeam>;
   /** Footballeur mis aux enchères */
   current: Footballer | null;
+  /** Mode à l'aveugle : les footballeurs suivants sont cachés */
+  blind: boolean;
   /** Les autres footballeurs du poste, encore à vendre */
   upcoming: Footballer[];
   /** Joueurs qui n'ont pas encore de footballeur à ce poste (ils peuvent enchérir) */
