@@ -96,7 +96,7 @@ export class AuctionGame extends GameModule<Settings> {
     if (this.settings.blind) {
       // Mode à l'aveugle : après la tête d'affiche, n'importe qui… y compris de vrais ratés
       const flops = SURPRISES.filter((f) => fitsSlot(slot.label, f) && !this.owned.has(f.id));
-      const rest = shuffle([...byPrice.filter((p) => p !== top).slice(0, 30), ...flops, ...flops, ...flops]);
+      const rest = shuffle([...shuffle(byPrice.filter((p) => p !== top)).slice(0, 30), ...flops, ...flops, ...flops]);
       const lot = [top];
       for (const p of rest) {
         if (lot.length >= n) break;
