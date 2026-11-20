@@ -21,6 +21,8 @@ export interface RoundSpec<P, X> {
   /** Pour les QCM */
   correctIndex?: number;
   extra?: X;
+  /** Chrono visible seulement pour les `voteMs` dernières ms (ex : après la coupure d'une vidéo) */
+  voteMs?: number;
   /** Durée du reveal (ex : plus longue pour rejouer la fin d'une vidéo) */
   revealMs?: number;
   /**
@@ -349,6 +351,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
                 ? FREEZE_VOTE_MS
                 : spec?.durationMs ?? 0,
       judged: !!spec?.judged,
+      voteMs: this.phase === 'question' && !this.frozen ? spec?.voteMs : undefined,
       frozen: this.frozen,
       prompt: showQuestion ? spec?.prompt ?? null : null,
       input: showQuestion ? spec?.input ?? null : null,

@@ -7,6 +7,9 @@ import { shuffle } from '../../utils/random';
 import { speedPoints } from '../GameModule';
 import { RoundGame, type RoundSpec } from '../RoundGame';
 
+/** Marge pour le chargement du lecteur YouTube */
+const LOAD_BUFFER_S = 3;
+
 type Settings = { rounds: number; time: string; source: string; mode?: string };
 type Item = VideoQuestion | MemeQuestion;
 const isMeme = (x: Item): x is MemeQuestion => 'text' in x;
@@ -33,11 +36,12 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
     const spec = this.buildChoiceRound(q);
     if (this.settings.mode !== 'libre' || spec.input?.kind !== 'choice') return spec;
     // Réponse libre : on retire les propositions, il faut taper la réponse
-    const clipMs = isMeme(q) ? 0 : Math.max(0, q.clip.end - q.clip.start) * 1000;
+    const vote = Math.max(spec.voteMs ?? spec.durationMs, 20_000);
     return {
       ...spec,
       input: { kind: 'text', placeholder: 'Ta réponse…', keys: [{ key: 'answer', label: 'Réponse' }] },
-      durationMs: Math.max(spec.durationMs, clipMs + 20_000),
+      durationMs: spec.durationMs - (spec.voteMs ?? spec.durationMs) + vote,
+      voteMs: spec.voteMs ? vote : undefined,
       correctIndex: undefined,
     };
   }
@@ -53,12 +57,36 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
   protected matchText(q: Item, guess: string, remaining: string[]) {
     if (!remaining.includes('answer')) return { found: [], close: false };
     const m = fuzzyMatch(guess, this.accepted(q));
-    return { found: m === 'exact' ? ['answer'] : [], close: m === 'close' };
+    if (m === 'exact') return { found: ['answer'], close: false };
+    // Un morceau d'au moins 2 mots de la bonne réponse suffit (« tequila heineken »)
+    const g = normalize(guess).split(' ').filter(Boolean);
+    const words = normalize(q.choices[q.answer]).split(' ').filter(Boolean);
+    if (g.length >= 2) {
+      const windows: string[] = [];
+      for (let i = 0; i + g.length <= words.length; i++) windows.push(words.slice(i, i + g.length).join(' '));
+      const w = fuzzyMatch(guess, windows);
+      if (w === 'exact') return { found: ['answer'], close: false };
+      if (w === 'close') return { found: [], close: true };
+    }
+    return { found: [], close: m === 'close' };
+  }
+
+  /** Points comptés à partir de la coupure de l'extrait (le temps de visionnage ne pénalise pas) */
+  private voteTime(ms: number, spec: RoundSpec<VideoPrompt, VideoExtra>) {
+    const vote = spec.voteMs ?? spec.durationMs;
+    return { ms: Math.max(0, ms - (spec.durationMs - vote)), duration: vote };
+  }
+
+  protected scoreChoice(_q: Item, spec: RoundSpec<VideoPrompt, VideoExtra>, choice: number, ms: number) {
+    const t = this.voteTime(ms, spec);
+    const correct = choice === spec.correctIndex;
+    return { correct, points: correct ? speedPoints(t.ms, t.duration) : 0 };
   }
 
   protected textPoints(_key: string, ms: number, order: number, spec: RoundSpec<VideoPrompt, VideoExtra>): number {
     const bonus = order === 0 ? 150 : order === 1 ? 75 : order === 2 ? 25 : 0;
-    return speedPoints(ms, spec.durationMs) + bonus;
+    const t = this.voteTime(ms, spec);
+    return speedPoints(t.ms, t.duration) + bonus;
   }
 
   private buildChoiceRound(q: Item): RoundSpec<VideoPrompt, VideoExtra> {
@@ -78,8 +106,9 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
     return {
       prompt: { clip: q.clip, question: q.question },
       input: { kind: 'choice', choices: q.choices, layout: 'grid' },
-      // Le chrono de vote démarre avec l'extrait : durée de l'extrait + temps de vote
-      durationMs: (clipSeconds + Number(this.settings.time)) * 1000,
+      // Extrait + marge de chargement, puis le chrono de vote (affiché seulement à la coupure)
+      durationMs: (clipSeconds + LOAD_BUFFER_S + Number(this.settings.time)) * 1000,
+      voteMs: Number(this.settings.time) * 1000,
       correctIndex: q.answer,
       answer: q.choices[q.answer],
       extra: { revealClip: q.revealClip, explanation: q.explanation },

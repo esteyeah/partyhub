@@ -127,6 +127,8 @@ export interface RoundGameView<P = unknown, X = unknown> {
     found: string[];
     feedback: { type: 'close' | 'wrong' | 'found'; text: string; id: number } | null;
   };
+  /** Chrono affiché seulement pendant les `voteMs` dernières ms (vidéo en cours avant) */
+  voteMs?: number;
   /** Mode arbitre : la réponse n'est pas connue, l'hôte la choisit après la révélation */
   judged?: boolean;
   /** Mode arbitre : l'hôte a stoppé la vidéo (vote en cours) */

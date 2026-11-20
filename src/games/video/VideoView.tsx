@@ -2,11 +2,16 @@
 
 import { motion } from 'framer-motion';
 import type { RoundGameView, VideoExtra, VideoPrompt } from '@shared/types';
-import { ClipPlayer } from '@/components/media/ClipPlayer';
+import { useEffect } from 'react';
+import { ClipPlayer, loadYouTubeApi } from '@/components/media/ClipPlayer';
 import { RoundStage } from '../round/RoundStage';
 import type { GameViewProps } from '../types';
 
 export function VideoView({ view, room, you }: GameViewProps<RoundGameView<VideoPrompt, VideoExtra>>) {
+  // Charge le lecteur YouTube dès l'arrivée dans le jeu (les extraits démarrent plus vite)
+  useEffect(() => {
+    loadYouTubeApi().catch(() => {});
+  }, []);
   return (
     <RoundStage
       view={view}

@@ -67,7 +67,7 @@ export function ClipPlayer({
   return (
     <div className={`relative w-full overflow-hidden rounded-2xl bg-black ${portrait ? 'aspect-[540/760]' : 'aspect-video'}`}>
       {clip.type === 'youtube' ? (
-        <YouTubeClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
+        <YouTubeClip key={key} clip={clip} crop={!portrait} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
       ) : (
         <FileClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
       )}
@@ -114,7 +114,7 @@ interface InnerProps<C> {
   pauseRef: React.MutableRefObject<() => void>;
 }
 
-function YouTubeClip({ clip, onEnded, onBlocked, playRef, pauseRef }: InnerProps<Extract<Clip, { type: 'youtube' }>>) {
+function YouTubeClip({ clip, crop, onEnded, onBlocked, playRef, pauseRef }: InnerProps<Extract<Clip, { type: 'youtube' }>> & { crop?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -187,7 +187,9 @@ function YouTubeClip({ clip, onEnded, onBlocked, playRef, pauseRef }: InnerProps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={host} className="absolute inset-0 [&_iframe]:h-full [&_iframe]:w-full" />;
+  // Lecteur plus haut que le cadre : la vidéo reste au centre, et les bandeaux de YouTube
+  // (titre, chaîne, logo, suggestions) tombent dans les bandes noires, hors du cadre visible.
+  return <div ref={host} className="absolute inset-x-0 [&_iframe]:h-full [&_iframe]:w-full" style={crop ? { top: '-30%', height: '160%' } : { top: 0, height: '100%' }} />;
 }
 
 function FileClip({ clip, onEnded, onBlocked, playRef, pauseRef }: InnerProps<Extract<Clip, { type: 'file' }>>) {

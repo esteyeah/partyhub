@@ -6,6 +6,7 @@ import type { PlayerPublic, RoomSnapshot, RoundGameView } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { TimerBar, TimerRing } from '@/components/ui/Timer';
 import { CHOICE_STYLES } from '@/lib/colors';
+import { useRemaining } from '@/lib/hooks';
 import { sendAction } from '@/lib/net';
 
 /**
@@ -65,8 +66,7 @@ export function RoundStage<P, X>({
             <span className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-sm font-bold text-zinc-300">
               {view.round}/{view.totalRounds}
             </span>
-            <div className="flex-1">{!isReveal && <TimerBar endsAt={view.endsAt} durationMs={view.durationMs} />}</div>
-            {!isReveal && <TimerRing endsAt={view.endsAt} durationMs={view.durationMs} size={48} />}
+            {!isReveal && <VoteTimer view={view} />}
             {isReveal && <span className="text-sm font-semibold text-emerald-300">Réponse</span>}
           </div>
           <div className="p-5 sm:p-6">{view.prompt && renderPrompt(view.prompt, view)}</div>
@@ -187,6 +187,23 @@ function ChoiceInput<P, X>({ view, isHost }: { view: RoundGameView<P, X>; isHost
         );
       })}
     </div>
+  );
+}
+
+/** Chrono de la manche ; pour les vidéos, il n'apparaît qu'à la coupure de l'extrait */
+function VoteTimer<P, X>({ view }: { view: RoundGameView<P, X> }) {
+  const remaining = useRemaining(view.voteMs ? view.endsAt : null);
+  if (view.voteMs && remaining > view.voteMs) {
+    return <div className="flex-1 text-center text-sm font-semibold text-zinc-400">🎬 Extrait en cours… le chrono démarre à la coupure</div>;
+  }
+  const d = view.voteMs ?? view.durationMs;
+  return (
+    <>
+      <div className="flex-1">
+        <TimerBar endsAt={view.endsAt} durationMs={d} />
+      </div>
+      <TimerRing endsAt={view.endsAt} durationMs={d} size={48} />
+    </>
   );
 }
 
