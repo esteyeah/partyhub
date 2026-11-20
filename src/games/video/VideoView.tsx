@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import type { RoundGameView, VideoExtra, VideoPrompt } from '@shared/types';
 import { useEffect } from 'react';
 import { ClipPlayer, loadYouTubeApi } from '@/components/media/ClipPlayer';
+import { sendAction } from '@/lib/net';
 import { RoundStage } from '../round/RoundStage';
 import type { GameViewProps } from '../types';
 
@@ -42,7 +43,12 @@ export function VideoView({ view, room, you }: GameViewProps<RoundGameView<Video
         return (
           <div className="space-y-4">
             <div className={p.clip.type === 'file' ? 'mx-auto max-w-sm' : ''}>
-              <ClipPlayer clip={revealClip ?? p.clip} endedLabel={revealClip ? '🎬 Fin de l’action' : undefined} portrait={p.clip.type === 'file'} />
+              <ClipPlayer
+                clip={revealClip ?? p.clip}
+                endedLabel={revealClip ? '🎬 Fin de l’action' : undefined}
+                portrait={p.clip.type === 'file'}
+                onEnded={revealClip ? undefined : () => sendAction({ type: 'clipEnded' })}
+              />
             </div>
             <h2 className="text-center text-xl font-extrabold sm:text-2xl">{p.question}</h2>
           </div>

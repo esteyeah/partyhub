@@ -129,6 +129,8 @@ export interface RoundGameView<P = unknown, X = unknown> {
   };
   /** Chrono affiché seulement pendant les `voteMs` dernières ms (vidéo en cours avant) */
   voteMs?: number;
+  /** Le chrono de vote a démarré (l'extrait s'est arrêté) */
+  voteStarted?: boolean;
   /** Mode arbitre : la réponse n'est pas connue, l'hôte la choisit après la révélation */
   judged?: boolean;
   /** Mode arbitre : l'hôte a stoppé la vidéo (vote en cours) */
@@ -399,6 +401,8 @@ export type GameAction =
   /** Enchères : offre (montant en M€) ou passer son tour */
   | { type: 'bid'; amount: number }
   | { type: 'pass' }
+  /** L'extrait vidéo s'est arrêté chez ce joueur (démarre le chrono de vote) */
+  | { type: 'clipEnded' }
   /** Hôte, mode arbitre : stopper la vidéo avant la révélation */
   | { type: 'freeze' }
   /** Hôte, mode arbitre : indiquer la bonne réponse */

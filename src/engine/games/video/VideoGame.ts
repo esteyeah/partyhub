@@ -8,7 +8,7 @@ import { speedPoints } from '../GameModule';
 import { RoundGame, type RoundSpec } from '../RoundGame';
 
 /** Marge pour le chargement du lecteur YouTube */
-const LOAD_BUFFER_S = 3;
+const LOAD_BUFFER_S = 20;
 
 type Settings = { rounds: number; time: string; source: string; mode?: string };
 type Item = VideoQuestion | MemeQuestion;
@@ -74,7 +74,9 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
   /** Points comptés à partir de la coupure de l'extrait (le temps de visionnage ne pénalise pas) */
   private voteTime(ms: number, spec: RoundSpec<VideoPrompt, VideoExtra>) {
     const vote = spec.voteMs ?? spec.durationMs;
-    return { ms: Math.max(0, ms - (spec.durationMs - vote)), duration: vote };
+    // Temps compté à partir de l'arrêt de l'extrait
+    const before = this.voteStartedAt !== null ? this.voteStartedAt - (this.now() - ms) : ms;
+    return { ms: Math.max(0, ms - before), duration: vote };
   }
 
   protected scoreChoice(_q: Item, spec: RoundSpec<VideoPrompt, VideoExtra>, choice: number, ms: number) {
@@ -107,6 +109,7 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
       prompt: { clip: q.clip, question: q.question },
       input: { kind: 'choice', choices: q.choices, layout: 'grid' },
       // Extrait + marge de chargement, puis le chrono de vote (affiché seulement à la coupure)
+      // Sécurité si l'arrêt de l'extrait n'est jamais signalé (le chrono démarre normalement à la coupure)
       durationMs: (clipSeconds + LOAD_BUFFER_S + Number(this.settings.time)) * 1000,
       voteMs: Number(this.settings.time) * 1000,
       correctIndex: q.answer,

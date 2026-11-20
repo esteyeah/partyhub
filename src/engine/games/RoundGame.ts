@@ -70,6 +70,9 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   private phase: RoundPhase = 'loading';
   private endsAt: number | null = null;
   private startedAt = 0;
+  /** Vidéos : le chrono de vote ne démarre qu'à l'arrêt de l'extrait chez les joueurs */
+  protected voteStartedAt: number | null = null;
+  private clipEnded = new Set<string>();
   private spec: RoundSpec<P, X> | null = null;
   private states = new Map<string, PlayerRoundState>();
   private results: RoundResult[] = [];
@@ -150,6 +153,8 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
     this.phase = 'question';
     this.startedAt = this.now();
     this.endsAt = this.startedAt + this.spec.durationMs;
+    this.voteStartedAt = null;
+    this.clipEnded.clear();
     this.setTimer(this.spec.durationMs, () => this.reveal());
     this.ctx.sync();
   }
@@ -194,6 +199,15 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       }
     }
     if (this.phase !== 'question' || !this.spec) return;
+    if (action.type === 'clipEnded') {
+      if (!this.spec.voteMs || this.voteStartedAt !== null) return;
+      this.clipEnded.add(playerId);
+      const active = this.ctx.players().filter((p) => p.connected);
+      // Tout le monde a vu la coupure, ou au plus 2 s après le premier
+      if (active.every((p) => this.clipEnded.has(p.id))) this.startVote();
+      else if (this.clipEnded.size === 1) this.setTimer(2000, () => this.startVote());
+      return;
+    }
     const item = this.items[this.index];
     const ms = this.now() - this.startedAt;
     const s = this.state(playerId);
@@ -255,6 +269,16 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       // Mode arbitre : dès que tout le monde a voté, la vidéo continue jusqu'à la révélation
       this.setTimer(600, () => (this.spec?.judged ? this.startJudge() : this.reveal()));
     }
+    this.ctx.sync();
+  }
+
+  /** Démarre le chrono de vote (extrait terminé) */
+  private startVote() {
+    if (this.phase !== 'question' || !this.spec?.voteMs || this.voteStartedAt !== null) return;
+    this.clearTimers();
+    this.voteStartedAt = this.now();
+    this.endsAt = this.voteStartedAt + this.spec.voteMs;
+    this.setTimer(this.spec.voteMs, () => this.reveal());
     this.ctx.sync();
   }
 
@@ -352,6 +376,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
                 : spec?.durationMs ?? 0,
       judged: !!spec?.judged,
       voteMs: this.phase === 'question' && !this.frozen ? spec?.voteMs : undefined,
+      voteStarted: this.voteStartedAt !== null,
       frozen: this.frozen,
       prompt: showQuestion ? spec?.prompt ?? null : null,
       input: showQuestion ? spec?.input ?? null : null,

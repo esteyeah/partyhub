@@ -40,7 +40,10 @@ export function ClipPlayer({
   portrait = false,
   paused = false,
   pausedLabel = '⏸ Vidéo stoppée : votez !',
+  onEnded,
 }: {
+  /** Appelé quand l'extrait s'arrête (coupure) */
+  onEnded?: () => void;
   clip: Clip;
   endedLabel?: string;
   portrait?: boolean;
@@ -67,9 +70,9 @@ export function ClipPlayer({
   return (
     <div className={`relative w-full overflow-hidden rounded-2xl bg-black ${portrait ? 'aspect-[540/760]' : 'aspect-video'}`}>
       {clip.type === 'youtube' ? (
-        <YouTubeClip key={key} clip={clip} crop={!portrait} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
+        <YouTubeClip key={key} clip={clip} crop={!portrait} onEnded={() => { setEnded(true); onEnded?.(); }} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
       ) : (
-        <FileClip key={key} clip={clip} onEnded={() => setEnded(true)} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
+        <FileClip key={key} clip={clip} onEnded={() => { setEnded(true); onEnded?.(); }} onBlocked={setNeedsClick} playRef={play} pauseRef={pause} />
       )}
       {paused && !ended && (
         <div className="absolute inset-x-0 top-3 flex justify-center px-3">
