@@ -36,6 +36,7 @@ export const CLOSEST_QUESTIONS: ClosestQuestion[] = [
   n('Combien de places compte le stade Vélodrome de Marseille (environ) ?', 67000, 'places'),
   n('Combien de places compte le Stade de France (environ) ?', 80000, 'places'),
   n('Combien de minutes dure un match de NBA (temps réglementaire) ?', 48, 'min'),
+  n('Combien de matchs Dimitri Payet a-t-il disputés avec l’OM ?', 326, 'matchs'),
   // — Séries, jeux, culture —
   n('Combien d’épisodes compte la série Friends ?', 236, 'épisodes'),
   n('Combien d’épisodes compte How I Met Your Mother ?', 208, 'épisodes'),
