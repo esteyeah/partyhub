@@ -76,6 +76,7 @@ export const CLOSEST_QUESTIONS: ClosestQuestion[] = [
   n('Combien de secondes dure « Billie Jean » de Michael Jackson ?', 294, 's'),
   n('Combien de secondes dure « Like a Rolling Stone » de Bob Dylan ?', 373, 's'),
   n('Combien de secondes dure le clip de « Gangnam Style » ?', 252, 's'),
+  n('Combien de secondes dure le clip de « Formidable » de Stromae ?', 294, 's'),
   n('Combien de secondes met la lumière du Soleil pour atteindre la Terre (environ) ?', 500, 's'),
   // — Culture générale —
   n('Combien de pattes a une araignée ?', 8, 'pattes'),
