@@ -213,9 +213,9 @@ function NumberInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
     ref.current?.focus();
   }, [view.round]);
   if (view.input?.kind !== 'number') return null;
-  const { min, max, placeholder } = view.input;
-  const value = Number(text);
-  const valid = text.trim() !== '' && Number.isInteger(value) && value >= min && value <= max;
+  const { min, max, placeholder, decimals } = view.input;
+  const value = Number(text.replace(',', '.'));
+  const valid = text.trim() !== '' && Number.isFinite(value) && (decimals || Number.isInteger(value)) && value >= min && value <= max;
   const sent = view.me.locked;
 
   return (
@@ -232,10 +232,10 @@ function NumberInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
             ref={ref}
             className="input text-center font-mono text-2xl tracking-widest"
             placeholder={placeholder}
-            inputMode="numeric"
-            maxLength={4}
+            inputMode={decimals ? 'decimal' : 'numeric'}
+            maxLength={max > 9999 ? 15 : 4}
             value={text}
-            onChange={(e) => setText(e.target.value.replace(/[^0-9]/g, ''))}
+            onChange={(e) => setText(e.target.value.replace(decimals ? /[^0-9.,]/g : /[^0-9]/g, ''))}
             autoComplete="off"
             autoFocus
           />
@@ -247,7 +247,7 @@ function NumberInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
         <p className="text-center text-sm font-semibold text-zinc-300">
           {view.me.choice !== null ? (
             <>
-              Ta réponse : <span className="font-mono text-lg text-white">{view.me.choice}</span> 🔒
+              Ta réponse : <span className="font-mono text-lg text-white">{view.me.choice.toLocaleString('fr-FR', { maximumFractionDigits: 3 })}</span> 🔒
             </>
           ) : (
             'Pas de réponse'
@@ -256,7 +256,7 @@ function NumberInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
       )}
       {!view.reveal && !sent && (
         <p className="mt-2 text-center text-xs text-zinc-500">
-          Entre {min} et {max} · une seule réponse, plus tu es proche et rapide, plus tu marques
+          {max > 9999 ? 'Une seule réponse' : `Entre ${min} et ${max} · une seule réponse`}{decimals ? ' · décimales acceptées (virgule ou point)' : ''} · plus tu es proche et rapide, plus tu marques
         </p>
       )}
     </div>

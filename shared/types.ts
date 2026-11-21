@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'auction' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'auction' | 'closest' | 'eleven';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -91,7 +91,7 @@ export type RoundInput =
   | { kind: 'choice'; choices: string[]; layout: 'grid' | 'ladder' }
   | { kind: 'text'; placeholder: string; keys: { key: string; label: string }[] }
   /** Réponse chiffrée (ex : une année) : une seule proposition, verrouillée */
-  | { kind: 'number'; placeholder: string; min: number; max: number };
+  | { kind: 'number'; placeholder: string; min: number; max: number; decimals?: boolean };
 
 export type ProgressStatus = 'waiting' | 'answered' | 'partial' | 'done';
 
@@ -233,6 +233,15 @@ export interface MixPrompt {
 }
 export interface MixExtra {
   inner: unknown;
+}
+
+export interface ClosestPrompt {
+  question: string;
+  unit: string;
+}
+export interface ClosestExtra {
+  answer: number;
+  unit?: string;
 }
 
 export interface PixelExtra {

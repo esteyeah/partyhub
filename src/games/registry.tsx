@@ -8,6 +8,7 @@ import { BlindYearView } from './blindyear/BlindYearView';
 import { DatesView } from './dates/DatesView';
 import { MixView } from './mix/MixView';
 import { AuctionView } from './auction/AuctionView';
+import { ClosestView } from './closest/ClosestView';
 import { QuizView } from './quiz/QuizView';
 import { RankView } from './rank/RankView';
 import type { GameViewComponent } from './types';
@@ -29,5 +30,6 @@ export const GAME_VIEWS: Record<GameId, GameViewComponent> = {
   dates: DatesView,
   mix: MixView,
   auction: AuctionView,
+  closest: ClosestView,
   eleven: ElevenView,
 };

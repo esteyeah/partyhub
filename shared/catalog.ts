@@ -308,7 +308,21 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'g_whoami', label: '🕵️ Qui suis-je ?', type: 'boolean', default: true },
       { key: 'g_movietitle', label: '🎞️ Devine le film', type: 'boolean', default: true },
       { key: 'g_dates', label: '🏛️ Devine la date', type: 'boolean', default: true },
+      { key: 'g_closest', label: '🎯 Au plus proche', type: 'boolean', default: true },
       { key: 'g_rank', label: '🏆 Devine le rang', type: 'boolean', default: true },
+    ],
+  },
+  closest: {
+    id: 'closest',
+    name: 'Au plus proche',
+    emoji: '🎯',
+    tagline: 'Une question chiffrée : vise le plus juste',
+    description:
+      'Années, records, populations, épisodes, distances… Tape ta réponse : plus tu es proche, plus tu marques (la rapidité compte un peu).',
+    gradient: 'from-orange-500 to-red-500',
+    settings: [
+      { key: 'rounds', label: 'Questions', type: 'number', min: 3, max: 25, default: 10 },
+      { key: 'time', label: 'Temps / question', type: 'select', options: timeOptions([15, 20, 30]), default: '20' },
     ],
   },
   rank: {

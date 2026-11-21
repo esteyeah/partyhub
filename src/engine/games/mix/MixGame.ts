@@ -5,6 +5,7 @@ import { customCounts } from '../../customContent';
 import { shuffle } from '../../utils/random';
 import { BlindTestGame } from '../blindtest/BlindTestGame';
 import { BlindYearGame } from '../blindyear/BlindYearGame';
+import { ClosestGame } from '../closest/ClosestGame';
 import { DatesGame } from '../dates/DatesGame';
 import type { GameContext } from '../GameModule';
 import { MovieTitleGame } from '../movietitle/MovieTitleGame';
@@ -29,6 +30,7 @@ const SUB_GAMES: Partial<Record<GameId, Ctor>> = {
   movietitle: MovieTitleGame as unknown as Ctor,
   blindyear: BlindYearGame as unknown as Ctor,
   dates: DatesGame as unknown as Ctor,
+  closest: ClosestGame as unknown as Ctor,
   rank: RankGame as unknown as Ctor,
 };
 

@@ -224,11 +224,12 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       s.correct = score.correct;
     } else if (action.type === 'number' && this.spec.input.kind === 'number') {
       if (s.choice !== null) return; // réponse verrouillée
-      const v = Math.round(Number(action.value));
+      const raw = Number(action.value);
+      const v = this.spec.input.decimals ? Math.round(raw * 1000) / 1000 : Math.round(raw);
       if (!Number.isFinite(v) || v < this.spec.input.min || v > this.spec.input.max) return;
       s.choice = v;
       s.choiceMs = ms;
-      s.label = String(v);
+      s.label = v.toLocaleString('fr-FR', { maximumFractionDigits: 3 });
       const score = this.scoreNumber(item, this.spec, v, ms);
       s.points = score.points;
       s.correct = score.correct;
