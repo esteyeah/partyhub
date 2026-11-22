@@ -15,13 +15,17 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🎞️ **Devine le film** (titre québécois, espagnol ou anglais → titre français ; QCM ou réponse libre) | ✅ jouable | 71 titres (47 québécois) |
 | 📅 **Blind Test des années** (devine l’année de sortie : précision d’abord, rapidité ensuite) | ✅ jouable | 165 morceaux de 1792 à 2024 |
 | 🏛️ **Devine la date** (histoire & culture, barème tolérant) | ✅ jouable | 71 événements |
-| 🎯 **Au plus proche** (question chiffrée : années, records, populations… le plus proche marque le plus) | ✅ jouable | 77 questions |
+| 🎯 **Au plus proche** (question chiffrée : années, records, populations… le plus proche marque le plus) | ✅ jouable | 81 questions |
 | 🎲 **Méli-mélo** (N manches piochées dans tous les jeux, sauf Compose ton 11) | ✅ jouable | — |
 | 🎬 **Devine la suite** (vidéo coupée ou réplique à compléter) | ✅ jouable | 87 répliques et mèmes « Complète la phrase », 48 « Quelle est la suite ? » (sagas de films) + tes vidéos YouTube via `/admin` |
 
 **Stack :** Next.js 16 (export statique) · React 19 · Tailwind CSS 4 · PeerJS (WebRTC) · Framer Motion · TypeScript.
 
 ---
+
+## 🎤 Mode animateur (un seul téléphone)
+
+Lien « 🎤 Mode animateur » sur l’accueil (`/animateur`) : celui qui tient le téléphone pose les questions à voix haute, voit la réponse, avance à son rythme (pas de chrono) et compte les points des autres. Jeux : Quiz, Au plus proche, Devine la date, Qui suis-je ?, Devine le film, Complète la phrase, Blind test, Devine l’image.
 
 ## 🌍 Mettre le site en ligne sur GitHub Pages
 

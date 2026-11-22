@@ -85,4 +85,5 @@ export const DATE_EVENTS: DateEvent[] = [
   c('Mort de Johnny Hallyday', 2017),
   c('Incendie de Notre-Dame de Paris', 2019),
   c('Mort de Kobe Bryant', 2020),
+  c('Inauguration du circuit Paul-Ricard au Castellet', 1970),
 ];

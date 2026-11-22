@@ -99,4 +99,9 @@ export const CLOSEST_QUESTIONS: ClosestQuestion[] = [
   n('Quel est l’âge de l’Univers (environ, en milliards d’années) ?', 13.8, 'milliards d’années', true),
   n('Combien d’humains vivent sur Terre (environ, en milliards) ?', 8.2, 'milliards', true),
   n('Quelle est la superficie de la Russie (environ, en millions de km²) ?', 17.1, 'millions de km²', true),
+  // — Circuits —
+  n('Record du tour en course au Grand Prix de Monaco (Lewis Hamilton, 2021) : combien de secondes ?', 72.909, 's', true),
+  y('En quelle année le circuit Paul-Ricard (Le Castellet) a-t-il été inauguré ?', 1970),
+  n('Combien de kilomètres mesure un tour du circuit Paul-Ricard (tracé F1) ?', 5.842, 'km', true),
+  n('Record du tour en course de F1 au circuit Paul-Ricard (Sebastian Vettel, 2019) : combien de secondes ?', 92.74, 's', true),
 ];
