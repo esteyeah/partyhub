@@ -8,7 +8,7 @@
  *   mercato d'hiver (2 ventes, 2 achats) → compo → 2e partie (journées 18-34, phases finales, Coupe de France) →
  *   prolongations des fins de contrat → bilan → saison suivante.
  */
-import { FOOTBALLERS, UCL_CLUBS, fitsSlot, priceFor } from '@content/footballers';
+import { FOOTBALLERS, fitsSlot, priceFor } from '@content/footballers';
 import type { FootPos, Footballer } from '@shared/types';
 
 /* ------------------------------------------------------------------ */
@@ -205,6 +205,17 @@ function buildRoster(club: string, level: number, season: number): MPlayer[] {
   return roster;
 }
 
+/** Coupes d'Europe 2026-27 des clubs français (qualifications réelles) */
+const FIRST_SEASON_EURO: Record<string, string> = {
+  PSG: 'Ligue des champions',
+  Lens: 'Ligue des champions',
+  Lille: 'Ligue des champions',
+  Marseille: 'Ligue Europa',
+  Lyon: 'Ligue Europa',
+  Rennes: 'Ligue Europa',
+  Monaco: 'Ligue Conférence',
+};
+
 /* ------------------------------------------------------------------ */
 /* Nouvelle partie                                                     */
 /* ------------------------------------------------------------------ */
@@ -233,7 +244,7 @@ export function newGame(club: string): Save {
     fixtures: [],
     matchday: 0,
     log: [],
-    euro: UCL_CLUBS.includes(club) ? { name: 'Ligue des champions', points: 0, played: 0, stage: 'league' } : info.level >= 74 ? { name: 'Ligue Europa', points: 0, played: 0, stage: 'league' } : null,
+    euro: FIRST_SEASON_EURO[club] ? { name: FIRST_SEASON_EURO[club], points: 0, played: 0, stage: 'league' } : null,
     cup: 'Pas encore entrée',
     news: [`Tu prends les rênes de ${club} pour la saison ${season}-${String(season + 1).slice(2)} !`],
     history: [],
