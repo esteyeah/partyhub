@@ -8,8 +8,8 @@
  *   mercato d'hiver (2 ventes, 2 achats) → compo → 2e partie (journées 18-34, phases finales, Coupe de France) →
  *   prolongations des fins de contrat → bilan → saison suivante.
  */
-import { FLAGS, FOOTBALLERS, fitsSlot, priceFor } from '@content/footballers';
-import { MANAGER_SQUADS } from '@content/managerSquads';
+import { FOOTBALLERS, ageFactor, fitsSlot, priceFor } from '@content/footballers';
+import { TM_SQUADS } from '@content/tmSquads';
 import type { FootPos, Footballer } from '@shared/types';
 
 /* ------------------------------------------------------------------ */
@@ -233,38 +233,43 @@ function fromFootballer(f: Footballer, season: number): MPlayer {
   };
 }
 
-const ALL_NAMES = new Set(FOOTBALLERS.map((f) => f.name));
 const slugify = (n: string) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-/** Joueurs réels en plus de la base, pour un club */
-function extraPlayers(club: string, season: number): MPlayer[] {
-  return (MANAGER_SQUADS[club] ?? [])
-    .map((line) => line.split(';'))
-    .filter(([name]) => !ALL_NAMES.has(name))
-    .map(([name, nat, roles, rating, year]) => {
-      const r = Number(rating);
-      const age = season - Number(year);
-      const list = roles.split('/');
-      const value = priceFor(r, age);
-      return {
-        id: `m-${slugify(name)}`,
-        name,
-        pos: POS_OF[list[0]],
-        roles: list,
-        rating: r,
-        age,
-        flag: FLAGS[nat] ?? '🏳️',
-        value,
-        wage: wageFor(value, r),
-        contractEnd: season + 1 + Math.floor(rnd() * 4),
-      };
-    });
+const norm = (n: string) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+const BY_NAME = new Map(FOOTBALLERS.filter((f) => !f.retired).map((f) => [norm(f.name), f]));
+
+/** Effectif réel (Transfermarkt) : la note vient de la base si le joueur y est, sinon de sa valeur marchande et de son âge */
+function tmPlayers(club: string, season: number): MPlayer[] | null {
+  const rows = TM_SQUADS[club];
+  if (!rows) return null;
+  return rows.map((line) => {
+    const [name, flag, role, value, year, contract] = line.split(';');
+    const age = season - Number(year);
+    const v = Math.max(0.2, Number(value));
+    const known = BY_NAME.get(norm(name));
+    const rating = known
+      ? known.rating
+      : Math.max(55, Math.min(88, Math.round(70 + Math.log(v / (3 * ageFactor(age))) / 0.185)));
+    const roles = known ? [role, ...known.roles.filter((r) => r !== role)] : [role];
+    return {
+      id: known?.id ?? `tm-${slugify(name)}`,
+      name,
+      pos: POS_OF[role],
+      roles,
+      rating,
+      age,
+      flag,
+      value: Math.round(v * 10) / 10,
+      wage: wageFor(v, rating),
+      contractEnd: Math.max(season + 1, Number(contract) || season + 2),
+    };
+  });
 }
 
 /** Effectif de départ d'un club : ses vrais joueurs (base + compléments). Un joueur généré seulement s'il manque un gardien. */
 function buildRoster(club: string, level: number, season: number, dataLeague = 'Ligue 1'): MPlayer[] {
-  const real = FOOTBALLERS.filter((f) => f.league === dataLeague && f.club === club && !f.retired).map((f) => fromFootballer(f, season));
-  const roster = [...real, ...extraPlayers(club, season)];
+  const tm = tmPlayers(club, season);
+  const roster = tm ?? FOOTBALLERS.filter((f) => f.league === dataLeague && f.club === club && !f.retired).map((f) => fromFootballer(f, season));
   for (let i = roster.filter((p) => p.roles.includes('GB')).length; i < 2; i++) roster.push(generated(club, 'GB', level, season));
   return roster;
 }
