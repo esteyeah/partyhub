@@ -221,7 +221,7 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
           { value: 'mix', label: '🎲 Mélange' },
           { value: 'qc', label: '🇨🇦 Québécois' },
           { value: 'es', label: '🇪🇸 Espagnols' },
-          { value: 'en', label: '🇬🇧 Anglais (films français)' },
+          { value: 'en', label: '🇬🇧 Titres originaux (anglais)' },
         ],
         default: 'mix',
       },

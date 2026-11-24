@@ -12,7 +12,7 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 | 🏆 **Devine le Rang** (100 / 50 / 0 pts) | ✅ dès qu’un clip est ajouté | uniquement des clips au rang vérifié (tes matchs CS2 via `tools/cs`, ou ajoutés dans `/admin`) |
 | 🔍 **Devine l’image** (floue et zoomée, elle se défloute et dézoome petit à petit) | ✅ jouable | 266 images : célébrités, jaquettes de jeux vidéo, affiches de films et de séries (récupérées sur Wikipédia au lancement) |
 | 🕵️ **Qui suis-je ?** (indices de plus en plus évidents) | ✅ jouable | 167 fiches (dont 47 difficiles) : personnalités, personnages de fiction et œuvres |
-| 🎞️ **Devine le film** (titre québécois, espagnol ou anglais → titre français ; QCM ou réponse libre) | ✅ jouable | 71 titres (47 québécois) |
+| 🎞️ **Devine le film** (titre québécois, espagnol ou anglais → titre français ; QCM ou réponse libre) | ✅ jouable | 81 titres (47 québécois, 32 titres originaux anglais, 2 espagnols) |
 | 📅 **Blind Test des années** (devine l’année de sortie : précision d’abord, rapidité ensuite) | ✅ jouable | 165 morceaux de 1792 à 2024 |
 | 🏛️ **Devine la date** (histoire & culture, barème tolérant) | ✅ jouable | 71 événements |
 | 🎯 **Au plus proche** (question chiffrée : années, records, populations… le plus proche marque le plus) | ✅ jouable | 86 questions |

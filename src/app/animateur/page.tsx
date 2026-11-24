@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { CLOSEST_QUESTIONS } from '@content/closest';
 import { DATE_EVENTS } from '@content/dates';
@@ -31,9 +30,10 @@ interface Card {
   image?: string;
 }
 
-type Mode = 'quiz' | 'closest' | 'dates' | 'whoami' | 'movietitle' | 'memes' | 'blindyear' | 'pixel';
+type Mode = 'mix' | 'quiz' | 'closest' | 'dates' | 'whoami' | 'movietitle' | 'memes' | 'blindyear' | 'pixel';
 
 const MODES: { id: Mode; emoji: string; name: string; hint: string }[] = [
+  { id: 'mix', emoji: '🎲', name: 'Méli-mélo', hint: 'Un peu de tous les jeux, au hasard' },
   { id: 'quiz', emoji: '🧠', name: 'Quiz', hint: 'Lis la question et les 4 réponses' },
   { id: 'closest', emoji: '🎯', name: 'Au plus proche', hint: 'Chacun annonce un nombre, le plus proche gagne' },
   { id: 'dates', emoji: '🏛️', name: 'Devine la date', hint: 'Chacun annonce une année' },
@@ -55,10 +55,29 @@ function shuffle<T>(a: readonly T[]): T[] {
 
 const fmt = (v: number) => v.toLocaleString('fr-FR', { maximumFractionDigits: 3 });
 
-function buildDeck(mode: Mode): Card[] {
+/** Thèmes proposés pour chaque jeu (« all » = tout) */
+const THEMES: Partial<Record<Mode, { id: string; label: string }[]>> = {
+  quiz: [{ id: 'all', label: 'Tout' }, { id: 'culture', label: '🌍 Culture G' }, { id: 'foot', label: '⚽ Foot' }, { id: 'enigme', label: '🧩 Énigmes' }, { id: 'piege', label: '🪤 Pièges' }],
+  dates: [{ id: 'all', label: 'Tout' }, { id: 'histoire', label: '🏛️ Histoire' }, { id: 'culture', label: '🎭 Culture' }],
+  whoami: [{ id: 'all', label: 'Tout' }, { id: 'perso', label: '⭐ Personnalités' }, { id: 'fiction', label: '🦸 Fiction' }, { id: 'oeuvre', label: '🎨 Œuvres' }, { id: 'hard', label: '🔥 Difficile' }],
+  movietitle: [{ id: 'all', label: 'Tout' }, { id: 'qc', label: '🇨🇦 Québécois' }, { id: 'en', label: '🇬🇧 Titres originaux' }, { id: 'es', label: '🇪🇸 Espagnol' }],
+  memes: [{ id: 'all', label: 'Tout' }, { id: 'quotes', label: '💬 Répliques' }, { id: 'sequels', label: '🎞️ Suites de films' }],
+  blindyear: [{ id: 'all', label: 'Tout' }, { id: 'fr', label: '🇫🇷 Francophone' }, { id: 'inter', label: '🌎 International' }, { id: 'old', label: '📼 Avant 2000' }, { id: 'new', label: '📱 Depuis 2000' }],
+  pixel: [{ id: 'all', label: 'Tout' }, { id: 'celeb', label: '⭐ Célébrités' }, { id: 'game', label: '🎮 Jeux vidéo' }, { id: 'film', label: '🎬 Films' }, { id: 'serie', label: '📺 Séries' }],
+};
+
+function buildDeck(mode: Mode, theme = 'all'): Card[] {
+  const all = theme === 'all';
   switch (mode) {
+    case 'mix': {
+      // Méli-mélo : on pioche dans chaque jeu à tour de rôle, dans le désordre
+      const decks = (['quiz', 'closest', 'dates', 'whoami', 'movietitle', 'memes', 'blindyear', 'pixel'] as Mode[]).map((m) => buildDeck(m));
+      const out: Card[] = [];
+      while (decks.some((d) => d.length)) for (const d of shuffle(decks)) if (d.length) out.push(d.shift()!);
+      return out;
+    }
     case 'quiz':
-      return shuffle(QUIZ_QUESTIONS).map((q) => ({
+      return shuffle(QUIZ_QUESTIONS.filter((q) => all || (theme === 'foot' ? q.theme === 'foot' : q.category === theme))).map((q) => ({
         label: q.category === 'enigme' ? '🧩 Énigme' : '🧠 Quiz',
         question: q.question,
         choices: q.category === 'enigme' ? undefined : q.choices,
@@ -68,18 +87,18 @@ function buildDeck(mode: Mode): Card[] {
     case 'closest':
       return shuffle(CLOSEST_QUESTIONS).map((q) => ({ label: '🎯 Au plus proche', question: q.q, answer: fmt(q.answer) + (q.unit ? ` ${q.unit}` : '') }));
     case 'dates':
-      return shuffle(DATE_EVENTS).map((e) => ({ label: e.cat === 'histoire' ? '🏛️ Histoire' : '🎭 Culture', question: `${e.text} : en quelle année ?`, answer: String(e.year) }));
+      return shuffle(DATE_EVENTS.filter((e) => all || e.cat === theme)).map((e) => ({ label: e.cat === 'histoire' ? '🏛️ Histoire' : '🎭 Culture', question: `${e.text} : en quelle année ?`, answer: String(e.year) }));
     case 'whoami':
-      return shuffle(WHO_ITEMS).map((w) => ({ label: '🕵️ Qui suis-je ?', question: 'Qui suis-je ?', clues: w.clues, answer: w.name }));
+      return shuffle(WHO_ITEMS.filter((w) => all || (theme === 'hard' ? w.hard : w.cat === theme))).map((w) => ({ label: '🕵️ Qui suis-je ?', question: 'Qui suis-je ?', clues: w.clues, answer: w.name }));
     case 'movietitle':
-      return shuffle(MOVIE_TITLES).map((m) => ({
-        label: m.lang === 'qc' ? '🇨🇦 Titre québécois' : m.lang === 'es' ? '🇪🇸 Titre espagnol' : '🇬🇧 Titre anglais',
+      return shuffle(MOVIE_TITLES.filter((m) => all || m.lang === theme)).map((m) => ({
+        label: m.lang === 'qc' ? '🇨🇦 Titre québécois' : m.lang === 'es' ? '🇪🇸 Titre espagnol' : '🇬🇧 Titre original',
         question: `« ${m.foreign} »`,
         answer: m.answer,
         note: `Sorti en ${m.year}`,
       }));
     case 'memes':
-      return shuffle(MEMES).map((m) => ({
+      return shuffle(MEMES.filter((m) => all || (theme === 'sequels' ? m.kind === 'sequel' : m.kind !== 'sequel'))).map((m) => ({
         label: m.kind === 'sequel' ? '🎞️ Quelle est la suite ?' : '💬 Complète la phrase',
         question: m.text,
         choices: m.choices,
@@ -87,7 +106,9 @@ function buildDeck(mode: Mode): Card[] {
         note: m.source,
       }));
     case 'blindyear':
-      return shuffle(YEAR_TRACKS).map((t) => ({
+      return shuffle(
+        YEAR_TRACKS.filter((t) => all || (theme === 'fr' ? t.fr : theme === 'inter' ? !t.fr : theme === 'old' ? t.year < 2000 : t.year >= 2000)),
+      ).map((t) => ({
         label: '🎵 Blind test',
         question: 'Titre, artiste… et année ?',
         answer: `${t.title} — ${t.artist}`,
@@ -95,12 +116,13 @@ function buildDeck(mode: Mode): Card[] {
         audio: { artist: t.artist, title: t.title },
       }));
     case 'pixel':
-      return shuffle(PIXEL_ITEMS).map((p) => ({ label: '🔍 Devine l’image', question: 'Qui ou qu’est-ce que c’est ?', answer: p.name, image: `wiki:${p.wiki}` }));
+      return shuffle(PIXEL_ITEMS.filter((p) => all || p.cat === theme)).map((p) => ({ label: '🔍 Devine l’image', question: 'Qui ou qu’est-ce que c’est ?', answer: p.name, image: `wiki:${p.wiki}` }));
   }
 }
 
 export default function AnimateurPage() {
   const [mode, setMode] = useState<Mode | null>(null);
+  const [theme, setTheme] = useState('all');
   const [deck, setDeck] = useState<Card[]>([]);
   const [i, setI] = useState(0);
   const [shown, setShown] = useState(false);
@@ -110,9 +132,10 @@ export default function AnimateurPage() {
 
   const card = deck[i];
 
-  const start = (m: Mode) => {
+  const start = (m: Mode, t = 'all') => {
     setMode(m);
-    setDeck(buildDeck(m));
+    setTheme(t);
+    setDeck(buildDeck(m, t));
     setI(0);
     setShown(false);
     setClue(1);
@@ -126,9 +149,7 @@ export default function AnimateurPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-5">
       <div className="mb-5 flex items-center justify-between">
-        <Link href="/">
-          <Logo />
-        </Link>
+        <Logo />
         {mode && (
           <button onClick={() => setMode(null)} className="rounded-xl px-3 py-1.5 text-sm text-zinc-400 hover:bg-white/10 hover:text-white">
             ← Jeux
@@ -157,6 +178,19 @@ export default function AnimateurPage() {
         </div>
       ) : card ? (
         <div className="space-y-4">
+          {THEMES[mode] && (
+            <div className="flex flex-wrap gap-2">
+              {THEMES[mode]!.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => start(mode, t.id)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${theme === t.id ? 'bg-fuchsia-500/30 text-white ring-1 ring-fuchsia-400/60' : 'bg-white/[0.05] text-zinc-400'}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex items-center justify-between text-sm text-zinc-400">
             <span>{card.label}</span>
             <span className="font-mono">
@@ -212,7 +246,14 @@ export default function AnimateurPage() {
 
           <Scores players={players} setPlayers={setPlayers} newName={newName} setNewName={setNewName} compact />
         </div>
-      ) : null}
+      ) : (
+        <div className="panel p-6 text-center text-zinc-400">
+          Aucune question pour ce thème.{' '}
+          <button onClick={() => start(mode, 'all')} className="font-bold text-fuchsia-300">
+            Tout afficher
+          </button>
+        </div>
+      )}
     </main>
   );
 }

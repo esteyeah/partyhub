@@ -10,7 +10,7 @@ type Settings = { rounds: number; time: string; lang: string; mode: string };
 const LANGS: Record<TitleLang, { flag: string; label: string }> = {
   qc: { flag: '🇨🇦', label: 'Titre québécois' },
   es: { flag: '🇪🇸', label: 'Titre espagnol' },
-  en: { flag: '🇬🇧', label: 'Titre anglais' },
+  en: { flag: '🇬🇧', label: 'Titre original' },
 };
 
 /** Devine le film à partir de son titre étranger (québécois surtout). */
@@ -36,7 +36,7 @@ export class MovieTitleGame extends RoundGame<MovieTitle, MovieTitlePrompt, Movi
     if (this.settings.mode === 'libre') {
       return {
         ...base,
-        input: { kind: 'text', placeholder: 'Titre du film en France…', keys: [{ key: 'answer', label: 'Film' }] },
+        input: { kind: 'text', placeholder: 'Titre en France…', keys: [{ key: 'answer', label: 'Film' }] },
         durationMs: Math.max(time, 25_000),
       };
     }
