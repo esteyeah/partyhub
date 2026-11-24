@@ -23,6 +23,10 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 
 ---
 
+## ⚽ Manager Ligue 1 (solo)
+
+Lien « ⚽ Manager » sur l’accueil (`/manager`) : choisis un club de Ligue 1, gère les mercatos d’été (4 dilemmes de vente, 4 d’achat dont un au poste de ton choix) et d’hiver (2 + 2), ton budget transferts et ta masse salariale, prolonge ou non les fins de contrat, compose ton 11 et tes remplaçants avant chaque demi-saison simulée (Ligue 1, Coupe de France, coupe d’Europe). Partie sauvegardée dans le navigateur.
+
 ## 🎤 Mode animateur (un seul téléphone)
 
 Lien « 🎤 Mode animateur » sur l’accueil (`/animateur`) : celui qui tient le téléphone pose les questions à voix haute, voit la réponse, avance à son rythme (pas de chrono) et compte les points des autres. Jeux : Quiz, Au plus proche, Devine la date, Qui suis-je ?, Devine le film, Complète la phrase, Blind test, Devine l’image.

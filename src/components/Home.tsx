@@ -46,6 +46,9 @@ export function Home() {
           <span className="hidden items-center gap-2 text-sm text-zinc-400 sm:flex">
             <span className="h-2 w-2 rounded-full bg-emerald-400" /> Connexion directe entre joueurs
           </span>
+          <Link href="/manager" className="rounded-xl px-3 py-1.5 text-sm font-semibold text-emerald-300 transition hover:bg-white/8 hover:text-white">
+            ⚽ Manager
+          </Link>
           <Link href="/animateur" className="rounded-xl px-3 py-1.5 text-sm font-semibold text-fuchsia-300 transition hover:bg-white/8 hover:text-white">
             🎤 Mode animateur
           </Link>
