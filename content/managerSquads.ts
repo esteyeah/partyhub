@@ -12,7 +12,6 @@ export const MANAGER_SQUADS: Record<string, string[]> = {
     "Faris Moumbagna;CMR;BU;72;2000",
     "Keyliane Abdallah;FRA;AG;68;2006",
     "Rubén Blanco;ESP;GB;70;1995",
-    "Emran Soglo;BEN;AD;69;2005",
     "Théo Vermot;FRA;GB;68;2005",
     "Jeffrey de Lange;NED;GB;70;1998",
     "Derek Cornelius;CAN;DC/DG;75;1997",
