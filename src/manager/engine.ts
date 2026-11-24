@@ -152,12 +152,12 @@ export const CLUBS: { name: string; level: number; budget: number }[] = [
   { name: 'Paris FC', level: 72, budget: 30 },
   { name: 'Brest', level: 72, budget: 15 },
   { name: 'Toulouse', level: 72, budget: 15 },
-  { name: 'Nantes', level: 71, budget: 12 },
   { name: 'Auxerre', level: 70, budget: 10 },
   { name: 'Lorient', level: 70, budget: 10 },
   { name: 'Le Havre', level: 70, budget: 10 },
   { name: 'Angers', level: 70, budget: 8 },
-  { name: 'Metz', level: 69, budget: 8 },
+  { name: 'Troyes', level: 70, budget: 12 },
+  { name: 'Le Mans', level: 69, budget: 8 },
 ];
 
 export const FORMATIONS: Record<string, string[]> = {
