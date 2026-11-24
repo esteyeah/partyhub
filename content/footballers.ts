@@ -10,7 +10,8 @@ import type { FootPos, Footballer } from '../shared/types';
  */
 type Row = [name: string, nat: string, club: string, league: string, rating: number, roles: string];
 
-const FLAGS: Record<string, string> = {
+export const FLAGS: Record<string, string> = {
+  PAN: '🇵🇦', FIN: '🇫🇮', SLE: '🇸🇱', TUN: '🇹🇳', BDI: '🇧🇮', JOR: '🇯🇴', PAR: '🇵🇾', GNB: '🇬🇼', CHI: '🇨🇱', VEN: '🇻🇪', BEN: '🇧🇯', HAI: '🇭🇹', GAM: '🇬🇲', JAM: '🇯🇲', NIR: '🇬🇧', WAL: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', MOZ: '🇲🇿', BUL: '🇧🇬', AUS: '🇦🇺',
   FRA: '🇫🇷', ESP: '🇪🇸', ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', BRA: '🇧🇷', ARG: '🇦🇷', POR: '🇵🇹', GER: '🇩🇪', ITA: '🇮🇹', BEL: '🇧🇪', NED: '🇳🇱',
   MAR: '🇲🇦', CRO: '🇭🇷', NOR: '🇳🇴', URU: '🇺🇾', EGY: '🇪🇬', POL: '🇵🇱', SWE: '🇸🇪', GEO: '🇬🇪', NGA: '🇳🇬', SVN: '🇸🇮',
   UKR: '🇺🇦', SUI: '🇨🇭', CAN: '🇨🇦', TUR: '🇹🇷', CMR: '🇨🇲', ECU: '🇪🇨', KOR: '🇰🇷', HUN: '🇭🇺', KOS: '🇽🇰', SVK: '🇸🇰',

@@ -1,13 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   LEAGUES,
   clubsOf,
   type LeagueId,
   FORMATIONS,
   answerDilemma,
+  answerSale,
+  answerScout,
+  market,
+  scout,
+  trySell,
   autoLineup,
   chooseSlot,
   expiring,
@@ -170,7 +175,13 @@ type Update = (fn: (s: Save) => string | void | null) => void;
 
 function Game({ save, update }: { save: Save; update: Update }) {
   const p = save.phase;
-  if (p === 'summer' || p === 'winter') return <Mercato save={save} update={update} />;
+  if (p === 'summer' || p === 'winter')
+    return (
+      <div className="space-y-3">
+        <Mercato save={save} update={update} />
+        <MarketTools save={save} update={update} />
+      </div>
+    );
   if (p === 'lineup1' || p === 'lineup2') return <Lineup save={save} update={update} />;
   if (p === 'results1' || p === 'results2') return <Results save={save} update={update} />;
   if (p === 'renew') return <Renew save={save} update={update} />;
@@ -268,6 +279,84 @@ function Mercato({ save, update }: { save: Save; update: Update }) {
           </button>
         </>
       )}
+    </div>
+  );
+}
+
+/* ---------------- Sondages et ventes libres ---------------- */
+
+function MarketTools({ save, update }: { save: Save; update: Update }) {
+  const [q, setQ] = useState('');
+  const [sellId, setSellId] = useState('');
+  const results = useMemo(() => {
+    if (q.trim().length < 2) return [];
+    const n = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return market(save)
+      .filter((m) => m.player.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(n))
+      .slice(0, 8);
+  }, [q, save]);
+  const b = save.pendingBuy;
+  const sale = save.pendingSale;
+  const saleP = sale ? save.squad.find((p) => p.id === sale.playerId) : null;
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="panel space-y-2 p-4">
+        <h3 className="font-black">🔎 Sonder un joueur <span className="text-xs font-normal text-zinc-500">({save.scouts ?? 0} restant{(save.scouts ?? 0) > 1 ? 's' : ''})</span></h3>
+        {b ? (
+          <div className="space-y-2 rounded-xl bg-white/[0.04] p-3">
+            <PlayerLine p={b.player} />
+            <p className="text-sm">
+              {b.club} {b.free ? <b className="text-amber-300">le laisse partir libre</b> : <>demande <b className="text-rose-300">{b.fee} M€</b></>} · salaire {b.player.wage} M€/an
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => update((s) => answerScout(s, true))} className="flex-1 rounded-xl bg-emerald-500/20 py-1.5 text-sm font-bold text-emerald-200">Accepter</button>
+              <button onClick={() => update((s) => answerScout(s, false))} className="flex-1 rounded-xl bg-rose-500/15 py-1.5 text-sm font-bold text-rose-200">Refuser</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <input className="input text-sm" placeholder="Nom du joueur (ex : Mbappé, Saka…)" value={q} onChange={(e) => setQ(e.target.value)} disabled={!save.scouts} />
+            <ul className="space-y-1">
+              {results.map((m) => (
+                <li key={m.player.id}>
+                  <button disabled={!save.scouts} onClick={() => { update((s) => scout(s, m.player.id)); setQ(''); }} className="w-full rounded-lg bg-white/[0.03] px-2 py-1.5 text-left text-sm hover:bg-white/[0.08] disabled:opacity-40">
+                    <b className="font-mono">{m.player.rating}</b> {m.player.name} · <span className="text-zinc-500">{m.player.roles[0]} · {m.club} · ~{m.player.value} M€</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+      <div className="panel space-y-2 p-4">
+        <h3 className="font-black">📤 Mettre un joueur en vente <span className="text-xs font-normal text-zinc-500">({save.saleTries ?? 0} restante{(save.saleTries ?? 0) > 1 ? 's' : ''})</span></h3>
+        {sale && saleP ? (
+          <div className="space-y-2 rounded-xl bg-white/[0.04] p-3">
+            <PlayerLine p={saleP} />
+            {sale.offers.map((o, i) => (
+              <button key={i} onClick={() => update((s) => answerSale(s, i))} className="flex w-full items-center justify-between rounded-lg bg-white/[0.05] px-3 py-1.5 text-sm hover:bg-white/10">
+                <span>{o.club} <span className={`ml-1 rounded px-1.5 text-[10px] font-bold ${o.tone === 'belle' ? 'bg-emerald-500/30' : o.tone === 'correcte' ? 'bg-sky-500/25' : 'bg-rose-500/25'}`}>offre {o.tone}</span></span>
+                <b className="text-emerald-300">+{o.fee} M€</b>
+              </button>
+            ))}
+            <button onClick={() => update((s) => answerSale(s, null))} className="w-full rounded-lg bg-rose-500/15 py-1.5 text-sm font-bold text-rose-200">Refuser toutes les offres</button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <select className="flex-1 rounded-xl border border-white/10 bg-ink-800 px-2 py-1.5 text-sm" value={sellId} onChange={(e) => setSellId(e.target.value)} disabled={!save.saleTries}>
+              <option value="">Choisis un joueur…</option>
+              {[...save.squad].sort((a, b) => b.rating - a.rating).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.rating} · {p.name} ({p.roles[0]}) · valeur {p.value} M€
+                </option>
+              ))}
+            </select>
+            <button disabled={!sellId || !save.saleTries} onClick={() => { update((s) => trySell(s, sellId)); setSellId(''); }} className="rounded-xl bg-white/10 px-3 text-sm font-bold disabled:opacity-40">
+              Proposer
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

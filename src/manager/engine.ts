@@ -8,7 +8,8 @@
  *   mercato d'hiver (2 ventes, 2 achats) → compo → 2e partie (journées 18-34, phases finales, Coupe de France) →
  *   prolongations des fins de contrat → bilan → saison suivante.
  */
-import { FOOTBALLERS, fitsSlot, priceFor } from '@content/footballers';
+import { FLAGS, FOOTBALLERS, fitsSlot, priceFor } from '@content/footballers';
+import { MANAGER_SQUADS } from '@content/managerSquads';
 import type { FootPos, Footballer } from '@shared/types';
 
 /* ------------------------------------------------------------------ */
@@ -95,6 +96,11 @@ export interface Save {
   history: { season: number; rank: number; cup: string; euro: string }[];
   /** Effectifs des autres clubs (pour les achats et la force des adversaires) */
   others: Record<string, MPlayer[]>;
+  /** Mercato : sondages d'achat et tentatives de vente restants */
+  scouts?: number;
+  saleTries?: number;
+  pendingBuy?: { player: MPlayer; club: string; fee: number; free: boolean } | null;
+  pendingSale?: { playerId: string; offers: { club: string; fee: number; tone: 'basse' | 'correcte' | 'belle' }[] } | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -227,15 +233,39 @@ function fromFootballer(f: Footballer, season: number): MPlayer {
   };
 }
 
-/** Effectif de départ d'un club : ses vrais joueurs, complétés jusqu'à 2 joueurs par poste */
+const ALL_NAMES = new Set(FOOTBALLERS.map((f) => f.name));
+const slugify = (n: string) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+/** Joueurs réels en plus de la base, pour un club */
+function extraPlayers(club: string, season: number): MPlayer[] {
+  return (MANAGER_SQUADS[club] ?? [])
+    .map((line) => line.split(';'))
+    .filter(([name]) => !ALL_NAMES.has(name))
+    .map(([name, nat, roles, rating, year]) => {
+      const r = Number(rating);
+      const age = season - Number(year);
+      const list = roles.split('/');
+      const value = priceFor(r, age);
+      return {
+        id: `m-${slugify(name)}`,
+        name,
+        pos: POS_OF[list[0]],
+        roles: list,
+        rating: r,
+        age,
+        flag: FLAGS[nat] ?? '🏳️',
+        value,
+        wage: wageFor(value, r),
+        contractEnd: season + 1 + Math.floor(rnd() * 4),
+      };
+    });
+}
+
+/** Effectif de départ d'un club : ses vrais joueurs (base + compléments). Un joueur généré seulement s'il manque un gardien. */
 function buildRoster(club: string, level: number, season: number, dataLeague = 'Ligue 1'): MPlayer[] {
   const real = FOOTBALLERS.filter((f) => f.league === dataLeague && f.club === club && !f.retired).map((f) => fromFootballer(f, season));
-  const roster = [...real];
-  const need: Record<string, number> = { GB: 2, DG: 2, DC: 4, DD: 2, MDC: 2, MC: 3, MOC: 1, AG: 2, AD: 2, BU: 2 };
-  for (const [role, n] of Object.entries(need)) {
-    const have = roster.filter((p) => p.roles.includes(role)).length;
-    for (let i = have; i < n; i++) roster.push(generated(club, role, level, season));
-  }
+  const roster = [...real, ...extraPlayers(club, season)];
+  for (let i = roster.filter((p) => p.roles.includes('GB')).length; i < 2; i++) roster.push(generated(club, 'GB', level, season));
   return roster;
 }
 
@@ -395,6 +425,10 @@ export function makeBuy(s: Save, slot: string): Dilemma {
 
 function summerDilemmas(s: Save): Dilemma[] {
   s.dilemmas = [];
+  s.scouts = 3;
+  s.saleTries = 3;
+  s.pendingBuy = null;
+  s.pendingSale = null;
   for (let i = 0; i < 4; i++) s.dilemmas.push(makeSell(s));
   const n = needs(s);
   for (let i = 0; i < 3; i++) s.dilemmas.push(makeBuy(s, n[i % n.length]));
@@ -404,10 +438,88 @@ function summerDilemmas(s: Save): Dilemma[] {
 
 function winterDilemmas(s: Save): Dilemma[] {
   s.dilemmas = [];
+  s.scouts = 2;
+  s.saleTries = 2;
+  s.pendingBuy = null;
+  s.pendingSale = null;
   for (let i = 0; i < 2; i++) s.dilemmas.push(makeSell(s));
   s.dilemmas.push(makeBuy(s, needs(s)[0]));
   s.dilemmas.push({ kind: 'pickSlot' });
   return s.dilemmas;
+}
+
+function removeFromOthers(s: Save, id: string) {
+  for (const c of Object.keys(s.others)) s.others[c] = s.others[c].filter((p) => p.id !== id);
+}
+
+/* ---------------- Sondages et ventes libres ---------------- */
+
+/** Tous les joueurs qu'on peut sonder : autres clubs du championnat + reste de la base */
+export function market(s: Save): { player: MPlayer; club: string }[] {
+  const out: { player: MPlayer; club: string }[] = [];
+  const seen = new Set(s.squad.map((p) => p.id));
+  for (const [club, roster] of Object.entries(s.others)) for (const p of roster) if (!seen.has(p.id)) (seen.add(p.id), out.push({ player: p, club }));
+  for (const f of FOOTBALLERS) if (!f.retired && !seen.has(f.id)) (seen.add(f.id), out.push({ player: fromFootballer(f, s.season), club: f.club }));
+  return out;
+}
+
+/** Sonder un joueur : son club annonce un prix (plus bas en fin de contrat, gratuit s'il est libre) */
+export function scout(s: Save, playerId: string): string | void {
+  if (!s.scouts) return 'Plus de sondage disponible pour ce mercato';
+  const m = market(s).find((x) => x.player.id === playerId);
+  if (!m) return 'Joueur introuvable';
+  s.scouts--;
+  const free = m.club === 'Sans club' || m.club === 'Libre';
+  const endSoon = m.player.contractEnd <= s.season + 1;
+  const ask = free ? 0 : Math.max(1, Math.round(m.player.value * (endSoon ? 0.5 + rnd() * 0.3 : 1.05 + rnd() * 0.45)));
+  const player = { ...m.player, contractEnd: s.season + 2 + Math.floor(rnd() * 3), wage: free ? round1(m.player.wage * 1.5) : m.player.wage };
+  s.pendingBuy = { player, club: m.club, fee: ask, free };
+}
+
+export function answerScout(s: Save, accept: boolean): string | void {
+  const b = s.pendingBuy;
+  if (!b) return;
+  if (accept) {
+    if (b.fee > s.transferBudget) return 'Budget transferts insuffisant';
+    if (wageTotal(s) + b.player.wage > s.wageBudget) return 'Masse salariale dépassée';
+    s.transferBudget -= b.fee;
+    s.squad.push(b.player);
+    removeFromOthers(s, b.player.id);
+    s.news.unshift(`✍️ ${b.player.name} arrive de ${b.club}${b.free ? ' (libre)' : ` pour ${b.fee} M€`}.`);
+  } else s.news.unshift(`🙅 Tu refuses les ${b.fee} M€ demandés pour ${b.player.name}.`);
+  s.pendingBuy = null;
+}
+
+/** Mettre un joueur sur le marché : offres variées (souvent basses, parfois correctes, rarement belles) */
+export function trySell(s: Save, playerId: string): string | void {
+  if (!s.saleTries) return 'Plus de tentative de vente pour ce mercato';
+  const p = s.squad.find((x) => x.id === playerId);
+  if (!p) return 'Joueur introuvable';
+  s.saleTries--;
+  const buyers = shuffle([...Object.keys(s.others), 'Brighton', 'Villarreal', 'Séville', 'Bologne', 'Fenerbahçe', 'Porto', 'Al-Ahli', 'Leverkusen', 'Benfica', 'Galatasaray']).slice(0, 3);
+  const n = 1 + Math.floor(rnd() * 3);
+  const offers = buyers.slice(0, n).map((club) => {
+    const r = rnd();
+    const tone: 'basse' | 'correcte' | 'belle' = r < 0.5 ? 'basse' : r < 0.85 ? 'correcte' : 'belle';
+    const f = tone === 'basse' ? 0.45 + rnd() * 0.3 : tone === 'correcte' ? 0.85 + rnd() * 0.25 : 1.15 + rnd() * 0.35;
+    return { club, fee: Math.max(1, Math.round(p.value * f)), tone };
+  });
+  s.pendingSale = { playerId, offers: offers.sort((a, b) => b.fee - a.fee) };
+}
+
+export function answerSale(s: Save, idx: number | null) {
+  const sale = s.pendingSale;
+  if (!sale) return;
+  const p = s.squad.find((x) => x.id === sale.playerId);
+  if (p && idx !== null) {
+    const o = sale.offers[idx];
+    s.squad = s.squad.filter((x) => x.id !== p.id);
+    s.transferBudget += o.fee;
+    s.xi = s.xi.map((id) => (id === p.id ? null : id));
+    s.subs = s.subs.filter((id) => id !== p.id);
+    s.news.unshift(`💸 ${p.name} vendu à ${o.club} pour ${o.fee} M€.`);
+  } else if (p) s.news.unshift(`🙅 Tu refuses les offres pour ${p.name}.`);
+  s.pendingSale = null;
 }
 
 export const wageTotal = (s: Save) => round1(s.squad.reduce((x, p) => x + p.wage, 0));
@@ -432,6 +544,7 @@ export function answerDilemma(s: Save, idx: number, choice: number | null): stri
       if (wageTotal(s) + o.player.wage > s.wageBudget) return 'Masse salariale dépassée : vends ou laisse partir un joueur d’abord';
       s.transferBudget -= o.fee;
       s.squad.push(o.player);
+      removeFromOthers(s, o.player.id);
       s.news.unshift(`✍️ ${o.player.name} signe${o.free ? ' libre' : ` pour ${o.fee} M€`} (${o.player.wage} M€/an).`);
     }
   }
