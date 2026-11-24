@@ -104,4 +104,9 @@ export const CLOSEST_QUESTIONS: ClosestQuestion[] = [
   y('En quelle année le circuit Paul-Ricard (Le Castellet) a-t-il été inauguré ?', 1970),
   n('Combien de kilomètres mesure un tour du circuit Paul-Ricard (tracé F1) ?', 5.842, 'km', true),
   n('Record du tour en course de F1 au circuit Paul-Ricard (Sebastian Vettel, 2019) : combien de secondes ?', 92.74, 's', true),
+  y('En quelle année a été créé le parc d’attractions OK Corral (Cuges-les-Pins) ?', 1966),
+  n('Quelle est la vitesse de pointe record en MotoGP (Jorge Martín, Mugello 2026) ?', 368.6, 'km/h', true),
+  n('Record du monde sur la Route Arc-en-ciel de Mario Kart 8 Deluxe en 150 cc : combien de secondes (environ) ?', 117.9, 's', true),
+  n('Combien de spectateurs peut accueillir le circuit Paul-Ricard (environ) ?', 90000, 'spectateurs'),
+  n('Quelle est la superficie de la commune de Ceyreste ?', 22.6, 'km²', true),
 ];
