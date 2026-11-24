@@ -72,6 +72,8 @@ export type Phase = 'summer' | 'lineup1' | 'results1' | 'winter' | 'lineup2' | '
 
 export interface Save {
   version: 1;
+  /** Championnat (anciennes sauvegardes : Ligue 1) */
+  league?: LeagueId;
   club: string;
   season: number;
   phase: Phase;
@@ -98,6 +100,38 @@ export interface Save {
 /* ------------------------------------------------------------------ */
 /* Clubs                                                               */
 /* ------------------------------------------------------------------ */
+
+export type LeagueId = 'L1' | 'PL';
+
+export const LEAGUES: Record<LeagueId, { name: string; dataLeague: string; cup: string; amateurs: string[] }> = {
+  L1: { name: 'Ligue 1', dataLeague: 'Ligue 1', cup: 'Coupe de France', amateurs: ['FC Rouen', 'Le Puy Foot', 'US Concarneau', 'Bastia', 'Guingamp', 'Amiens', 'Red Star', 'Grenoble', 'Caen', 'Dunkerque'] },
+  PL: { name: 'Premier League', dataLeague: 'Premier League', cup: 'FA Cup', amateurs: ['Wrexham', 'Stockport County', 'Plymouth Argyle', 'Barnsley', 'Wigan', 'Bolton', 'Portsmouth', 'Sheffield Wednesday', 'Derby County', 'Blackburn'] },
+};
+
+export const PL_CLUBS: { name: string; level: number; budget: number }[] = [
+  { name: 'Arsenal', level: 83, budget: 150 },
+  { name: 'Liverpool', level: 83, budget: 150 },
+  { name: 'Manchester City', level: 83, budget: 180 },
+  { name: 'Chelsea', level: 81, budget: 150 },
+  { name: 'Manchester United', level: 80, budget: 130 },
+  { name: 'Tottenham', level: 80, budget: 120 },
+  { name: 'Aston Villa', level: 79, budget: 90 },
+  { name: 'Newcastle', level: 79, budget: 100 },
+  { name: 'Crystal Palace', level: 77, budget: 60 },
+  { name: 'Brighton', level: 77, budget: 70 },
+  { name: 'Bournemouth', level: 76, budget: 50 },
+  { name: 'Nottingham Forest', level: 76, budget: 60 },
+  { name: 'Brentford', level: 75, budget: 45 },
+  { name: 'Fulham', level: 75, budget: 45 },
+  { name: 'Everton', level: 75, budget: 50 },
+  { name: 'Sunderland', level: 74, budget: 40 },
+  { name: 'Leeds', level: 73, budget: 40 },
+  { name: 'Coventry City', level: 72, budget: 30 },
+  { name: 'Ipswich Town', level: 72, budget: 30 },
+  { name: 'Hull City', level: 71, budget: 25 },
+];
+
+export const clubsOf = (league: LeagueId = 'L1') => (league === 'PL' ? PL_CLUBS : CLUBS);
 
 export const CLUBS: { name: string; level: number; budget: number }[] = [
   { name: 'PSG', level: 81, budget: 150 },
@@ -194,8 +228,8 @@ function fromFootballer(f: Footballer, season: number): MPlayer {
 }
 
 /** Effectif de départ d'un club : ses vrais joueurs, complétés jusqu'à 2 joueurs par poste */
-function buildRoster(club: string, level: number, season: number): MPlayer[] {
-  const real = FOOTBALLERS.filter((f) => f.league === 'Ligue 1' && f.club === club && !f.retired).map((f) => fromFootballer(f, season));
+function buildRoster(club: string, level: number, season: number, dataLeague = 'Ligue 1'): MPlayer[] {
+  const real = FOOTBALLERS.filter((f) => f.league === dataLeague && f.club === club && !f.retired).map((f) => fromFootballer(f, season));
   const roster = [...real];
   const need: Record<string, number> = { GB: 2, DG: 2, DC: 4, DD: 2, MDC: 2, MC: 3, MOC: 1, AG: 2, AD: 2, BU: 2 };
   for (const [role, n] of Object.entries(need)) {
@@ -214,22 +248,34 @@ const FIRST_SEASON_EURO: Record<string, string> = {
   Lyon: 'Ligue Europa',
   Rennes: 'Ligue Europa',
   Monaco: 'Ligue Conférence',
+  // Premier League
+  Arsenal: 'Ligue des champions',
+  Liverpool: 'Ligue des champions',
+  'Manchester City': 'Ligue des champions',
+  'Aston Villa': 'Ligue des champions',
+  'Manchester United': 'Ligue des champions',
+  Bournemouth: 'Ligue Europa',
+  Sunderland: 'Ligue Europa',
+  'Crystal Palace': 'Ligue Europa',
+  Brighton: 'Ligue Conférence',
 };
 
 /* ------------------------------------------------------------------ */
 /* Nouvelle partie                                                     */
 /* ------------------------------------------------------------------ */
 
-export function newGame(club: string): Save {
+export function newGame(club: string, league: LeagueId = 'L1'): Save {
+  const CLUBS = clubsOf(league);
   const season = 2026;
   const others: Record<string, MPlayer[]> = {};
-  for (const c of CLUBS) others[c.name] = buildRoster(c.name, c.level, season);
+  for (const c of CLUBS) others[c.name] = buildRoster(c.name, c.level, season, LEAGUES[league].dataLeague);
   const squad = others[club];
   delete others[club];
   const info = CLUBS.find((c) => c.name === club)!;
   const wages = squad.reduce((s, p) => s + p.wage, 0);
   const save: Save = {
     version: 1,
+    league,
     club,
     season,
     phase: 'summer',
@@ -257,7 +303,7 @@ export function newGame(club: string): Save {
 }
 
 function startSeason(s: Save) {
-  const clubs = CLUBS.map((c) => c.name);
+  const clubs = clubsOf(s.league).map((c) => c.name);
   s.table = clubs.map((club) => ({ club, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   s.fixtures = schedule(clubs);
   s.matchday = 0;
@@ -314,7 +360,7 @@ export function makeSell(s: Save): Dilemma {
   const opts = candidates.slice(0, 3).map((p) => ({
     playerId: p.id,
     fee: Math.max(1, Math.round(p.value * (0.85 + rnd() * 0.45))),
-    club: pick([...CLUBS.map((c) => c.name).filter((c) => c !== s.club), 'Brighton', 'Bournemouth', 'Fulham', 'Villarreal', 'Séville', 'Bologne', 'Fenerbahçe', 'Porto', 'Al-Ahli', 'Leverkusen']),
+    club: pick([...clubsOf(s.league).map((c) => c.name).filter((c) => c !== s.club), 'Brighton', 'Bournemouth', 'Fulham', 'Villarreal', 'Séville', 'Bologne', 'Fenerbahçe', 'Porto', 'Al-Ahli', 'Leverkusen']),
   }));
   return { kind: 'sell', options: opts };
 }
@@ -490,6 +536,12 @@ export function sortedTable(s: Save): Row[] {
 
 const EURO_POOL = ['Real Madrid', 'FC Barcelone', 'Bayern Munich', 'Manchester City', 'Arsenal', 'Liverpool', 'Inter', 'Juventus', 'Atlético Madrid', 'Dortmund', 'Leverkusen', 'Naples', 'AC Milan', 'Benfica', 'Porto', 'Sporting', 'PSV', 'Club Bruges', 'Tottenham', 'Chelsea', 'Aston Villa', 'Galatasaray', 'Ajax', 'Celtic'];
 
+/** Adversaires européens : jamais un club du même championnat */
+function euroPool(s: Save): string[] {
+  const own = new Set(clubsOf(s.league).map((c) => c.name));
+  return [...EURO_POOL, 'PSG', 'Marseille', 'Monaco', 'Lille', 'Lens', 'Lyon'].filter((c) => !own.has(c));
+}
+
 function euroStrength(club: string): number {
   const ps = FOOTBALLERS.filter((f) => f.club === club && !f.retired).sort((a, b) => b.rating - a.rating).slice(0, 11);
   return ps.length >= 6 ? ps.reduce((x, p) => x + p.rating, 0) / ps.length - 1 : 76;
@@ -535,9 +587,9 @@ function simLeague(s: Save, from: number, to: number) {
 
 export function simulateFirstHalf(s: Save) {
   s.log = [];
-  simLeague(s, 0, 17);
+  simLeague(s, 0, s.fixtures.length / 2);
   if (s.euro && s.euro.stage === 'league') {
-    for (const opp of shuffle(EURO_POOL).slice(0, 8)) {
+    for (const opp of shuffle(euroPool(s)).slice(0, 8)) {
       const home = rnd() < 0.5;
       const me = lineupStrength(s);
       const os = euroStrength(opp);
@@ -561,24 +613,25 @@ export function simulateFirstHalf(s: Save) {
 
 export function simulateSecondHalf(s: Save) {
   s.log = [];
-  // Coupe de France (à partir des 32es)
+  // Coupe nationale (à partir des 32es)
+  const L = LEAGUES[s.league ?? 'L1'];
   const cupRounds: [string, number][] = [['32es de finale', 62], ['16es de finale', 66], ['8es de finale', 70], ['Quarts de finale', 73], ['Demi-finale', 75], ['Finale', 77]];
   s.cup = 'Éliminé en 32es';
   for (const [label, base] of cupRounds) {
-    const opp = base < 70 ? pick(['FC Rouen', 'Le Puy Foot', 'US Concarneau', 'Bastia', 'Guingamp', 'Amiens', 'Red Star', 'Grenoble', 'Caen', 'Dunkerque']) : pick(CLUBS.map((c) => c.name).filter((c) => c !== s.club));
+    const opp = base < 70 ? pick(L.amateurs) : pick(clubsOf(s.league).map((c) => c.name).filter((c) => c !== s.club));
     const os = base < 70 ? base + rnd() * 4 : clubStrength(s, opp);
-    if (!knockout(s, 'CDF', `Coupe de France · ${label}`, opp, os, false)) {
+    if (!knockout(s, 'CDF', `${L.cup} · ${label}`, opp, os, false)) {
       s.cup = `Éliminé en ${label.toLowerCase()}`;
       break;
     }
     s.cup = label === 'Finale' ? '🏆 Vainqueur !' : `Qualifié après les ${label.toLowerCase()}`;
   }
-  simLeague(s, 17, 34);
+  simLeague(s, s.fixtures.length / 2, s.fixtures.length);
   // Coupe d'Europe : phases finales
   if (s.euro && s.euro.stage !== 'out') {
     const steps: [string, string][] = [['playoff', 'Barrages'], ['r16', '8es de finale'], ['qf', 'Quarts de finale'], ['sf', 'Demi-finale'], ['final', 'Finale']];
     const startAt = steps.findIndex(([k]) => k === s.euro!.stage);
-    const opps = shuffle(EURO_POOL);
+    const opps = shuffle(euroPool(s));
     for (let i = Math.max(0, startAt); i < steps.length; i++) {
       const [key, label] = steps[i];
       const opp = opps[i];
@@ -622,7 +675,7 @@ export function seasonSummary(s: Save) {
   const euro = s.euro ? `${s.euro.name} : ${s.euro.stage}` : '—';
   s.history.push({ season: s.season, rank, cup: s.cup, euro });
   // Primes de fin de saison
-  const prize = Math.max(4, 42 - rank * 2) + (s.cup.includes('Vainqueur') ? 6 : 0) + (s.euro?.stage.includes('Vainqueur') ? 40 : 0);
+  const prize = Math.max(4, (s.league === 'PL' ? 90 : 42) - rank * (s.league === 'PL' ? 4 : 2)) + (s.cup.includes('Vainqueur') ? 6 : 0) + (s.euro?.stage.includes('Vainqueur') ? 40 : 0);
   s.transferBudget += prize;
   s.news.unshift(`💰 Primes de fin de saison : +${prize} M€.`);
   s.phase = 'summary';
@@ -645,7 +698,7 @@ export function nextSeason(s: Save) {
   startSeason(s);
   s.news = [`Nouvelle saison ${s.season}-${String(s.season + 1).slice(2)} !`];
   // Centre de formation : des jeunes montent pour compléter l'effectif (2 par poste minimum)
-  const level = CLUBS.find((c) => c.name === s.club)?.level ?? 72;
+  const level = clubsOf(s.league).find((c) => c.name === s.club)?.level ?? 72;
   const need: Record<string, number> = { GB: 2, DG: 1, DC: 3, DD: 1, MDC: 1, MC: 2, AG: 1, AD: 1, BU: 2 };
   for (const [role, n] of Object.entries(need)) {
     for (let i = s.squad.filter((p) => p.roles.includes(role)).length; i < n; i++) {

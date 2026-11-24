@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  CLUBS,
+  LEAGUES,
+  clubsOf,
+  type LeagueId,
   FORMATIONS,
   answerDilemma,
   autoLineup,
@@ -45,6 +47,7 @@ function load(): Save | null {
 export default function ManagerPage() {
   const [save, setSave] = useState<Save | null>(null);
   const [hasSave, setHasSave] = useState(false);
+  const [league, setLeague] = useState<LeagueId>('L1');
   const [tab, setTab] = useState<'jeu' | 'effectif' | 'classement'>('jeu');
   const [error, setError] = useState<string | null>(null);
 
@@ -70,10 +73,10 @@ export default function ManagerPage() {
       <main className="mx-auto max-w-3xl px-4 py-6">
         <Header />
         <div className="panel mb-4 p-5">
-          <h1 className="text-2xl font-black">⚽ Manager Ligue 1</h1>
+          <h1 className="text-2xl font-black">⚽ Manager</h1>
           <p className="mt-1 text-sm text-zinc-400">
             Choisis ton club, gère tes mercatos (ventes et achats sous forme de dilemmes), ta masse salariale et tes prolongations, compose ton 11 et
-            enchaîne les saisons : Ligue 1, Coupe de France et coupes d’Europe.
+            enchaîne les saisons : championnat, coupe nationale et coupes d’Europe. En Ligue 1 ou en Premier League.
           </p>
           {hasSave && (
             <button onClick={() => setSave(load())} className="mt-4 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-lime-500 py-3 font-black text-black">
@@ -81,14 +84,21 @@ export default function ManagerPage() {
             </button>
           )}
         </div>
+        <div className="mb-3 flex gap-2">
+          {(Object.keys(LEAGUES) as LeagueId[]).map((l) => (
+            <button key={l} onClick={() => setLeague(l)} className={`rounded-xl px-4 py-2 font-bold ${league === l ? 'bg-emerald-500/25 ring-1 ring-emerald-400/50' : 'bg-white/[0.05] text-zinc-400'}`}>
+              {l === 'L1' ? '🇫🇷' : '🏴󠁧󠁢󠁥󠁮󠁧󠁿'} {LEAGUES[l].name}
+            </button>
+          ))}
+        </div>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">{hasSave ? 'Ou nouvelle partie avec…' : 'Choisis ton club'}</h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {CLUBS.map((c) => (
+          {clubsOf(league).map((c) => (
             <button
               key={c.name}
               onClick={() => {
                 if (hasSave && !confirm('Écraser la partie en cours ?')) return;
-                const s = newGame(c.name);
+                const s = newGame(c.name, league);
                 setSave(s);
                 localStorage.setItem(KEY, JSON.stringify(s));
               }}
@@ -111,6 +121,7 @@ export default function ManagerPage() {
       <Header />
       <div className="panel mb-3 flex flex-wrap items-center gap-x-5 gap-y-1 p-4 text-sm">
         <div className="text-lg font-black">{save.club}</div>
+        <div className="text-zinc-400">{LEAGUES[save.league ?? 'L1'].name}</div>
         <div className="text-zinc-400">Saison {season(save.season)}</div>
         <div>
           💶 Transferts : <b className="font-mono">{save.transferBudget} M€</b>
@@ -343,7 +354,7 @@ function Lineup({ save, update }: { save: Save; update: Update }) {
         onClick={() => update((s) => (s.xi.filter(Boolean).length < 11 ? 'Il te manque des titulaires' : s.phase === 'lineup1' ? simulateFirstHalf(s) : simulateSecondHalf(s)))}
         className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-lime-500 py-3 text-lg font-black text-black"
       >
-        ▶ Simuler {save.phase === 'lineup1' ? 'la phase aller (J1 → J17)' : 'la phase retour (J18 → J34)'}
+        ▶ Simuler {save.phase === 'lineup1' ? `la phase aller (J1 → J${save.fixtures.length / 2})` : `la phase retour (J${save.fixtures.length / 2 + 1} → J${save.fixtures.length})`}
       </button>
     </div>
   );
@@ -358,10 +369,10 @@ function Results({ save, update }: { save: Save; update: Update }) {
       <div className="panel p-4">
         <div className="text-lg font-black">
           {rank}
-          <sup>e</sup> de Ligue 1 après {save.matchday} journées
+          <sup>e</sup> de {LEAGUES[save.league ?? 'L1'].name} après {save.matchday} journées
         </div>
         <div className="text-sm text-zinc-400">
-          {save.euro ? `${save.euro.name} : ${save.euro.stage}` : 'Pas de coupe d’Europe'} · Coupe de France : {save.cup}
+          {save.euro ? `${save.euro.name} : ${save.euro.stage}` : 'Pas de coupe d’Europe'} · {LEAGUES[save.league ?? 'L1'].cup} : {save.cup}
         </div>
       </div>
       <div className="panel max-h-96 overflow-y-auto p-4">
@@ -440,7 +451,7 @@ function Summary({ save, update }: { save: Save; update: Update }) {
             {last.rank}
             <sup>e</sup>
           </div>
-          <div className="text-sm text-zinc-300">Coupe de France : {last.cup}</div>
+          <div className="text-sm text-zinc-300">{LEAGUES[save.league ?? 'L1'].cup} : {last.cup}</div>
           <div className="text-sm text-zinc-300">{last.euro}</div>
         </div>
       )}
@@ -449,7 +460,7 @@ function Summary({ save, update }: { save: Save; update: Update }) {
           {save.history.map((h) => (
             <div key={h.season}>
               {season(h.season)} : {h.rank}
-              <sup>e</sup> · CdF {h.cup} · {h.euro}
+              <sup>e</sup> · {LEAGUES[save.league ?? 'L1'].cup} {h.cup} · {h.euro}
             </div>
           ))}
         </div>
@@ -494,7 +505,7 @@ function Table({ save }: { save: Save }) {
         </thead>
         <tbody>
           {sortedTable(save).map((r, i) => (
-            <tr key={r.club} className={`${r.club === save.club ? 'bg-emerald-500/15 font-bold' : ''} ${i < 3 ? 'text-sky-200' : i >= 15 ? 'text-rose-300' : ''}`}>
+            <tr key={r.club} className={`${r.club === save.club ? 'bg-emerald-500/15 font-bold' : ''} ${i < 3 ? 'text-sky-200' : i >= save.table.length - 3 ? 'text-rose-300' : ''}`}>
               <td>{i + 1}</td>
               <td>{r.club}</td>
               <td className="text-center">{r.p}</td>
@@ -507,7 +518,7 @@ function Table({ save }: { save: Save }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-2 text-xs text-zinc-500">Top 3 : Ligue des champions · 4-5 : Ligue Europa · 6 : Conférence · 16-18 : relégables</p>
+      <p className="mt-2 text-xs text-zinc-500">Top 3 : Ligue des champions · 4-5 : Ligue Europa · 6 : Conférence · 3 derniers : relégables</p>
     </div>
   );
 }

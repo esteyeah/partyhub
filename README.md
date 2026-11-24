@@ -23,9 +23,9 @@ Crée un salon, partage le lien (`https://<pseudo>.github.io/partyhub/?salle=ABC
 
 ---
 
-## ⚽ Manager Ligue 1 (solo)
+## ⚽ Manager Ligue 1 / Premier League (solo)
 
-Lien « ⚽ Manager » sur l’accueil (`/manager`) : choisis un club de Ligue 1, gère les mercatos d’été (4 dilemmes de vente, 4 d’achat dont un au poste de ton choix) et d’hiver (2 + 2), ton budget transferts et ta masse salariale, prolonge ou non les fins de contrat, compose ton 11 et tes remplaçants avant chaque demi-saison simulée (Ligue 1, Coupe de France, coupe d’Europe). Partie sauvegardée dans le navigateur.
+Lien « ⚽ Manager » sur l’accueil (`/manager`) : choisis un club de Ligue 1 ou de Premier League, gère les mercatos d’été (4 dilemmes de vente, 4 d’achat dont un au poste de ton choix) et d’hiver (2 + 2), ton budget transferts et ta masse salariale, prolonge ou non les fins de contrat, compose ton 11 et tes remplaçants avant chaque demi-saison simulée (Ligue 1, Coupe de France, coupe d’Europe). Partie sauvegardée dans le navigateur.
 
 ## 🎤 Mode animateur (un seul téléphone)
 
