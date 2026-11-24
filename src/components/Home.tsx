@@ -46,12 +46,6 @@ export function Home() {
           <span className="hidden items-center gap-2 text-sm text-zinc-400 sm:flex">
             <span className="h-2 w-2 rounded-full bg-emerald-400" /> Connexion directe entre joueurs
           </span>
-          <Link href="/manager" className="rounded-xl px-3 py-1.5 text-sm font-semibold text-emerald-300 transition hover:bg-white/8 hover:text-white">
-            ⚽ Manager
-          </Link>
-          <Link href="/animateur" className="rounded-xl px-3 py-1.5 text-sm font-semibold text-fuchsia-300 transition hover:bg-white/8 hover:text-white">
-            🎤 Mode animateur
-          </Link>
           <Link href="/admin" className="rounded-xl px-3 py-1.5 text-sm text-zinc-400 transition hover:bg-white/8 hover:text-white">
             ⚙️ Admin
           </Link>
@@ -72,7 +66,19 @@ export function Home() {
             Crée un salon privé, partage le code, et enchaînez quiz, blind tests et défis foot. Le classement se met à jour en direct.
           </p>
 
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <Link href="/manager" className="rounded-2xl bg-gradient-to-br from-emerald-500/25 to-lime-500/10 p-4 ring-1 ring-emerald-400/40 transition hover:-translate-y-0.5">
+              <div className="text-2xl">⚽</div>
+              <div className="font-black">Manager</div>
+              <div className="text-xs text-zinc-400">Solo · Ligue 1 ou Premier League</div>
+            </Link>
+            <Link href="/animateur" className="rounded-2xl bg-gradient-to-br from-fuchsia-500/25 to-violet-500/10 p-4 ring-1 ring-fuchsia-400/40 transition hover:-translate-y-0.5">
+              <div className="text-2xl">🎤</div>
+              <div className="font-black">Mode animateur</div>
+              <div className="text-xs text-zinc-400">Un seul téléphone pour tous</div>
+            </Link>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {GAME_IDS.map((id, i) => {
               const g = GAME_CATALOG[id];
               return (
