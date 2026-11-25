@@ -30,6 +30,10 @@ export interface MPlayer {
   wage: number;
   /** Fin de contrat : 30 juin de cette année */
   contractEnd: number;
+  /** Statistiques de la saison en cours (matchs joués, buts, passes, somme des notes) */
+  st?: { apps: number; goals: number; assists: number; rsum: number };
+  /** Bilan de la saison précédente */
+  last?: { apps: number; goals: number; assists: number; avg: number };
 }
 
 export type Dilemma =
@@ -96,6 +100,13 @@ export interface Save {
   history: { season: number; rank: number; cup: string; euro: string }[];
   /** Effectifs des autres clubs (pour les achats et la force des adversaires) */
   others: Record<string, MPlayer[]>;
+  /** Classement de la phase de ligue européenne (36 équipes) */
+  euroTable?: { club: string; pts: number; gd: number }[];
+  /** Matchs de coupe d'Europe et de coupe nationale de la saison */
+  euroLog?: MatchLine[];
+  cupLog?: MatchLine[];
+  /** Message des dirigeants en fin de saison */
+  board?: string;
   /** Mercato : sondages d'achat et tentatives de vente restants */
   scouts?: number;
   saleTries?: number;
@@ -161,6 +172,12 @@ export const CLUBS: { name: string; level: number; budget: number }[] = [
 ];
 
 export const FORMATIONS: Record<string, string[]> = {
+  '4-1-4-1': ['GB', 'DG', 'DC', 'DC', 'DD', 'MDC', 'MG', 'MC', 'MC', 'MD', 'BU'],
+  '4-4-2 losange': ['GB', 'DG', 'DC', 'DC', 'DD', 'MDC', 'MC', 'MC', 'MOC', 'BU', 'BU'],
+  '4-3-1-2': ['GB', 'DG', 'DC', 'DC', 'DD', 'MC', 'MDC', 'MC', 'MOC', 'BU', 'BU'],
+  '3-4-3': ['GB', 'DC', 'DC', 'DC', 'MG', 'MC', 'MC', 'MD', 'AG', 'BU', 'AD'],
+  '5-3-2': ['GB', 'DG', 'DC', 'DC', 'DC', 'DD', 'MC', 'MDC', 'MC', 'BU', 'BU'],
+  '5-4-1': ['GB', 'DG', 'DC', 'DC', 'DC', 'DD', 'MG', 'MC', 'MC', 'MD', 'BU'],
   '4-3-3': ['GB', 'DG', 'DC', 'DC', 'DD', 'MC', 'MDC', 'MC', 'AG', 'BU', 'AD'],
   '4-2-3-1': ['GB', 'DG', 'DC', 'DC', 'DD', 'MDC', 'MDC', 'MG', 'MOC', 'MD', 'BU'],
   '4-4-2': ['GB', 'DG', 'DC', 'DC', 'DD', 'MG', 'MC', 'MC', 'MD', 'BU', 'BU'],
@@ -344,6 +361,10 @@ function startSeason(s: Save) {
   s.matchday = 0;
   s.log = [];
   s.cup = 'Pas encore entrée';
+  s.euroLog = [];
+  s.cupLog = [];
+  s.euroTable = [];
+  for (const p of s.squad) p.st = { apps: 0, goals: 0, assists: 0, rsum: 0 };
 }
 
 /** Calendrier aller-retour (méthode du cercle) */
@@ -569,24 +590,42 @@ export function chooseSlot(s: Save, idx: number, slot: string) {
 /* Composition                                                         */
 /* ------------------------------------------------------------------ */
 
+/** Coordonnées des postes (largeur, profondeur) pour mesurer la distance entre deux postes */
+const SPOT: Record<string, [number, number]> = {
+  GB: [0, 0], DG: [-1, 1], DC: [0, 1], DD: [1, 1], MDC: [0, 2], MC: [0, 2.5], MOC: [0, 3], MG: [-1, 2.7], MD: [1, 2.7], AG: [-1, 3.6], AD: [1, 3.6], BU: [0, 4],
+};
+/** Malus de note quand un joueur joue hors de son poste : léger s'il est proche (MC en MDC), énorme pour un gardien */
+export function posPenalty(slot: string, p: MPlayer): number {
+  if (fits(slot, p)) return 0;
+  const gk = slot === 'GB';
+  if (gk !== p.roles.includes('GB') && (gk || p.roles[0] === 'GB')) return 20;
+  let best = 99;
+  for (const r of p.roles) {
+    const a = SPOT[r];
+    const b = SPOT[slot];
+    if (!a || !b) continue;
+    best = Math.min(best, Math.round((Math.abs(a[0] - b[0]) * 1.3 + Math.abs(a[1] - b[1])) * 3));
+  }
+  return Math.max(1, Math.min(15, best));
+}
+
 export function autoLineup(s: Save) {
   const used = new Set<string>();
   s.xi = slotsOf(s).map((slot) => {
-    const best = s.squad.filter((p) => !used.has(p.id) && fits(slot, p)).sort((a, b) => b.rating - a.rating)[0]
-      ?? s.squad.filter((p) => !used.has(p.id)).sort((a, b) => b.rating - a.rating)[0];
+    const best = s.squad.filter((p) => !used.has(p.id)).sort((a, b) => b.rating - posPenalty(slot, b) - (a.rating - posPenalty(slot, a)))[0];
     if (best) used.add(best.id);
     return best?.id ?? null;
   });
   s.subs = s.squad.filter((p) => !used.has(p.id)).sort((a, b) => b.rating - a.rating).slice(0, 7).map((p) => p.id);
 }
 
-/** Force du 11 : moyenne des notes, -6 pour un joueur hors de son poste, -10 par poste vide */
+/** Force du 11 : moyenne des notes, moins le malus de poste de chaque joueur */
 export function lineupStrength(s: Save): number {
   const slots = slotsOf(s);
   let total = 0;
   slots.forEach((slot, i) => {
     const p = s.squad.find((x) => x.id === s.xi[i]);
-    total += p ? p.rating - (fits(slot, p) ? 0 : 6) : 55;
+    total += p ? p.rating - posPenalty(slot, p) : 55;
   });
   // Un banc de 7 joueurs apporte un petit bonus
   const bench = s.subs.map((id) => s.squad.find((p) => p.id === id)).filter(Boolean) as MPlayer[];
@@ -660,6 +699,8 @@ function euroPool(s: Save): string[] {
   return [...EURO_POOL, 'PSG', 'Marseille', 'Monaco', 'Lille', 'Lens', 'Lyon'].filter((c) => !own.has(c));
 }
 
+const EURO_EXTRA = ['Feyenoord', 'Celtic', 'Rangers', 'Olympiakos', 'Fenerbahçe', 'Besiktas', 'Shakhtar Donetsk', 'Slavia Prague', 'Bodø/Glimt', 'Salzbourg', 'Young Boys', 'Dinamo Zagreb', 'Étoile rouge', 'Copenhague', 'AZ Alkmaar', 'Braga', 'Union Saint-Gilloise', 'Sparta Prague', 'Ferencváros', 'Midtjylland', 'Viking', 'AEK Athènes', 'LASK', 'Real Betis', 'Villarreal', 'Stuttgart', 'RB Leipzig', 'Como', 'AS Roma', 'Lazio', 'Fiorentina', 'Sporting Braga', 'Anderlecht', 'Gand'];
+
 function euroStrength(club: string): number {
   const ps = FOOTBALLERS.filter((f) => f.club === club && !f.retired).sort((a, b) => b.rating - a.rating).slice(0, 11);
   return ps.length >= 6 ? ps.reduce((x, p) => x + p.rating, 0) / ps.length - 1 : 76;
@@ -667,29 +708,80 @@ function euroStrength(club: string): number {
 
 function knockout(s: Save, comp: 'EU' | 'CDF', label: string, opp: string, oppStrength: number, twoLegs: boolean): boolean {
   const me = lineupStrength(s);
+  const push = (m: MatchLine) => {
+    s.log.push(m);
+    (comp === 'EU' ? (s.euroLog ??= []) : (s.cupLog ??= [])).push(m);
+  };
   if (!twoLegs) {
-    const [a, b] = playMatch(me, oppStrength, label === 'Finale');
+    const [a, b] = playMatch(me, oppStrength, label.endsWith('Finale') && !label.includes('Demi'));
     let pens: string | undefined;
     let win = a > b;
     if (a === b) {
       win = rnd() < 0.5 + (me - oppStrength) * 0.02;
-      pens = win ? '5-4 tab' : '4-5 tab';
+      pens = win ? 'qualifié aux tirs au but' : 'éliminé aux tirs au but';
     }
-    s.log.push({ comp, label, home: s.club, away: opp, hg: a, ag: b, pens });
+    push({ comp, label: `${label} · ${win ? '✅ qualifié' : '❌ éliminé'}`, home: s.club, away: opp, hg: a, ag: b, pens });
+    matchStats(s, a, b);
     return win;
   }
   const [a1, b1] = playMatch(me, oppStrength);
   const [b2, a2] = playMatch(oppStrength, me);
-  s.log.push({ comp, label: `${label} (aller)`, home: s.club, away: opp, hg: a1, ag: b1 });
-  let pens: string | undefined;
+  matchStats(s, a1, b1);
+  matchStats(s, a2, b2);
   let win = a1 + a2 > b1 + b2;
+  let pens: string | undefined;
   if (a1 + a2 === b1 + b2) {
-    win = rnd() < 0.5;
-    pens = win ? '5-3 tab' : '3-5 tab';
+    win = rnd() < 0.5 + (me - oppStrength) * 0.02;
+    pens = win ? 'qualifié aux tirs au but' : 'éliminé aux tirs au but';
   }
-  s.log.push({ comp, label: `${label} (retour)`, home: opp, away: s.club, hg: b2, ag: a2, pens });
+  push({ comp, label: `${label} (aller)`, home: s.club, away: opp, hg: a1, ag: b1 });
+  push({ comp, label: `${label} (retour) · cumul ${a1 + a2}-${b1 + b2} ${win ? '✅ qualifié' : '❌ éliminé'}`, home: opp, away: s.club, hg: b2, ag: a2, pens });
   return win;
 }
+
+const GOAL_W: Record<string, number> = { GB: 0, DG: 0.15, DD: 0.15, DC: 0.2, MDC: 0.3, MC: 0.6, MOC: 1.2, MG: 0.9, MD: 0.9, AG: 1.6, AD: 1.6, BU: 2.6 };
+const ASSIST_W: Record<string, number> = { GB: 0.05, DG: 0.6, DD: 0.6, DC: 0.2, MDC: 0.5, MC: 1, MOC: 1.6, MG: 1.2, MD: 1.2, AG: 1.4, AD: 1.4, BU: 0.9 };
+function weighted<T>(items: T[], w: (x: T) => number): T | null {
+  const total = items.reduce((x, i) => x + w(i), 0);
+  if (total <= 0) return null;
+  let r = rnd() * total;
+  for (const i of items) if ((r -= w(i)) <= 0) return i;
+  return items[items.length - 1];
+}
+/** Statistiques individuelles d'un match de notre équipe */
+function matchStats(s: Save, mine: number, theirs: number) {
+  const slots = slotsOf(s);
+  const starters = s.xi.map((id, i) => ({ p: s.squad.find((x) => x.id === id), slot: slots[i] })).filter((x) => x.p) as { p: MPlayer; slot: string }[];
+  const bench = shuffle(s.subs.map((id) => s.squad.find((x) => x.id === id)).filter(Boolean) as MPlayer[]).slice(0, 3);
+  const goals = new Map<string, number>();
+  const assists = new Map<string, number>();
+  for (let g = 0; g < mine; g++) {
+    const sc = weighted(starters, (x) => GOAL_W[x.slot] * (x.p.rating / 80));
+    if (!sc) continue;
+    goals.set(sc.p.id, (goals.get(sc.p.id) ?? 0) + 1);
+    if (rnd() < 0.75) {
+      const as = weighted(starters.filter((x) => x !== sc), (x) => ASSIST_W[x.slot]);
+      if (as) assists.set(as.p.id, (assists.get(as.p.id) ?? 0) + 1);
+    }
+  }
+  const base = 6.3 + (mine - theirs) * 0.25;
+  for (const { p, slot } of starters) {
+    const defensive = slot === 'GB' || slot.startsWith('D');
+    let note = base + (rnd() - 0.5) * 1.2 + (p.rating - 75) * 0.03 + (goals.get(p.id) ?? 0) * 0.9 + (assists.get(p.id) ?? 0) * 0.5 - posPenalty(slot, p) * 0.05;
+    if (defensive) note += theirs === 0 ? 0.6 : -0.2 * theirs;
+    const st = (p.st ??= { apps: 0, goals: 0, assists: 0, rsum: 0 });
+    st.apps++;
+    st.goals += goals.get(p.id) ?? 0;
+    st.assists += assists.get(p.id) ?? 0;
+    st.rsum += Math.max(3.5, Math.min(10, note));
+  }
+  for (const p of bench) {
+    const st = (p.st ??= { apps: 0, goals: 0, assists: 0, rsum: 0 });
+    st.apps++;
+    st.rsum += Math.max(4.5, Math.min(8.5, 6.2 + (mine - theirs) * 0.15 + (rnd() - 0.5)));
+  }
+}
+const ours = (s: Save, home: string, hg: number, ag: number) => (home === s.club ? [hg, ag] : [ag, hg]);
 
 /** Simule les journées [from, to[ du championnat */
 function simLeague(s: Save, from: number, to: number) {
@@ -697,7 +789,11 @@ function simLeague(s: Save, from: number, to: number) {
     for (const [h, a] of s.fixtures[r]) {
       const [hg, ag] = playMatch(clubStrength(s, h), clubStrength(s, a));
       record(s.table, h, a, hg, ag);
-      if (h === s.club || a === s.club) s.log.push({ comp: 'L1', label: `J${r + 1}`, home: h, away: a, hg, ag });
+      if (h === s.club || a === s.club) {
+        s.log.push({ comp: 'L1', label: `J${r + 1}`, home: h, away: a, hg, ag });
+        const [m, t] = ours(s, h, hg, ag);
+        matchStats(s, m, t);
+      }
     }
     s.matchday = r + 1;
   }
@@ -707,20 +803,40 @@ export function simulateFirstHalf(s: Save) {
   s.log = [];
   simLeague(s, 0, s.fixtures.length / 2);
   if (s.euro && s.euro.stage === 'league') {
-    for (const opp of shuffle(euroPool(s)).slice(0, 8)) {
+    // Phase de ligue à 36 : 8 matchs chacun, classement complet
+    const field = [...shuffle(euroPool(s)), ...EURO_EXTRA].filter((c, i, arr) => arr.indexOf(c) === i && c !== s.club).slice(0, 35);
+    const rows = new Map<string, { club: string; pts: number; gd: number }>([[s.club, { club: s.club, pts: 0, gd: 0 }]]);
+    for (const c of field) rows.set(c, { club: c, pts: 0, gd: 0 });
+    const strength = (c: string) => (c === s.club ? lineupStrength(s) : euroStrength(c));
+    let gd = 0;
+    for (const opp of shuffle(field).slice(0, 8)) {
       const home = rnd() < 0.5;
-      const me = lineupStrength(s);
-      const os = euroStrength(opp);
-      const [x, y] = home ? playMatch(me, os) : playMatch(os, me);
+      const [x, y] = home ? playMatch(strength(s.club), strength(opp)) : playMatch(strength(opp), strength(s.club));
       const [mine, theirs] = home ? [x, y] : [y, x];
       s.euro.points += mine > theirs ? 3 : mine === theirs ? 1 : 0;
+      gd += mine - theirs;
       s.euro.played++;
-      s.log.push({ comp: 'EU', label: `${s.euro.name} · phase de ligue`, home: home ? s.club : opp, away: home ? opp : s.club, hg: x, ag: y });
+      const m: MatchLine = { comp: 'EU', label: `${s.euro.name} · phase de ligue (J${s.euro.played})`, home: home ? s.club : opp, away: home ? opp : s.club, hg: x, ag: y };
+      s.log.push(m);
+      (s.euroLog ??= []).push(m);
+      matchStats(s, mine, theirs);
     }
-    s.euro.stage = s.euro.points >= 16 ? 'r16' : s.euro.points >= 10 ? 'playoff' : 'out';
+    rows.get(s.club)!.pts = s.euro.points;
+    rows.get(s.club)!.gd = gd;
+    for (const c of field) {
+      const r = rows.get(c)!;
+      for (let k = 0; k < 8; k++) {
+        const [x, y] = playMatch(strength(c), euroStrength(pick(field)), rnd() < 0.5);
+        r.pts += x > y ? 3 : x === y ? 1 : 0;
+        r.gd += x - y;
+      }
+    }
+    s.euroTable = [...rows.values()].sort((p, q) => q.pts - p.pts || q.gd - p.gd);
+    const rank = s.euroTable.findIndex((r) => r.club === s.club) + 1;
+    s.euro.stage = rank <= 8 ? 'r16' : rank <= 24 ? 'playoff' : 'out';
     s.news.unshift(
       s.euro.stage === 'r16'
-        ? `🌟 ${s.euro.name} : ${s.euro.points} pts, qualifié directement pour les 8es !`
+        ? `🌟 ${s.euro.name} : ${s.euro.points} pts (${s.euroTable!.findIndex((r) => r.club === s.club) + 1}e), qualifié directement pour les 8es !`
         : s.euro.stage === 'playoff'
           ? `${s.euro.name} : ${s.euro.points} pts, barrages en février.`
           : `❌ ${s.euro.name} : ${s.euro.points} pts, éliminé en phase de ligue.`,
@@ -772,7 +888,17 @@ export function expiring(s: Save): MPlayer[] {
   return s.squad.filter((p) => p.contractEnd <= s.season + 1);
 }
 
-export const renewWage = (p: MPlayer) => round1(p.wage * (p.age >= 31 ? 1.05 : p.rating >= 80 ? 1.35 : 1.2));
+export const avgRating = (p: MPlayer) => (p.st && p.st.apps ? p.st.rsum / p.st.apps : null);
+
+/** Salaire de prolongation : dépend de l'âge et des performances (un trentenaire moyen accepte souvent une baisse) */
+export function renewWage(p: MPlayer): number {
+  const avg = avgRating(p) ?? 6.6;
+  let f = p.age <= 23 ? 1.15 : p.age <= 29 ? 1.05 : p.age <= 32 ? 0.9 : 0.75;
+  f += avg >= 7.3 ? 0.2 : avg >= 6.9 ? 0.08 : avg < 6.3 ? -0.12 : 0;
+  if ((p.st?.apps ?? 0) < 8) f -= 0.1;
+  const market = wageFor(p.value, p.rating);
+  return round1(Math.max(0.3, Math.min(p.wage * f, market * 1.3)));
+}
 
 export function renew(s: Save, id: string, keep: boolean): string | void {
   const p = s.squad.find((x) => x.id === id);
@@ -796,13 +922,32 @@ export function seasonSummary(s: Save) {
   const prize = Math.max(4, (s.league === 'PL' ? 90 : 42) - rank * (s.league === 'PL' ? 4 : 2)) + (s.cup.includes('Vainqueur') ? 6 : 0) + (s.euro?.stage.includes('Vainqueur') ? 40 : 0);
   s.transferBudget += prize;
   s.news.unshift(`💰 Primes de fin de saison : +${prize} M€.`);
+  // Les dirigeants jugent la saison : résultat attendu selon le niveau du club
+  const order = [...clubsOf(s.league)].sort((a, b) => b.level - a.level).map((c) => c.name);
+  const expected = order.indexOf(s.club) + 1;
+  const diff = expected - rank;
+  const euroBonus = s.euro?.stage.includes('Vainqueur') ? 0.1 : s.euro && !['out', 'league'].includes(s.euro.stage) && !s.euro.stage.includes('phase') ? 0.04 : 0;
+  const wageF = Math.max(-0.08, Math.min(0.12, diff * 0.015)) + euroBonus + (s.cup.includes('Vainqueur') ? 0.03 : 0);
+  const transferAdj = Math.round(diff * (s.league === 'PL' ? 4 : 2));
+  s.wageBudget = round1(s.wageBudget * (1 + wageF));
+  s.transferBudget = Math.max(0, s.transferBudget + transferAdj);
+  s.board =
+    diff >= 3
+      ? `🎉 Les dirigeants sont ravis (${rank}e, objectif ${expected}e) : +${transferAdj} M€ de transferts et masse salariale +${Math.round(wageF * 100)} %.`
+      : diff <= -3
+        ? `😠 Les dirigeants sont déçus (${rank}e, objectif ${expected}e) : ${transferAdj} M€ de transferts et masse salariale ${Math.round(wageF * 100)} %.`
+        : `🙂 Saison conforme aux attentes (${rank}e, objectif ${expected}e). Masse salariale ${wageF >= 0 ? '+' : ''}${Math.round(wageF * 100)} %, transferts ${transferAdj >= 0 ? '+' : ''}${transferAdj} M€.`;
+  s.news.unshift(s.board);
   s.phase = 'summary';
   return { rank, prize };
 }
 
 function age(p: MPlayer) {
   p.age++;
-  const d = p.age <= 21 ? 2 + rnd() * 3 : p.age <= 24 ? rnd() * 3 : p.age <= 29 ? rnd() * 2 - 1 : p.age <= 32 ? -1 - rnd() * 2 : -2 - rnd() * 3;
+  const avg = p.st && p.st.apps >= 8 ? p.st.rsum / p.st.apps : null;
+  const perf = avg === null ? 0 : avg >= 7.3 ? 2 : avg >= 6.9 ? 1 : avg < 6.2 ? -1 : 0;
+  if (p.st) p.last = { apps: p.st.apps, goals: p.st.goals, assists: p.st.assists, avg: avg ?? 0 };
+  const d = perf + p.age <= 21 ? 2 + rnd() * 3 : p.age <= 24 ? rnd() * 3 : p.age <= 29 ? rnd() * 2 - 1 : p.age <= 32 ? -1 - rnd() * 2 : -2 - rnd() * 3;
   p.rating = Math.max(55, Math.min(93, Math.round(p.rating + d)));
   p.value = priceFor(p.rating, p.age);
 }

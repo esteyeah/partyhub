@@ -53,7 +53,7 @@ export default function ManagerPage() {
   const [save, setSave] = useState<Save | null>(null);
   const [hasSave, setHasSave] = useState(false);
   const [league, setLeague] = useState<LeagueId>('L1');
-  const [tab, setTab] = useState<'jeu' | 'effectif' | 'classement'>('jeu');
+  const [tab, setTab] = useState<'jeu' | 'effectif' | 'classement' | 'coupes'>('jeu');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => setHasSave(!!load()), []);
@@ -135,10 +135,10 @@ export default function ManagerPage() {
           👛 Salaires : <b className="font-mono">{wages}</b> / {save.wageBudget} M€/an
         </div>
       </div>
-      <div className="mb-3 flex gap-2">
-        {(['jeu', 'effectif', 'classement'] as const).map((t) => (
+      <div className="mb-3 flex flex-wrap gap-2">
+        {(['jeu', 'effectif', 'classement', 'coupes'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`rounded-xl px-3 py-1.5 text-sm font-semibold ${tab === t ? 'bg-white/15' : 'text-zinc-400'}`}>
-            {t === 'jeu' ? '🎮 Partie' : t === 'effectif' ? '👥 Effectif' : '📊 Classement'}
+            {t === 'jeu' ? '🎮 Partie' : t === 'effectif' ? '👥 Effectif' : t === 'classement' ? '📊 Championnat' : '🏆 Coupes'}
           </button>
         ))}
       </div>
@@ -146,6 +146,7 @@ export default function ManagerPage() {
 
       {tab === 'effectif' && <Squad save={save} />}
       {tab === 'classement' && <Table save={save} />}
+      {tab === 'coupes' && <Cups save={save} />}
       {tab === 'jeu' && <Game save={save} update={update} />}
 
       <div className="mt-4 panel p-4">
@@ -564,14 +565,95 @@ function Summary({ save, update }: { save: Save; update: Update }) {
 /* ---------------- Onglets ---------------- */
 
 function Squad({ save }: { save: Save }) {
-  const order = ['GK', 'DEF', 'MID', 'ATT'];
-  const list = [...save.squad].sort((a, b) => order.indexOf(a.pos) - order.indexOf(b.pos) || b.rating - a.rating);
+  const groups: [string, string][] = [['GK', '🧤 Gardiens'], ['DEF', '🛡️ Défenseurs'], ['MID', '⚙️ Milieux'], ['ATT', '⚡ Attaquants']];
   return (
-    <div className="panel space-y-2 p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{save.squad.length} joueurs</h3>
-      {list.map((p) => (
-        <PlayerLine key={p.id} p={p} />
-      ))}
+    <div className="space-y-3">
+      <p className="text-xs text-zinc-500">{save.squad.length} joueurs · MJ = matchs joués · Moy = note moyenne sur 10</p>
+      {groups.map(([pos, label]) => {
+        const list = save.squad.filter((p) => p.pos === pos).sort((a, b) => b.rating - a.rating);
+        return (
+          <div key={pos} className="panel space-y-1 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              {label} ({list.length})
+            </h3>
+            {list.map((p) => {
+              const avg = p.st?.apps ? p.st.rsum / p.st.apps : null;
+              return (
+                <div key={p.id}>
+                  <PlayerLine p={p} />
+                  <div className="mb-1 ml-2 flex flex-wrap gap-3 text-[11px] text-zinc-400">
+                    <span>MJ {p.st?.apps ?? 0}</span>
+                    <span>⚽ {p.st?.goals ?? 0}</span>
+                    <span>🅰️ {p.st?.assists ?? 0}</span>
+                    <span className={avg === null ? '' : avg >= 7 ? 'text-emerald-300' : avg < 6.3 ? 'text-rose-300' : ''}>Moy {avg === null ? '–' : avg.toFixed(2)}</span>
+                    {p.last && <span className="text-zinc-500">Saison passée : {p.last.apps} MJ, {p.last.goals} buts, {p.last.avg.toFixed(2)}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MatchList({ save, list }: { save: Save; list: Save['log'] }) {
+  return (
+    <div className="space-y-1 text-sm">
+      {list.map((m, i) => {
+        const mine = m.home === save.club ? m.hg : m.ag;
+        const theirs = m.home === save.club ? m.ag : m.hg;
+        return (
+          <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-1.5">
+            <span className="text-xs text-zinc-400">{m.label}</span>
+            <span className={mine > theirs ? 'text-emerald-300' : mine < theirs ? 'text-rose-300' : ''}>
+              {m.home} <b className="font-mono">{m.hg}-{m.ag}</b> {m.away}
+              {m.pens && <span className="ml-1 text-xs text-zinc-400">({m.pens})</span>}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Cups({ save }: { save: Save }) {
+  const table = save.euroTable ?? [];
+  return (
+    <div className="space-y-3">
+      <div className="panel p-4">
+        <h3 className="mb-2 font-bold">🏆 {LEAGUES[save.league ?? 'L1'].cup} — {save.cup}</h3>
+        {save.cupLog?.length ? <MatchList save={save} list={save.cupLog} /> : <p className="text-sm text-zinc-500">La coupe commence en hiver.</p>}
+      </div>
+      {save.euro ? (
+        <>
+          <div className="panel p-4">
+            <h3 className="mb-2 font-bold">🌍 {save.euro.name}</h3>
+            {save.euroLog?.length ? <MatchList save={save} list={save.euroLog} /> : <p className="text-sm text-zinc-500">Pas encore de match.</p>}
+          </div>
+          {table.length > 0 && (
+            <div className="panel overflow-x-auto p-4">
+              <h3 className="mb-2 font-bold">Phase de ligue</h3>
+              <table className="w-full text-sm">
+                <thead className="text-xs text-zinc-500">
+                  <tr><th className="text-left">#</th><th className="text-left">Club</th><th>Diff</th><th>Pts</th></tr>
+                </thead>
+                <tbody>
+                  {table.map((r, i) => (
+                    <tr key={r.club} className={`${r.club === save.club ? 'bg-emerald-500/15 font-bold' : ''} ${i < 8 ? 'text-sky-200' : i >= 24 ? 'text-zinc-500' : ''}`}>
+                      <td>{i + 1}</td><td>{r.club}</td><td className="text-center">{r.gd}</td><td className="text-center font-mono font-black">{r.pts}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="mt-2 text-xs text-zinc-500">1-8 : 8es directs · 9-24 : barrages · 25-36 : éliminés</p>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="panel p-4 text-sm text-zinc-500">Pas de coupe d’Europe cette saison.</p>
+      )}
     </div>
   );
 }
