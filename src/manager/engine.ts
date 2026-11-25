@@ -12,7 +12,8 @@ import { FOOTBALLERS, ageFactor, fitsSlot, priceFor } from '@content/footballers
 import { TM_SQUADS as TM_FR_EN } from '@content/tmSquads';
 import { TM_SQUADS_ES } from '@content/tmSquadsEs';
 import { TM_SQUADS_DE } from '@content/tmSquadsDe';
-const TM_SQUADS: Record<string, string[]> = { ...TM_FR_EN, ...TM_SQUADS_ES, ...TM_SQUADS_DE };
+import { TM_SQUADS_IT } from '@content/tmSquadsIt';
+const TM_SQUADS: Record<string, string[]> = { ...TM_FR_EN, ...TM_SQUADS_ES, ...TM_SQUADS_DE, ...TM_SQUADS_IT };
 import type { FootPos, Footballer } from '@shared/types';
 
 /* ------------------------------------------------------------------ */
@@ -121,12 +122,13 @@ export interface Save {
 /* Clubs                                                               */
 /* ------------------------------------------------------------------ */
 
-export type LeagueId = 'L1' | 'PL' | 'LL' | 'BL';
+export type LeagueId = 'L1' | 'PL' | 'LL' | 'BL' | 'SA';
 
 export const LEAGUES: Record<LeagueId, { name: string; dataLeague: string; cup: string; amateurs: string[] }> = {
   L1: { name: 'Ligue 1', dataLeague: 'Ligue 1', cup: 'Coupe de France', amateurs: ['FC Rouen', 'Le Puy Foot', 'US Concarneau', 'Bastia', 'Guingamp', 'Amiens', 'Red Star', 'Grenoble', 'Caen', 'Dunkerque'] },
   LL: { name: 'La Liga', dataLeague: 'La Liga', cup: 'Copa del Rey', amateurs: ['Burgos', 'Sporting Gijón', 'Real Saragosse', 'Almería', 'Cádiz', 'Huesca', 'Albacete', 'Eibar', 'Leganés', 'Córdoba'] },
   BL: { name: 'Bundesliga', dataLeague: 'Bundesliga', cup: 'Coupe d’Allemagne', amateurs: ['Hertha Berlin', 'Fortuna Düsseldorf', 'Hanovre 96', 'Kaiserslautern', 'Nuremberg', 'Karlsruhe', 'Darmstadt', 'Hansa Rostock', 'Dynamo Dresde', 'Arminia Bielefeld'] },
+  SA: { name: 'Serie A', dataLeague: 'Serie A', cup: 'Coupe d’Italie', amateurs: ['Palerme', 'Sampdoria', 'Bari', 'Spezia', 'Empoli', 'Catanzaro', 'Modène', 'Pise', 'Vérone', 'Crémonaise'] },
   PL: { name: 'Premier League', dataLeague: 'Premier League', cup: 'FA Cup', amateurs: ['Wrexham', 'Stockport County', 'Plymouth Argyle', 'Barnsley', 'Wigan', 'Bolton', 'Portsmouth', 'Sheffield Wednesday', 'Derby County', 'Blackburn'] },
 };
 
@@ -197,7 +199,30 @@ export const BL_CLUBS: { name: string; level: number; budget: number }[] = [
   { name: 'Paderborn', level: 69, budget: 8 },
 ];
 
-export const clubsOf = (league: LeagueId = 'L1') => (league === 'PL' ? PL_CLUBS : league === 'LL' ? LL_CLUBS : league === 'BL' ? BL_CLUBS : CLUBS);
+export const SA_CLUBS: { name: string; level: number; budget: number }[] = [
+  { name: 'Inter', level: 82, budget: 90 },
+  { name: 'Naples', level: 81, budget: 80 },
+  { name: 'Juventus', level: 80, budget: 80 },
+  { name: 'AC Milan', level: 80, budget: 80 },
+  { name: 'AS Roma', level: 78, budget: 50 },
+  { name: 'Como', level: 78, budget: 60 },
+  { name: 'Atalanta', level: 78, budget: 50 },
+  { name: 'Lazio', level: 76, budget: 30 },
+  { name: 'Fiorentina', level: 76, budget: 35 },
+  { name: 'Bologne', level: 76, budget: 30 },
+  { name: 'Torino', level: 73, budget: 15 },
+  { name: 'Sassuolo', level: 73, budget: 15 },
+  { name: 'Udinese', level: 73, budget: 15 },
+  { name: 'Genoa', level: 72, budget: 12 },
+  { name: 'Parme', level: 72, budget: 15 },
+  { name: 'Cagliari', level: 71, budget: 10 },
+  { name: 'Lecce', level: 70, budget: 8 },
+  { name: 'Venise', level: 70, budget: 10 },
+  { name: 'Monza', level: 70, budget: 10 },
+  { name: 'Frosinone', level: 69, budget: 8 },
+];
+
+export const clubsOf = (league: LeagueId = 'L1') => (league === 'PL' ? PL_CLUBS : league === 'LL' ? LL_CLUBS : league === 'BL' ? BL_CLUBS : league === 'SA' ? SA_CLUBS : CLUBS);
 
 export const CLUBS: { name: string; level: number; budget: number }[] = [
   { name: 'PSG', level: 81, budget: 150 },
@@ -305,6 +330,9 @@ const norm = (n: string) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').t
 const BY_NAME = new Map(FOOTBALLERS.filter((f) => !f.retired).map((f) => [norm(f.name), f]));
 
 /** Effectif réel (Transfermarkt) : la note vient de la base si le joueur y est, sinon de sa valeur marchande et de son âge */
+/** Bonus de note pour les géants qui dominent leur championnat */
+const CLUB_BOOST: Record<string, number> = { 'Bayern Munich': 3 };
+
 function tmPlayers(club: string, season: number): MPlayer[] | null {
   const rows = TM_SQUADS[club];
   if (!rows) return null;
@@ -313,9 +341,9 @@ function tmPlayers(club: string, season: number): MPlayer[] | null {
     const age = season - Number(year);
     const v = Math.max(0.2, Number(value));
     const known = BY_NAME.get(norm(name));
-    const rating = known
+    const rating = Math.min(92, (CLUB_BOOST[club] ?? 0) + (known
       ? known.rating
-      : Math.max(55, Math.min(88, Math.round(70 + Math.log(v / (3 * ageFactor(age))) / 0.185)));
+      : Math.max(55, Math.min(88, Math.round(70 + Math.log(v / (3 * ageFactor(age))) / 0.185)))));
     const roles = known ? [role, ...known.roles.filter((r) => r !== role)] : [role];
     return {
       id: known?.id ?? `tm-${slugify(name)}`,
@@ -376,6 +404,14 @@ const FIRST_SEASON_EURO: Record<string, string> = {
   Hoffenheim: 'Ligue Europa',
   Leverkusen: 'Ligue Europa',
   Fribourg: 'Ligue Conférence',
+  // Serie A (classement 2025-26)
+  Inter: 'Ligue des champions',
+  Naples: 'Ligue des champions',
+  'AS Roma': 'Ligue des champions',
+  Como: 'Ligue des champions',
+  'AC Milan': 'Ligue Europa',
+  Juventus: 'Ligue Europa',
+  Atalanta: 'Ligue Conférence',
 };
 
 /* ------------------------------------------------------------------ */
@@ -985,7 +1021,7 @@ export function seasonSummary(s: Save) {
   const euro = s.euro ? `${s.euro.name} : ${s.euro.stage}` : '—';
   s.history.push({ season: s.season, rank, cup: s.cup, euro });
   // Primes de fin de saison
-  const prize = Math.max(4, (s.league === 'PL' ? 90 : s.league === 'LL' || s.league === 'BL' ? 60 : 42) - rank * (s.league === 'L1' ? 2 : s.league === 'LL' || s.league === 'BL' ? 3 : 4)) + (s.cup.includes('Vainqueur') ? 6 : 0) + (s.euro?.stage.includes('Vainqueur') ? 40 : 0);
+  const prize = Math.max(4, (s.league === 'PL' ? 90 : s.league === 'LL' || s.league === 'BL' || s.league === 'SA' ? 60 : 42) - rank * (s.league === 'L1' ? 2 : s.league === 'LL' || s.league === 'BL' || s.league === 'SA' ? 3 : 4)) + (s.cup.includes('Vainqueur') ? 6 : 0) + (s.euro?.stage.includes('Vainqueur') ? 40 : 0);
   s.transferBudget += prize;
   s.news.unshift(`💰 Primes de fin de saison : +${prize} M€.`);
   // Les dirigeants jugent la saison : résultat attendu selon le niveau du club
@@ -994,7 +1030,7 @@ export function seasonSummary(s: Save) {
   const diff = expected - rank;
   const euroBonus = s.euro?.stage.includes('Vainqueur') ? 0.1 : s.euro && !['out', 'league'].includes(s.euro.stage) && !s.euro.stage.includes('phase') ? 0.04 : 0;
   const wageF = Math.max(-0.08, Math.min(0.12, diff * 0.015)) + euroBonus + (s.cup.includes('Vainqueur') ? 0.03 : 0);
-  const transferAdj = Math.round(diff * (s.league === 'PL' ? 4 : s.league === 'LL' || s.league === 'BL' ? 3 : 2));
+  const transferAdj = Math.round(diff * (s.league === 'PL' ? 4 : s.league === 'LL' || s.league === 'BL' || s.league === 'SA' ? 3 : 2));
   s.wageBudget = round1(s.wageBudget * (1 + wageF));
   s.transferBudget = Math.max(0, s.transferBudget + transferAdj);
   s.board =

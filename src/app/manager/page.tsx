@@ -92,7 +92,7 @@ export default function ManagerPage() {
         <div className="mb-3 flex gap-2">
           {(Object.keys(LEAGUES) as LeagueId[]).map((l) => (
             <button key={l} onClick={() => setLeague(l)} className={`rounded-xl px-4 py-2 font-bold ${league === l ? 'bg-emerald-500/25 ring-1 ring-emerald-400/50' : 'bg-white/[0.05] text-zinc-400'}`}>
-              {l === 'L1' ? '🇫🇷' : l === 'LL' ? '🇪🇸' : l === 'BL' ? '🇩🇪' : '🏴󠁧󠁢󠁥󠁮󠁧󠁿'} {LEAGUES[l].name}
+              {l === 'L1' ? '🇫🇷' : l === 'LL' ? '🇪🇸' : l === 'BL' ? '🇩🇪' : l === 'SA' ? '🇮🇹' : '🏴󠁧󠁢󠁥󠁮󠁧󠁿'} {LEAGUES[l].name}
             </button>
           ))}
         </div>
