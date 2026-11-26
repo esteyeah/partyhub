@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, Reorder, motion } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PlayerPublic, RoomSnapshot, RoundGameView } from '@shared/types';
 import { Avatar } from '@/components/ui/Avatar';
@@ -236,27 +236,32 @@ function OrderInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
   return (
     <div className="panel space-y-2 p-4">
       <div className="text-center text-xs font-semibold uppercase tracking-wider text-lime-300/80">⬆️ {top}</div>
+      <Reorder.Group axis="y" values={shown} onReorder={(v) => !sent && (setOrder(v), setSel(null))} className="space-y-2">
       {shown.map((item, rank) => (
-        <motion.div
-          layout
+        <Reorder.Item
+          value={item}
           key={item}
+          drag={!sent}
           onClick={() => tap(rank)}
-          className={`flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 ${sel === rank ? 'bg-lime-500/30 ring-2 ring-lime-300' : 'bg-white/5 hover:bg-white/10'}`}
+          whileDrag={{ scale: 1.03, zIndex: 10 }}
+          className={`flex select-none items-center gap-3 rounded-xl px-3 py-2.5 ${sent ? '' : 'cursor-grab active:cursor-grabbing'} ${sel === rank ? 'bg-lime-500/30 ring-2 ring-lime-300' : 'bg-zinc-800 hover:bg-zinc-700'}`}
         >
+          {!sent && <span className="text-zinc-500">⠿</span>}
           <span className="w-6 text-center font-mono text-lg font-black text-lime-300">{rank + 1}</span>
           <span className="flex-1 font-semibold">{items[item]}</span>
           {!sent && (
             <span className="flex gap-1">
-              <button type="button" onClick={(e) => (e.stopPropagation(), move(rank, rank - 1), setSel(null))} disabled={rank === 0} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
+              <button type="button" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), move(rank, rank - 1), setSel(null))} disabled={rank === 0} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
                 ▲
               </button>
-              <button type="button" onClick={(e) => (e.stopPropagation(), move(rank, rank + 1), setSel(null))} disabled={rank === n - 1} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
+              <button type="button" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), move(rank, rank + 1), setSel(null))} disabled={rank === n - 1} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
                 ▼
               </button>
             </span>
           )}
-        </motion.div>
+        </Reorder.Item>
       ))}
+      </Reorder.Group>
       <div className="text-center text-xs font-semibold uppercase tracking-wider text-lime-300/80">⬇️ {bottom}</div>
       {sent ? (
         <p className="text-center text-sm font-semibold text-zinc-300">Classement envoyé 🔒</p>
@@ -265,7 +270,7 @@ function OrderInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
           <button onClick={() => sendAction({ type: 'order', order })} className="w-full rounded-2xl bg-gradient-to-r from-lime-500 to-emerald-600 py-3 font-bold">
             Valider mon classement
           </button>
-          <p className="text-center text-xs text-zinc-500">Touche deux propositions pour les échanger, ou utilise les flèches · −50 pts par rang d’écart</p>
+          <p className="text-center text-xs text-zinc-500">Fais glisser les propositions, touche-en deux pour les échanger, ou utilise les flèches · −50 pts par rang d’écart</p>
         </>
       )}
     </div>
