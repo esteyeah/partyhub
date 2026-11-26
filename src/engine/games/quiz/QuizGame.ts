@@ -32,7 +32,7 @@ export class QuizGame extends RoundGame<QuizQuestion, QuizPrompt, QuizExtra, Set
     // Questions intégrées + questions ajoutées depuis l'espace admin
     const all: QuizQuestion[] = [...QUIZ_QUESTIONS, ...(await loadCustomQuestions())];
     const pool = this.settings.category === 'mix' ? all : all.filter((q) => q.category === this.settings.category);
-    return shuffle(pool).slice(0, this.settings.rounds);
+    return this.fresh(pool).slice(0, this.settings.rounds);
   }
 
   protected buildRound(q: QuizQuestion): RoundSpec<QuizPrompt, QuizExtra> {

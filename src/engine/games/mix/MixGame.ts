@@ -15,6 +15,7 @@ import { RankGame } from '../rank/RankGame';
 import { RoundGame, type ChoiceScore, type RoundSpec } from '../RoundGame';
 import { VideoGame } from '../video/VideoGame';
 import { WhoAmIGame } from '../whoami/WhoAmIGame';
+import { OrderGame } from '../order/OrderGame';
 
 type Settings = { rounds: number; mode: string } & Record<string, string | number | boolean>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,6 +33,7 @@ const SUB_GAMES: Partial<Record<GameId, Ctor>> = {
   dates: DatesGame as unknown as Ctor,
   closest: ClosestGame as unknown as Ctor,
   rank: RankGame as unknown as Ctor,
+  order: OrderGame as unknown as Ctor,
 };
 
 interface MixItem {
@@ -109,6 +111,19 @@ export class MixGame extends RoundGame<MixItem, MixPrompt, MixExtra, Settings> {
 
   protected scoreNumber(m: MixItem, _spec: RoundSpec<MixPrompt, MixExtra>, value: number, ms: number): ChoiceScore {
     return call(m.sub).scoreNumber(m.item, m.inner!, value, ms);
+  }
+
+  protected scoreOrder(m: MixItem, _spec: RoundSpec<MixPrompt, MixExtra>, order: number[], ms: number) {
+    return call(m.sub).scoreOrder(m.item, m.inner!, order, ms);
+  }
+
+  protected historyKey(m: MixItem): string {
+    return m.game;
+  }
+
+  protected historyId(m: unknown): string | undefined {
+    const x = m as MixItem;
+    return x?.sub ? call(x.sub).historyId(x.item) : undefined;
   }
 
   protected matchText(m: MixItem, guess: string, remaining: string[]) {

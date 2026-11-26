@@ -74,6 +74,7 @@ export function RoundStage<P, X>({
         {view.input?.kind === 'choice' && <ChoiceInput view={view} isHost={room.hostId === you} />}
         {view.input?.kind === 'text' && <TextInput view={view} />}
         {view.input?.kind === 'number' && <NumberInput view={view} />}
+        {view.input?.kind === 'order' && !isReveal && <OrderInput view={view} />}
         {isReveal && <RevealPanel view={view} players={room.players} extra={renderReveal?.(view)} />}
       </div>
 
@@ -202,6 +203,72 @@ function VoteTimer<P, X>({ view }: { view: RoundGameView<P, X> }) {
       </div>
       <TimerRing endsAt={view.endsAt} durationMs={d} size={48} />
     </>
+  );
+}
+
+/** Classement : touche une proposition puis une autre pour les échanger, ou utilise les flèches */
+function OrderInput<P, X>({ view }: { view: RoundGameView<P, X> }) {
+  const n = view.input?.kind === 'order' ? view.input.items.length : 0;
+  const [order, setOrder] = useState<number[]>(() => Array.from({ length: n }, (_, i) => i));
+  const [sel, setSel] = useState<number | null>(null);
+  useEffect(() => {
+    setOrder(Array.from({ length: n }, (_, i) => i));
+    setSel(null);
+  }, [view.round, n]);
+  if (view.input?.kind !== 'order') return null;
+  const { items, top, bottom } = view.input;
+  const sent = view.me.locked;
+  const shown = sent && view.me.order ? view.me.order : order;
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= n) return;
+    const next = [...order];
+    [next[from], next[to]] = [next[to], next[from]];
+    setOrder(next);
+  };
+  const tap = (rank: number) => {
+    if (sent) return;
+    if (sel === null) setSel(rank);
+    else {
+      if (sel !== rank) move(sel, rank);
+      setSel(null);
+    }
+  };
+  return (
+    <div className="panel space-y-2 p-4">
+      <div className="text-center text-xs font-semibold uppercase tracking-wider text-lime-300/80">⬆️ {top}</div>
+      {shown.map((item, rank) => (
+        <motion.div
+          layout
+          key={item}
+          onClick={() => tap(rank)}
+          className={`flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 ${sel === rank ? 'bg-lime-500/30 ring-2 ring-lime-300' : 'bg-white/5 hover:bg-white/10'}`}
+        >
+          <span className="w-6 text-center font-mono text-lg font-black text-lime-300">{rank + 1}</span>
+          <span className="flex-1 font-semibold">{items[item]}</span>
+          {!sent && (
+            <span className="flex gap-1">
+              <button type="button" onClick={(e) => (e.stopPropagation(), move(rank, rank - 1), setSel(null))} disabled={rank === 0} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
+                ▲
+              </button>
+              <button type="button" onClick={(e) => (e.stopPropagation(), move(rank, rank + 1), setSel(null))} disabled={rank === n - 1} className="rounded-lg bg-white/10 px-2.5 py-1 disabled:opacity-20">
+                ▼
+              </button>
+            </span>
+          )}
+        </motion.div>
+      ))}
+      <div className="text-center text-xs font-semibold uppercase tracking-wider text-lime-300/80">⬇️ {bottom}</div>
+      {sent ? (
+        <p className="text-center text-sm font-semibold text-zinc-300">Classement envoyé 🔒</p>
+      ) : (
+        <>
+          <button onClick={() => sendAction({ type: 'order', order })} className="w-full rounded-2xl bg-gradient-to-r from-lime-500 to-emerald-600 py-3 font-bold">
+            Valider mon classement
+          </button>
+          <p className="text-center text-xs text-zinc-500">Touche deux propositions pour les échanger, ou utilise les flèches · −50 pts par rang d’écart</p>
+        </>
+      )}
+    </div>
   );
 }
 

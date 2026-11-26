@@ -24,7 +24,7 @@ export class VideoGame extends RoundGame<Item, VideoPrompt, VideoExtra, Settings
       : this.settings.source === 'sequels' ? MEMES.filter((m) => m.kind === 'sequel')
       : this.settings.source === 'quotes' ? MEMES.filter((m) => m.kind !== 'sequel')
       : MEMES;
-    if (this.settings.source !== 'mix') return shuffle([...videos, ...memes]).slice(0, this.settings.rounds);
+    if (this.settings.source !== 'mix') return this.fresh([...videos, ...memes]).slice(0, this.settings.rounds);
     // Mélange : autant de vidéos que de mèmes (si possible), puis on alterne
     const half = Math.ceil(this.settings.rounds / 2);
     const v = shuffle(videos).slice(0, Math.max(half, this.settings.rounds - memes.length));

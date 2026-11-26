@@ -20,7 +20,7 @@ export class BlindTestGame extends RoundGame<Track, BlindPrompt, BlindExtra, Set
     const genre = this.settings.genre as BlindTrack['tags'][number] | 'mix';
     this.pool = genre === 'mix' ? BLIND_TRACKS : BLIND_TRACKS.filter((t) => t.tags.includes(genre));
     // On résout un peu plus de titres que nécessaire au cas où certains n'ont pas d'extrait.
-    const picked = shuffle(this.pool).slice(0, this.settings.rounds + 4);
+    const picked = this.fresh(this.pool).slice(0, this.settings.rounds + 4);
     const resolved = await Promise.all(
       picked.map(async (t): Promise<Track | null> => {
         if (t.previewUrl) return { ...t, audioUrl: t.previewUrl };

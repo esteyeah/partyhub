@@ -24,7 +24,7 @@ export class DatesGame extends RoundGame<DateEvent, DatesPrompt, DatesExtra, Set
   protected prepare() {
     const c = this.settings.cat;
     const pool = c === 'mix' ? DATE_EVENTS : DATE_EVENTS.filter((e) => e.cat === c);
-    return shuffle(pool).slice(0, this.settings.rounds);
+    return this.fresh(pool).slice(0, this.settings.rounds);
   }
 
   protected buildRound(e: DateEvent): RoundSpec<DatesPrompt, DatesExtra> {

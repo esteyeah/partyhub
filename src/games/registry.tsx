@@ -13,6 +13,7 @@ import { QuizView } from './quiz/QuizView';
 import { RankView } from './rank/RankView';
 import type { GameViewComponent } from './types';
 import { VideoView } from './video/VideoView';
+import { OrderView } from './order/OrderView';
 
 /**
  * Registre des vues client : gameId -> composant React.
@@ -32,4 +33,5 @@ export const GAME_VIEWS: Record<GameId, GameViewComponent> = {
   auction: AuctionView,
   closest: ClosestView,
   eleven: ElevenView,
+  order: OrderView as never,
 };

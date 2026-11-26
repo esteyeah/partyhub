@@ -32,7 +32,7 @@ export class ClosestGame extends RoundGame<ClosestQuestion, ClosestPrompt, Close
   protected revealMs = 7000;
 
   protected prepare() {
-    return shuffle(CLOSEST_QUESTIONS).slice(0, this.settings.rounds);
+    return this.fresh(CLOSEST_QUESTIONS).slice(0, this.settings.rounds);
   }
 
   protected buildRound(q: ClosestQuestion): RoundSpec<ClosestPrompt, ClosestExtra> {

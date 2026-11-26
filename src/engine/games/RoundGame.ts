@@ -10,6 +10,7 @@ import type {
   RoundResult,
 } from '@shared/types';
 import { GameModule, speedPoints } from './GameModule';
+import { freshOrder, remember } from '../utils/history';
 
 /** Description d'une manche, construite par chaque jeu à partir de son contenu. */
 export interface RoundSpec<P, X> {
@@ -44,6 +45,7 @@ interface PlayerRoundState {
   correct: boolean;
   label?: string;
   feedback: RoundGameView['me']['feedback'];
+  order?: number[];
 }
 
 export interface ChoiceScore {
@@ -85,6 +87,26 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   /** Charge et tire au sort le contenu de la partie. */
   protected abstract prepare(): Promise<Item[]> | Item[];
   protected abstract buildRound(item: Item, index: number): RoundSpec<P, X>;
+
+  /** Identifiant d'un élément de contenu, pour éviter de le reposer à la partie suivante */
+  protected historyId(item: unknown): string | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const o = item as any;
+    const v = o?.q ?? o?.question ?? o?.text ?? o?.title ?? o?.answer ?? o?.image ?? o?.name ?? o?.clip?.id;
+    return typeof v === 'string' ? v : undefined;
+  }
+  protected historyKey(_item: Item): string {
+    return this.gameId;
+  }
+  /** Mélange en mettant d'abord les éléments jamais (ou le moins récemment) posés */
+  protected fresh<T>(pool: readonly T[]): T[] {
+    return freshOrder(this.gameId, pool, (x) => this.historyId(x));
+  }
+
+  /** Classement (jeu « Classe 7 ») : points selon l'ordre proposé */
+  protected scoreOrder(_item: Item, _spec: RoundSpec<P, X>, _order: number[], _ms: number): ChoiceScore & { label?: string } {
+    return { points: 0, correct: false };
+  }
 
   /** Points d'une réponse QCM (par défaut : bonne réponse + rapidité). */
   protected scoreChoice(_item: Item, spec: RoundSpec<P, X>, choice: number, ms: number): ChoiceScore {
@@ -136,6 +158,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       return;
     }
     this.spec = this.buildRound(this.items[this.index], this.index);
+    remember(this.historyKey(this.items[this.index]), this.historyId(this.items[this.index]));
     this.states.clear();
     this.results = [];
     this.stats = null;
@@ -175,7 +198,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
   private isDone(playerId: string): boolean {
     const s = this.states.get(playerId);
     if (!s || !this.spec) return false;
-    if (this.spec.input.kind === 'choice' || this.spec.input.kind === 'number') return s.choice !== null;
+    if (this.spec.input.kind === 'choice' || this.spec.input.kind === 'number' || this.spec.input.kind === 'order') return s.choice !== null;
     return this.keys().every((k) => s.found.has(k));
   }
 
@@ -233,6 +256,18 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
       const score = this.scoreNumber(item, this.spec, v, ms);
       s.points = score.points;
       s.correct = score.correct;
+    } else if (action.type === 'order' && this.spec.input.kind === 'order') {
+      if (s.choice !== null) return;
+      const n = this.spec.input.items.length;
+      const order = Array.isArray(action.order) ? action.order.map(Number) : [];
+      if (order.length !== n || new Set(order).size !== n || order.some((i) => !Number.isInteger(i) || i < 0 || i >= n)) return;
+      s.choice = 0;
+      s.choiceMs = ms;
+      s.order = order;
+      const score = this.scoreOrder(item, this.spec, order, ms);
+      s.points = score.points;
+      s.correct = score.correct;
+      s.label = score.label;
     } else if (action.type === 'guess' && this.spec.input.kind === 'text') {
       const text = String(action.text ?? '').slice(0, 120);
       const remaining = this.keys().filter((k) => !s.found.has(k));
@@ -388,6 +423,7 @@ export abstract class RoundGame<Item, P, X = unknown, S extends GameSettings = G
         choice: me?.choice ?? null,
         found: me ? [...me.found.keys()] : [],
         feedback: me?.feedback ?? null,
+        order: me?.order,
       },
       reveal:
         this.phase === 'reveal' && spec

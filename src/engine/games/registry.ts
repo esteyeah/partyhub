@@ -15,6 +15,7 @@ import { ClosestGame } from './closest/ClosestGame';
 import { QuizGame } from './quiz/QuizGame';
 import { RankGame } from './rank/RankGame';
 import { VideoGame } from './video/VideoGame';
+import { OrderGame } from './order/OrderGame';
 
 /**
  * Registre des mini-jeux côté serveur.
@@ -50,6 +51,7 @@ export const GAME_REGISTRY: Record<GameId, GameDefinition> = {
   mix: { create: (ctx, s) => new MixGame(ctx, s as never), availability: always },
   auction: { create: (ctx, s) => new AuctionGame(ctx, s as never), availability: always },
   closest: { create: (ctx, s) => new ClosestGame(ctx, s as never), availability: always },
+  order: { create: (ctx, s) => new OrderGame(ctx, s as never), availability: always },
   eleven: { create: (ctx, s) => new ElevenGame(ctx, s as never), availability: always },
 };
 

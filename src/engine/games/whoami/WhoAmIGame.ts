@@ -27,7 +27,7 @@ export class WhoAmIGame extends RoundGame<WhoItem, WhoPrompt, WhoExtra, Settings
   protected prepare() {
     const c = this.settings.category;
     const pool = c === 'mix' ? WHO_ITEMS : c === 'hard' ? WHO_ITEMS.filter((w) => w.hard) : WHO_ITEMS.filter((w) => w.cat === c);
-    return shuffle(pool).slice(0, this.settings.rounds);
+    return this.fresh(pool).slice(0, this.settings.rounds);
   }
 
   protected buildRound(item: WhoItem): RoundSpec<WhoPrompt, WhoExtra> {

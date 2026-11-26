@@ -29,7 +29,7 @@ export class PixelGame extends RoundGame<Item, PixelPrompt, PixelExtra, Settings
     const cat = this.settings.category;
     this.pool = cat === 'mix' ? PIXEL_ITEMS : PIXEL_ITEMS.filter((p) => p.cat === cat);
     // Un peu plus que nécessaire au cas où certaines images manquent
-    const picked = shuffle(this.pool).slice(0, this.settings.rounds + 6);
+    const picked = this.fresh(this.pool).slice(0, this.settings.rounds + 6);
     const images = await resolveWikiImages(picked.map((p) => p.wiki));
     return picked
       .filter((p) => images.has(p.wiki))

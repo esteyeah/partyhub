@@ -16,6 +16,8 @@ export interface QuizQuestion {
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   // 🌍 Culture générale
+  { category: 'culture', question: 'Dans une série comique, qui répète régulièrement « N’est-elle pas grandiose ? »', choices: ['Franklin (Ma famille d’abord)', 'Junior (Ma famille d’abord)', 'Steve Urkel (La Vie de famille)', 'Carlton (Le Prince de Bel-Air)'], answer: 0 },
+  { category: 'culture', question: 'Quand le rappeur Werenoi est-il mort ?', choices: ['Février 2025', 'Novembre 2024', 'Juin 2025', 'Mars 2024'], answer: 0, explanation: 'Werenoi est mort le 17 février 2025, à 31 ans.' },
   { category: 'culture', question: 'Quelle est la capitale de l’Australie ?', choices: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], answer: 2 },
   { category: 'culture', question: 'Combien de cœurs possède une pieuvre ?', choices: ['1', '2', '3', '8'], answer: 2, explanation: 'Deux cœurs pour les branchies, un pour le reste du corps.' },
   { category: 'culture', question: 'Quel est le plus grand océan du monde ?', choices: ['Atlantique', 'Indien', 'Pacifique', 'Arctique'], answer: 2 },

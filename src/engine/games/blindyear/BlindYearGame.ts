@@ -7,7 +7,7 @@ import { RoundGame, type ChoiceScore, type RoundSpec } from '../RoundGame';
 type Settings = { rounds: number; time: string; scope: string };
 type Item = YearTrack & { audioUrl: string; artwork?: string };
 
-const MIN_YEAR = 1950;
+const MIN_YEAR = 1700;
 const MAX_YEAR = new Date().getFullYear();
 
 /**
@@ -32,7 +32,7 @@ export class BlindYearGame extends RoundGame<Item, BlindYearPrompt, BlindYearExt
     const pool = YEAR_TRACKS.filter((t) =>
       scope === 'fr' ? t.fr : scope === 'inter' ? !t.fr : scope === 'old' ? t.year < 2000 : scope === 'new' ? t.year >= 2000 : true,
     );
-    const picked = shuffle(pool).slice(0, this.settings.rounds + 4);
+    const picked = this.fresh(pool).slice(0, this.settings.rounds + 4);
     const resolved = await Promise.all(
       picked.map(async (t): Promise<Item | null> => {
         const r = await resolvePreview(t.artist, t.title);

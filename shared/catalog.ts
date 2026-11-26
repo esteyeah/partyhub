@@ -309,7 +309,21 @@ export const GAME_CATALOG: Record<GameId, GameMeta> = {
       { key: 'g_movietitle', label: '🎞️ Devine le film', type: 'boolean', default: true },
       { key: 'g_dates', label: '🏛️ Devine la date', type: 'boolean', default: true },
       { key: 'g_closest', label: '🎯 Au plus proche', type: 'boolean', default: true },
+      { key: 'g_order', label: '🔢 Classe 7', type: 'boolean', default: true },
       { key: 'g_rank', label: '🏆 Devine le rang', type: 'boolean', default: true },
+    ],
+  },
+  order: {
+    id: 'order',
+    name: 'Classe 7',
+    emoji: '🔢',
+    tagline: 'Remets 7 propositions dans le bon ordre',
+    description:
+      'Un thème, 7 propositions (dates, âges, valeurs marchandes, populations, matchs à l’OM…) à classer. Chaque rang d’écart coûte 50 points : place Indila 4e au lieu de 1re et tu perds 150 points. Prends le temps de réfléchir, il y a des pièges !',
+    gradient: 'from-lime-500 to-emerald-600',
+    settings: [
+      { key: 'rounds', label: 'Thèmes', type: 'number', min: 3, max: 15, default: 6 },
+      { key: 'time', label: 'Temps / thème', type: 'select', options: timeOptions([60, 90, 120]), default: '90' },
     ],
   },
   closest: {

@@ -4,7 +4,7 @@
  * les "vues" (snapshots) qu'il reçoit et envoyer des actions.
  */
 
-export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'auction' | 'closest' | 'eleven';
+export type GameId = 'quiz' | 'blindtest' | 'video' | 'rank' | 'pixel' | 'whoami' | 'movietitle' | 'blindyear' | 'dates' | 'mix' | 'auction' | 'closest' | 'eleven' | 'order';
 
 export type SettingValue = string | number | boolean;
 export type GameSettings = Record<string, SettingValue>;
@@ -91,7 +91,9 @@ export type RoundInput =
   | { kind: 'choice'; choices: string[]; layout: 'grid' | 'ladder' }
   | { kind: 'text'; placeholder: string; keys: { key: string; label: string }[] }
   /** Réponse chiffrée (ex : une année) : une seule proposition, verrouillée */
-  | { kind: 'number'; placeholder: string; min: number; max: number; decimals?: boolean };
+  | { kind: 'number'; placeholder: string; min: number; max: number; decimals?: boolean }
+  /** Remettre des propositions dans l'ordre (jeu « Classe 7 ») */
+  | { kind: 'order'; items: string[]; top: string; bottom: string };
 
 export type ProgressStatus = 'waiting' | 'answered' | 'partial' | 'done';
 
@@ -126,6 +128,8 @@ export interface RoundGameView<P = unknown, X = unknown> {
     choice: number | null;
     found: string[];
     feedback: { type: 'close' | 'wrong' | 'found'; text: string; id: number } | null;
+    /** Classement envoyé (indices des propositions, du 1er au dernier) */
+    order?: number[];
   };
   /** Chrono affiché seulement pendant les `voteMs` dernières ms (vidéo en cours avant) */
   voteMs?: number;
@@ -227,6 +231,16 @@ export interface DatesExtra {
 }
 
 /** Méli-mélo : une manche d'un autre jeu, emballée */
+export interface OrderPrompt {
+  question: string;
+}
+export interface OrderExtra {
+  /** Bon ordre : indices des propositions */
+  correct: number[];
+  /** Valeur affichée pour chaque proposition (ex : « 613 matchs ») */
+  shows: string[];
+}
+
 export interface MixPrompt {
   game: GameId;
   inner: unknown;
@@ -406,6 +420,8 @@ export type GameAction =
   | { type: 'guess'; text: string }
   /** Réponse chiffrée (ex : une année) */
   | { type: 'number'; value: number }
+  /** Classement : indices des propositions dans l'ordre choisi */
+  | { type: 'order'; order: number[] }
   | { type: 'pick'; footballerId: string }
   /** Enchères : offre (montant en M€) ou passer son tour */
   | { type: 'bid'; amount: number }

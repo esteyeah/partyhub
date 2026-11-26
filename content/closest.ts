@@ -23,6 +23,8 @@ export const CLOSEST_QUESTIONS: ClosestQuestion[] = [
   y('En quelle année est né Squeezie ?', 1996),
   y('En quelle année est né Jul ?', 1990),
   y('En quelle année est sorti le premier iPhone ?', 2007),
+  y('En quelle année est sorti le tout premier GTA ?', 1997),
+  y('En quelle année est mort le rappeur Werenoi ?', 2025),
   // — Sport —
   n('Quel est le record du monde du triple saut masculin ?', 18.29, 'm', true),
   n('Quel est le record du monde du 100 m (Usain Bolt) ?', 9.58, 's', true),

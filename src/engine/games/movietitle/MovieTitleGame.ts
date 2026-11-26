@@ -23,7 +23,7 @@ export class MovieTitleGame extends RoundGame<MovieTitle, MovieTitlePrompt, Movi
     const pool = l === 'mix' ? MOVIE_TITLES : MOVIE_TITLES.filter((m) => m.lang === l);
     // Évite deux fois le même film dans une partie
     const seen = new Set<string>();
-    return shuffle(pool).filter((m) => (seen.has(m.answer) ? false : (seen.add(m.answer), true))).slice(0, this.settings.rounds);
+    return this.fresh(pool).filter((m) => (seen.has(m.answer) ? false : (seen.add(m.answer), true))).slice(0, this.settings.rounds);
   }
 
   protected buildRound(m: MovieTitle): RoundSpec<MovieTitlePrompt, MovieTitleExtra> {
